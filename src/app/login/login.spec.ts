@@ -1,23 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { LoginComponent } from './login';
+import { ReactiveFormsModule } from '@angular/forms';
 
-import { Login } from './login';
-
-describe('Login', () => {
-  let component: Login;
-  let fixture: ComponentFixture<Login>;
-
+describe('LoginComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Login]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(Login);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+      imports: [LoginComponent, ReactiveFormsModule], // <- adicionado
+    }).compileComponents();
   });
 
   it('should create', () => {
+    const fixture = TestBed.createComponent(LoginComponent);
+    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
 });
