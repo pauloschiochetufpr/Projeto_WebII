@@ -1,0 +1,61 @@
+Create DATABASE manutencao
+
+Use manutencao
+
+Create Table cliente(
+idCliente int primary key auto increment
+nome varchar(50) not null
+email varchar(50) not null unique
+endereco int
+telefone varchar(11) not null
+senha varchar(4) not null
+constraint fkEndereco foreign key (endereco) references endereco(idEndereco)
+);
+
+Create Table endereço(
+idEndereco int primary key auto increment
+cep int not null
+numero int not null
+constraint fkCep foreign key (cep) references cep(cep)
+);
+
+Create Table Cep(
+cep int primary key
+);
+
+create Table categoria(
+idCategoria int primary key auto increment
+nome varchar(30) not null
+);
+
+Create Table funcionario(
+idFuncionario int primary key auto increment
+nome varchar(50) not null
+email varchar(50) not null unique
+dataNasc date not null
+telefone varchar(11) not null
+senha varchar(4) not null
+);
+
+create Table solicitacao(
+idSolicitacao int primary key auto increment
+nome varchar(50) not null
+descricao varchar(255) not null
+Status varchar(15) not null
+categoria int not null
+constraint fkCategoria foreign key (categoria) references categoria(idCategoria)
+);
+
+create Table HistSolicitacao(
+idHistorico int primary key auto increment
+dataHora datetime not null
+solicitacao int not null
+cliente int
+statusOld varchar(15)
+statusNew varchar(15)
+funcionarioOld int
+funcionarioNew int
+constraint fkSolicitacao foreign key (solicitacao) references solicitacao(idSolicitacao)
+constraint fkCliente foreign key (cliente) references cliente(idCliente)
+constraint fkFuncionario foreign key (funcionario) references funcionario(idFuncionario)
+);
