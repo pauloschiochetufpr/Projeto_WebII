@@ -1,24 +1,50 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
-
-# Node
-/node_modules
+# ======================================
+# FRONTEND (Angular / Node)
+# ======================================
+/frontend/node_modules
+/frontend/dist
+/frontend/tmp
+/frontend/out-tsc
+/frontend/bazel-out
+/frontend/.angular/cache
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
+# ======================================
+# BACKEND (Spring Boot / Maven)
+# ======================================
+/backend/target
+/backend/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ======================================
+# IDEs e editores
+# ======================================
+# IntelliJ IDEA
 .idea/
-.project
+*.iws
+*.iml
+*.ipr
+
+# Eclipse / STS
+.apt_generated
 .classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # Visual Studio Code
 .vscode/*
@@ -26,17 +52,16 @@ yarn-error.log
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history/*
 
+# ======================================
 # Miscellaneous
-/.angular/cache
+# ======================================
 .sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
 testem.log
 /typings
-
-# System files
+/.history
 .DS_Store
 Thumbs.db
