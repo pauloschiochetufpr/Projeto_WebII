@@ -1,35 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Listar soliticações</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Listar soliticações</title>
 
-  <link rel="stylesheet" href="listar.css">
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h2>Listar soliticações (parte do Funcionário)</h2>
-      <div class="controls" aria-label="controles de filtro">
-        <label><input type="radio" name="filtro" value="TODAS" checked> Todas</label>
-        <label><input type="radio" name="filtro" value="HOJE"> Hoje</label>
-        <label><input type="radio" name="filtro" value="PERIODO"> Período</label>
-        <input type="date" id="dateFrom" style="display:none">
-        <input type="date" id="dateTo" style="display:none">
-        <button id="refreshBtn">Atualizar</button>
+    <link rel="stylesheet" href="listar.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Listar soliticações (parte do Funcionário)</h2>
+        <div class="controls" aria-label="controles de filtro">
+          <label>
+            <input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="TODAS"
+              checked
+            />
+            Todas
+          </label>
+          <label
+            ><input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="HOJE"
+            />
+            Hoje</label
+          >
+          <label
+            ><input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="PERIODO"
+            />
+            Período</label
+          >
+          <ng-container *ngIf="filtro === 'PERIODO'">
+            <mat-form-field appearance="fill">
+              <mat-label>Data Início</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerStart"
+                formControlName="dateFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerStart"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Data Fim</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerEnd"
+                formControlName="dateTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerEnd"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerEnd></mat-datepicker>
+            </mat-form-field>
+          </ng-container>
+
+          <button id="refreshBtn">Atualizar</button>
+        </div>
       </div>
-    </div>
-    
-    <p class="summary" id="summary">Carregando...</p>
 
-    <table class="table" id="table">
-      <thead>
-        <tr><th>Data / Hora</th><th>ID</th><th>Cliente</th><th>Descrição</th><th>Estado</th><th>Destino</th></tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
-  <script type="module" src="listar.ts"></script>
-</body>
+      <p class="summary" id="summary">Carregando...</p>
+
+      <table class="table" id="table">
+        <thead>
+          <tr>
+            <th>Data / Hora</th>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Descrição</th>
+            <th>Estado</th>
+            <th>Destino</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <script type="module" src="listar.ts"></script>
+  </body>
 </html>
