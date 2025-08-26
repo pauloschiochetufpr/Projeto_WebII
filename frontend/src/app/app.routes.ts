@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login';
-import { BtnFormCrudWorkersComponent } from './btn-form-crud-workers/btn-form-crud-workers.component';
-import { CrudWorkersComponent } from './crud-workers/crud-workers.component';
-import { Listar } from './listar/listar';
+import { LoginComponent } from './pages/login/login';
+import { BtnFormCrudWorkersComponent } from './components/btn-form-crud-workers/btn-form-crud-workers.component';
+import { CrudWorkersComponent } from './pages/crud-workers/crud-workers.component';
+import { Listar } from './pages/listar/listar';
 
 export const routes: Routes = [
   { path: 'listar', component: Listar },
