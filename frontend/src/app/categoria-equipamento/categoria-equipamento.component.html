@@ -1,0 +1,39 @@
+
+  <h1>Gerenciar Categorias de Equipamento</h1>
+
+  <!-- Formulário de Inserção -->
+  <form id="formCategoria">
+    <label for="nomeCategoria">Nova Categoria:</label>
+    <input type="text" id="nomeCategoria" name="nomeCategoria" required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <!-- Tabela de Listagem -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome da Categoria</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="listaCategorias">
+      <tr>
+        <td>1</td>
+        <td>Notebook</td>
+        <td>
+          <button>Editar</button>
+          <button>Remover</button>
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Impressora</td>
+        <td>
+          <button>Editar</button>
+          <button>Remover</button>
+        </td>
+      </tr>
+      <!-- Outras categorias podem ser adicionadas dinamicamente -->
+    </tbody>
+  </table>
