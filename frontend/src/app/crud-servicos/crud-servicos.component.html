@@ -1,0 +1,35 @@
+<h2>CRUD de Serviços</h2>
+<p>Criei o html mas isso é coisa pro back.</p>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>CRUD Serviços</title>
+
+    <link rel="stylesheet" href="crud-servicos.component.css" />
+
+</head>
+<body>
+  <h1>Gerenciamento de Serviços</h1>
+
+  <form id="serviceForm">
+    <input type="text" id="descricao" placeholder="Descrição do serviço" required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Descrição</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="serviceTable"></tbody>
+  </table>
+
+  <script src="crud-servicos.component.js"></script>
+</body>
+</html>
