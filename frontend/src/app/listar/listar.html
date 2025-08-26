@@ -41,33 +41,7 @@
             Período</label
           >
           <ng-container *ngIf="filtro === 'PERIODO'">
-            <mat-form-field appearance="fill">
-              <mat-label>Data Início</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerStart"
-                formControlName="dateFrom"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="pickerStart"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #pickerStart></mat-datepicker>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill">
-              <mat-label>Data Fim</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerEnd"
-                formControlName="dateTo"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="pickerEnd"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #pickerEnd></mat-datepicker>
-            </mat-form-field>
+            <rangeDatePicker></rangeDatePicker>
           </ng-container>
 
           <button id="refreshBtn">Atualizar</button>
