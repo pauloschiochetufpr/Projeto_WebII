@@ -48,6 +48,10 @@ yarn-error.log
 
 # Visual Studio Code
 .vscode/*
+.vscode
+frontend/.vscode/*
+frontend/.vscode/
+frontend/.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

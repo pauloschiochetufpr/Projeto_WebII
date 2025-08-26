@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {
   FormBuilder,
   FormGroup,
@@ -16,7 +17,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   cadastroForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     // Login //
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,23 +41,36 @@ export class LoginComponent {
   // Submits |
   // --------|
 
+  //ainda precisa arrumar o retorno também
   onLoginSubmit() {
     if (this.loginForm.valid) {
-      console.log('Login enviado:', this.loginForm.value);
-    } else {
-      console.log('Login inválido');
+      this.http
+        .post('http://localhost:8080/api/login', this.loginForm.value, {
+          responseType: 'text',
+        })
+        .subscribe({
+          next: (res) => console.log(res),
+          error: (err) => console.error(err),
+        });
     }
   }
 
+  //Mais tarde preciso arrumar o retorno
   onCadastroSubmit() {
     if (this.cadastroForm.valid) {
       const formValue = { ...this.cadastroForm.value };
       formValue.cpf = formValue.cpf.replace(/\D/g, '');
       formValue.cep = formValue.cep.replace(/\D/g, '');
       formValue.telefone = formValue.telefone.replace(/\D/g, '');
-      console.log('Cadastro enviado:', formValue);
-    } else {
-      console.log('Cadastro inválido');
+
+      this.http
+        .post('http://localhost:8080/api/cadastro', formValue, {
+          responseType: 'text',
+        })
+        .subscribe({
+          next: (res) => console.log(res),
+          error: (err) => console.error(err),
+        });
     }
   }
 

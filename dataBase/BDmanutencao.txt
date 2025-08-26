@@ -1,67 +1,86 @@
-Create DATABASE manutencao
+drop database manutencao;
 
-Use manutencao
+Create DATABASE manutencao;
 
-Create Table cliente(
-idCliente int primary key auto increment,
-nome varchar(50) not null,
-email varchar(50) not null unique,
-endereco int,
-telefone varchar(11) not null,
-senha varchar(4) not null
-constraint fkEndereco foreign key (endereco) references endereco(idEndereco)
+Use manutencao;
+
+CREATE TABLE Cep (
+    cep VARCHAR(8) PRIMARY KEY
 );
 
-Create Table endereço(
-idEndereco int primary key auto increment,
-cep int not null,
-numero int not null
-constraint fkCep foreign key (cep) references cep(cep)
+CREATE TABLE endereco (
+    idEndereco INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(8) NOT NULL,
+    numero INT NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (cep)
+        REFERENCES Cep (cep)
 );
 
-Create Table Cep(
-cep int primary key
+CREATE TABLE cliente (
+    idCliente INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    nome VARCHAR(64) NOT NULL,
+    email VARCHAR(128) NOT NULL UNIQUE,
+    idEndereco INT UNSIGNED,
+    telefone VARCHAR(13) NOT NULL,
+    senha VARCHAR(4) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (idEndereco)
+        REFERENCES endereco (idEndereco)
 );
 
-create Table categoria(
-idCategoria int primary key auto increment,
-nome varchar(30) not null
+CREATE TABLE categoria (
+    idCategoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    ativo BOOLEAN DEFAULT TRUE,
+    nome VARCHAR(64) NOT NULL
 );
 
-Create Table funcionario(
-idFuncionario int primary key auto increment,
-nome varchar(50) not null,
-email varchar(50) not null unique,
-dataNasc date not null,
-telefone varchar(11) not null,
-senha varchar(4) not null
+CREATE TABLE funcionario (
+    idFuncionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(64) NOT NULL,
+    email VARCHAR(128) NOT NULL UNIQUE,
+    dataNasc DATE NOT NULL,
+    telefone VARCHAR(13) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    senha VARCHAR(4) NOT NULL
 );
 
-create Table status(
-    idStatus int primary key auto increment,
-    status varchar(15) not null
-)
-
-create Table solicitacao(
-idSolicitacao int primary key auto increment,
-nome varchar(50) not null,
-descricao varchar(255) not null,
-status int not null,
-categoria int not null
-constraint fkCategoria foreign key (categoria) references categoria(idCategoria)
-constraint fkStatus foreign key (status) references status(idStatus)
+CREATE TABLE stat (
+    idStatus INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    status VARCHAR(15) NOT NULL
 );
 
-create Table HistSolicitacao(
-idHistorico int primary key auto increment,
-dataHora datetime not null,
-solicitacao int not null,
-cliente int,
-statusOld varchar(15),
-statusNew varchar(15),
-funcionarioOld int,
-funcionarioNew int
-constraint fkSolicitacao foreign key (solicitacao) references solicitacao(idSolicitacao)
-constraint fkCliente foreign key (cliente) references cliente(idCliente)
-constraint fkFuncionario foreign key (funcionario) references funcionario(idFuncionario)
+CREATE TABLE solicitacao (
+    idSolicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(64) NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    idCliente INT UNSIGNED,
+    valor DECIMAL(10 , 2 ),
+    idStatus INT UNSIGNED NOT NULL,
+    idCategoria INT UNSIGNED UNSIGNED NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (idCategoria)
+        REFERENCES categoria (idCategoria),
+    FOREIGN KEY (idStatus)
+        REFERENCES stat (idStatus),
+    FOREIGN KEY (idCliente)
+        REFERENCES cliente (idCliente)
+);
+
+CREATE TABLE HistSolicitacao (
+    idHistorico INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    dataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    idSolicitacao INT UNSIGNED NOT NULL,
+    cliente BOOLEAN,
+    statusOld VARCHAR(32),
+    statusNew VARCHAR(32),
+    funcionarioOld INT UNSIGNED,
+    funcionarioNew INT UNSIGNED,
+    FOREIGN KEY (idSolicitacao)
+        REFERENCES solicitacao (idSolicitacao),
+    FOREIGN KEY (funcionarioNew)
+        REFERENCES funcionario (idFuncionario),
+    FOREIGN KEY (funcionarioOld)
+        REFERENCES funcionario (idFuncionario)
 );

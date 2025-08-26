@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login';
-import { App } from './app';
 import { BtnFormCrudWorkersComponent } from './btn-form-crud-workers/btn-form-crud-workers.component';
 import { CrudWorkersComponent } from './crud-workers/crud-workers.component';
 import { Listar } from './listar/listar';

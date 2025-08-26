@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 describe('LoginComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginComponent, ReactiveFormsModule], // <- adicionado
+      imports: [LoginComponent, ReactiveFormsModule],
     }).compileComponents();
   });
 
