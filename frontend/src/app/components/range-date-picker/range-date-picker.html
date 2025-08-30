@@ -1,10 +1,22 @@
-<mat-form-field>
-  <mat-label>Enter a date range</mat-label>
-  <mat-date-range-input [rangePicker]="picker">
-    <input matStartDate placeholder="Start date" />
-    <input matEndDate placeholder="End date" />
+<mat-form-field class="block">
+  <mat-label lass="text-sm text-gray-600">Enter a date range</mat-label>
+  <mat-date-range-input [rangePicker]="picker" class="w-full">
+    <input
+      matStartDate
+      placeholder="Start date"
+      class="w-full bg-transparent px-3 py-2 text-sm text-gray-800 focus:outline-none"
+    />
+    <input
+      matEndDate
+      placeholder="End date"
+      class="w-full bg-transparent px-3 py-2 text-sm text-gray-800 focus:outline-none"
+    />
   </mat-date-range-input>
-  <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-hint class="text-xs text-gray-500">MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+  <mat-datepicker-toggle
+    matIconSuffix
+    [for]="picker"
+    class="ml-2"
+  ></mat-datepicker-toggle>
   <mat-date-range-picker #picker></mat-date-range-picker>
 </mat-form-field>

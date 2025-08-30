@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 1) Dim do backdrop */
+.cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+/* 2) Forçar o fundo e borda do painel do datepicker) */
+.cdk-overlay-container .mat-datepicker-content,
+.cdk-overlay-container .mat-calendar,
+.cdk-overlay-container .mat-calendar-header,
+.cdk-overlay-container .mat-calendar-body {
+  background-color: #ffffff !important; /* fundo branco */
+  color: #111827 !important; /* texto escuro (gray-900) */
+}
+
+/* 3) Aparência do painel (sombra e canto arredondado) */
+.cdk-overlay-container .mat-datepicker-content {
+  border-radius: 0.5rem !important; /* rounded-md */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+}
+
+/* 4) Cores das células e do header */
+.cdk-overlay-container .mat-calendar-header {
+  background-color: #ffffff !important;
+}
+
+.cdk-overlay-container .mat-calendar-body-cell-content {
+  color: #111827 !important;
+}
