@@ -1,35 +1,30 @@
-<h2>CRUD de Serviços</h2>
-<p>Criei o html mas isso é coisa pro back.</p>
+<h2>Gerenciamento de Serviços</h2>
+// tirei o doctype, não é necessário no html do angular, na vdd é bem burro
+<input [(ngModel)]="novaDescricao" placeholder="Descrição do serviço">
+<button (click)="adicionarServico()">Adicionar</button>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <title>CRUD Serviços</title>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Status</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let s of servicos">
+      <td>{{s.id}}</td>
+      <td>{{s.descricao}}</td>
+      <td>{{s.status}}</td>
+      <td>
+        <button (click)="editarServico(s.id)">Editar</button>
+        <button (click)="excluirServico(s.id)">Excluir</button>
+        <button (click)="atualizarStatus(s.id)">Status</button>
+        <button (click)="inativarServico(s.id)">Inativar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-    <link rel="stylesheet" href="crud-servicos.component.css" />
 
-</head>
-<body>
-  <h1>Gerenciamento de Serviços</h1>
-
-  <form id="serviceForm">
-    <input type="text" id="descricao" placeholder="Descrição do serviço" required>
-    <button type="submit">Adicionar</button>
-  </form>
-
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Descrição</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="serviceTable"></tbody>
-  </table>
-
-  <script src="crud-servicos.component.js"></script>
-</body>
-</html>
