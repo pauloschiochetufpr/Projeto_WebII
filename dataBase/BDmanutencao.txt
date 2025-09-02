@@ -11,7 +11,7 @@ CREATE TABLE Cep (
 CREATE TABLE endereco (
     idEndereco INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
-    numero INT NOT NULL,
+    complemento varchar(128) NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (cep)
         REFERENCES Cep (cep)
@@ -24,7 +24,8 @@ CREATE TABLE cliente (
     email VARCHAR(128) NOT NULL UNIQUE,
     idEndereco INT UNSIGNED,
     telefone VARCHAR(13) NOT NULL,
-    senha VARCHAR(4) NOT NULL,
+    senha_hash VARCHAR(64) NOT NULL,
+    salt VARCHAR(16) NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (idEndereco)
         REFERENCES endereco (idEndereco)
@@ -42,8 +43,9 @@ CREATE TABLE funcionario (
     email VARCHAR(128) NOT NULL UNIQUE,
     dataNasc DATE NOT NULL,
     telefone VARCHAR(13) NOT NULL,
-    ativo BOOLEAN DEFAULT TRUE,
-    senha VARCHAR(4) NOT NULL
+	senha_hash VARCHAR(64) NOT NULL,
+    salt VARCHAR(16) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE stat (
