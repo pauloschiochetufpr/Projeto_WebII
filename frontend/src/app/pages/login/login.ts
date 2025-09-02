@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import {
   FormBuilder,
   FormGroup,
@@ -7,6 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +17,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   cadastroForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -41,21 +41,16 @@ export class LoginComponent {
   // Submits |
   // --------|
 
-  //ainda precisa arrumar o retorno também
   onLoginSubmit() {
     if (this.loginForm.valid) {
-      this.http
-        .post('http://localhost:8080/api/login', this.loginForm.value, {
-          responseType: 'text',
-        })
-        .subscribe({
-          next: (res) => console.log(res),
-          error: (err) => console.error(err),
-        });
+      const { email, password } = this.loginForm.value;
+      this.authService.login(email, password).subscribe({
+        next: (res) => console.log('Login OK:', res),
+        error: (err) => console.error('Erro login:', err),
+      });
     }
   }
 
-  //Mais tarde preciso arrumar o retorno
   onCadastroSubmit() {
     if (this.cadastroForm.valid) {
       const formValue = { ...this.cadastroForm.value };
@@ -63,14 +58,10 @@ export class LoginComponent {
       formValue.cep = formValue.cep.replace(/\D/g, '');
       formValue.telefone = formValue.telefone.replace(/\D/g, '');
 
-      this.http
-        .post('http://localhost:8080/api/cadastro', formValue, {
-          responseType: 'text',
-        })
-        .subscribe({
-          next: (res) => console.log(res),
-          error: (err) => console.error(err),
-        });
+      this.authService.cadastro(formValue).subscribe({
+        next: (res) => console.log('Cadastro OK:', res),
+        error: (err) => console.error('Erro cadastro:', err),
+      });
     }
   }
 
@@ -110,7 +101,6 @@ export class LoginComponent {
     const cpf = control.value.replace(/\D/g, '');
     if (cpf.length !== 11) return { cpfInvalido: true };
 
-    // Inicio: Calculo do 1º dígito verificador
     let sum = 0;
     let remainder: number;
 
@@ -120,9 +110,7 @@ export class LoginComponent {
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.substring(9, 10)))
       return { cpfInvalido: true };
-    // Fim: Calculo do 1º dígito verificador
-    //
-    //Inicio: Calculo o 2º dígito verificador
+
     sum = 0;
     for (let i = 1; i <= 10; i++)
       sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
@@ -130,8 +118,7 @@ export class LoginComponent {
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.substring(10, 11)))
       return { cpfInvalido: true };
-    // Fim: Calculo do 2º dígito verificador
 
-    return null; // CPF é valido
+    return null;
   }
 }
