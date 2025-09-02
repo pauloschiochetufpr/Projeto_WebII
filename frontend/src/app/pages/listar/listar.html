@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Listar soliticações</title>
+    <title>Listar solicitações</title>
 
     <link rel="stylesheet" href="listar.css" />
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h2>Listar soliticações (parte do Funcionário)</h2>
+        <h2>Listar solicitações (parte do Funcionário)</h2>
         <div class="controls" aria-label="controles de filtro">
           <label>
             <input
@@ -22,33 +22,39 @@
             />
             Todas
           </label>
-          <label
-            ><input
+          <label>
+            <input
               type="radio"
               name="filtro"
               [(ngModel)]="filtro"
               value="HOJE"
             />
-            Hoje</label
-          >
-          <label
-            ><input
+            Hoje
+          </label>
+          <label>
+            <input
               type="radio"
               name="filtro"
               [(ngModel)]="filtro"
               value="PERIODO"
             />
-            Período</label
-          >
+            Período
+          </label>
+          
           <ng-container *ngIf="filtro === 'PERIODO'">
             <rangeDatePicker></rangeDatePicker>
           </ng-container>
 
-          <button id="refreshBtn">Atualizar</button>
+          <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
         </div>
       </div>
 
-      <p class="summary" id="summary">Carregando...</p>
+      <!-- resumo do status da leitura -->
+      <p class="summary" id="summary">
+        <ng-container *ngIf="loading">Carregando...</ng-container>
+        <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
+        <ng-container *ngIf="error" class="error">{{ error }}</ng-container>
+      </p>
 
       <table class="table" id="table">
         <thead>
@@ -61,7 +67,21 @@
             <th>Destino</th>
           </tr>
         </thead>
-        <tbody id="tbody"></tbody>
+        <tbody>
+          <tr *ngFor="let s of listaFiltrada">
+            <td>{{ s.createdAt | date: 'short' }}</td>
+            <td>{{ s.id }}</td>
+            <td>{{ s.requesterName || '-' }}</td>
+            <td>{{ s.description || '-' }}</td>
+            <td>{{ s.state }}</td>
+            <td>{{ s.redirectDestinationName || '-' }}</td>
+          </tr>
+
+          <!-- lista vazia -->
+          <tr *ngIf="!loading && listaFiltrada.length === 0">
+            <td colspan="6" style="text-align:center">Nenhuma solicitação encontrada.</td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <script type="module" src="listar.ts"></script>
