@@ -1,22 +1,29 @@
 <mat-form-field class="block">
   <mat-label class="text-sm text-gray-600">Enter a date range</mat-label>
+
+  <!-- adicionamos (dateChange) nos inputs para capturar mudanças -->
   <mat-date-range-input [rangePicker]="picker" class="w-full">
     <input
       matStartDate
       placeholder="Start date"
       class="w-full bg-transparent px-3 py-2 text-sm text-gray-800 focus:outline-none"
+      (dateChange)="onStartDateChange($event)"
     />
     <input
       matEndDate
       placeholder="End date"
       class="w-full bg-transparent px-3 py-2 text-sm text-gray-800 focus:outline-none"
+      (dateChange)="onEndDateChange($event)"
     />
   </mat-date-range-input>
+
   <mat-hint class="text-xs text-gray-500">MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+
   <mat-datepicker-toggle
     matIconSuffix
     [for]="picker"
     class="ml-2"
   ></mat-datepicker-toggle>
+
   <mat-date-range-picker #picker></mat-date-range-picker>
 </mat-form-field>

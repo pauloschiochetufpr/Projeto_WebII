@@ -1,6 +1,6 @@
 <h2>Gerenciamento de Serviços</h2>
 // tirei o doctype, não é necessário no html do angular, na vdd é bem burro
-<input [(ngModel)]="novaDescricao" placeholder="Descrição do serviço">
+<!-- <input [(ngModel)]="novaDescricao" placeholder="Descrição do serviço"> -->
 <button (click)="adicionarServico()">Adicionar</button>
 
 <table>
@@ -14,9 +14,9 @@
   </thead>
   <tbody>
     <tr *ngFor="let s of servicos">
-      <td>{{s.id}}</td>
-      <td>{{s.descricao}}</td>
-      <td>{{s.status}}</td>
+      <td>{{ s.id }}</td>
+      <td>{{ s.descricao }}</td>
+      <td>{{ s.status }}</td>
       <td>
         <button (click)="editarServico(s.id)">Editar</button>
         <button (click)="excluirServico(s.id)">Excluir</button>
@@ -26,5 +26,3 @@
     </tr>
   </tbody>
 </table>
-
-

@@ -40,7 +40,7 @@
             />
             Período
           </label>
-          
+
           <ng-container *ngIf="filtro === 'PERIODO'">
             <rangeDatePicker></rangeDatePicker>
           </ng-container>
@@ -69,17 +69,19 @@
         </thead>
         <tbody>
           <tr *ngFor="let s of listaFiltrada">
-            <td>{{ s.createdAt | date: 'short' }}</td>
+            <td>{{ s.createdAt | date : "short" }}</td>
             <td>{{ s.id }}</td>
-            <td>{{ s.requesterName || '-' }}</td>
-            <td>{{ s.description || '-' }}</td>
+            <td>{{ s.requesterName || "-" }}</td>
+            <td>{{ s.description || "-" }}</td>
             <td>{{ s.state }}</td>
-            <td>{{ s.redirectDestinationName || '-' }}</td>
+            <td>{{ s.redirectDestinationName || "-" }}</td>
           </tr>
 
           <!-- lista vazia -->
           <tr *ngIf="!loading && listaFiltrada.length === 0">
-            <td colspan="6" style="text-align:center">Nenhuma solicitação encontrada.</td>
+            <td colspan="6" style="text-align: center">
+              Nenhuma solicitação encontrada.
+            </td>
           </tr>
         </tbody>
       </table>
