@@ -1,79 +1,94 @@
-// listar.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { JsonTestService } from '../../services/jsontest';
+import { JsonTestService, User } from '../../services/jsontest';
+import { DateSelection } from '../../services/date-selection';
+import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
 
-interface Entrada {
-  name?: string;
-  date?: string;
-  id?: string;
-  description?: string;
-  state?: string;
-  redirectDestinationName?: string;
-  requesterName?: string;
-  createdAt?: string;
+/**
+ * View model usado pelo template (contém todos os campos que o HTML espera).
+ * Todos opcionais para evitar problemas, mas declarados para que o template compile.
+ */
+interface DisplayUser {
+  id?: number | string | null;
+  createdAt?: string | null; // string ISO (usado no template com | date)
+  requesterName?: string | null;
+  description?: string | null;
+  state?: string | null;
+  redirectDestinationName?: string | null;
+  // manter também name e date caso queira usar diretamente
+  name?: string | null;
+  date?: string | null;
 }
 
 @Component({
   selector: 'app-listar',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RangeDatePicker],
   templateUrl: './listar.html',
   styleUrls: ['./listar.css'],
 })
-  
 export class Listar {
-  users: any[] = [];
+  // agora trabalhamos com DisplayUser, que tem todos os campos do template
+  users: DisplayUser[] = [];
   loading = false;
   error: string | null = null;
   summary = 'Pressione "Atualizar" para carregar';
+
   filtro: 'TODAS' | 'HOJE' | 'PERIODO' = 'TODAS';
-  dateFrom?: string;
-  dateTo?: string;
 
-  constructor(private router: Router, private jsonService: JsonTestService) {}
-  
-  get inicio(): number {
-  return (this.paginaAtual - 1) * this.itensPorPagina;
-}
+  constructor(
+    private jsonService: JsonTestService,
+    private dateSelection: DateSelection
+  ) {}
 
-  get fim(): number {
-  return this.inicio + this.itensPorPagina;
-}
-
-  get totalPaginas(): number {
-  return Math.ceil(this.users.length / this.itensPorPagina);
-}
-  
   onRefresh(): void {
     this.loading = true;
     this.error = null;
     this.summary = 'Carregando...';
     this.users = [];
 
-    this.jsonService.getUsers()
+    this.jsonService
+      .getUsers()
       .pipe(
+        // se houver erro, retornar array vazio (catchError)
         catchError((err: any) => {
           console.error('Erro ao carregar JSON', err);
           this.error = 'Erro ao carregar JSON';
           this.loading = false;
-          return of([] as Entrada[]);
+          return of([] as User[]);
+        }),
+        // garantir que temos um array (se for envelope, extrair)
+        map((res: any) => {
+          const arr = Array.isArray(res) ? res : res?.data ?? res?.items ?? [];
+          return arr;
         })
       )
       .subscribe({
-        next: (data: Entrada[]) => {
-          this.users = (data || []).map((r, idx) => ({
-            ...r,
-            id: r.id ?? `r${idx + 1}`,
-            createdAt: r.createdAt ?? r.date ?? new Date().toISOString(),
-            requesterName: r.requesterName ?? r.name ?? '-'
-          }));
+        next: (data: any[]) => {
+          // Normalizar cada item para o formato DisplayUser que o template espera
+          this.users = (data || []).map((item: any, idx: number) => {
+            // usar date (se existir) como createdAt para manter compatibilidade com template
+            const dateStr =
+              item.date ?? item.createdAt ?? item.created_at ?? null;
+
+            return {
+              id: item.id ?? item.ID ?? null,
+              createdAt: dateStr,
+              requesterName: item.requesterName ?? item.name ?? null,
+              description: item.description ?? item.desc ?? null,
+              state: item.state ?? item.status ?? null,
+              redirectDestinationName:
+                item.redirectDestinationName ?? item.destination ?? null,
+              name: item.name ?? null,
+              date: item.date ?? dateStr ?? null,
+            } as DisplayUser;
+          });
+
           this.loading = false;
           this.summary = `${this.users.length} registro(s) carregado(s)`;
         },
@@ -82,50 +97,77 @@ export class Listar {
           this.error = 'Erro desconhecido';
           this.loading = false;
           this.summary = '';
-        }
+        },
       });
   }
 
-  goToMostrarSolicitacao(item: any): void {
-    const id = item?.id ?? item?.requesterName ?? item?.name ?? null;
-    this.router.navigate(['/pages/crud-workers/crud-workers.component'], { queryParams: { id } });
+  // ---------- helpers de data ----------
+  private parseDate(value?: string | null): Date | null {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
   }
 
-  mudarPagina(direcao: number): void {
-  this.paginaAtual = Math.min(Math.max(1, this.paginaAtual + direcao), this.totalPaginas);
+  private isSameDay(a: Date, b: Date): boolean {
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
+  }
 
- get listaFiltrada(): any[] {
+  // getter que o template usa: listaFiltrada
+  get listaFiltrada(): DisplayUser[] {
     if (!this.users || this.users.length === 0) return [];
 
-    const arr = this.users.slice();
+    if (this.filtro === 'TODAS') return this.users;
 
     if (this.filtro === 'HOJE') {
-      const now = new Date();
-      const startTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      const endTs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).getTime();
-      return arr.filter(u => {
-        const ts = Number(u.createdAtTs);
-        return !isNaN(ts) && ts >= startTs && ts <= endTs;
+      const today = new Date();
+      return this.users.filter((u) => {
+        const d = this.parseDate(u.createdAt ?? u.date ?? null);
+        return d ? this.isSameDay(d, today) : false;
       });
     }
 
     if (this.filtro === 'PERIODO') {
-      if (!this.dateFromObj && !this.dateToObj) return [];
+      const range = this.dateSelection.getRange();
+      if (!range || (!range.start && !range.end)) {
+        // sem range definido, retorna vazio (padrão atual). Pode alterar se preferir.
+        return [];
+      }
 
-      const startTs = this.dateFromObj
-        ? new Date(this.dateFromObj.getFullYear(), this.dateFromObj.getMonth(), this.dateFromObj.getDate()).getTime()
-        : -8640000000000000;
-      const endTs = this.dateToObj
-        ? new Date(this.dateToObj.getFullYear(), this.dateToObj.getMonth(), this.dateToObj.getDate(), 23, 59, 59, 999).getTime()
-        : 8640000000000000;
+      const start = range.start ? new Date(range.start) : null;
+      const end = range.end ? new Date(range.end) : null;
 
-      return arr.filter(u => {
-        const ts = Number(u.createdAtTs);
-        return !isNaN(ts) && ts >= startTs && ts <= endTs;
+      return this.users.filter((u) => {
+        const d = this.parseDate(u.createdAt ?? u.date ?? null);
+        if (!d) return false;
+
+        if (start && !end) return d >= start;
+        if (!start && end) return d <= end;
+        if (start && end) {
+          const da = new Date(
+            d.getFullYear(),
+            d.getMonth(),
+            d.getDate()
+          ).getTime();
+          const sa = new Date(
+            start.getFullYear(),
+            start.getMonth(),
+            start.getDate()
+          ).getTime();
+          const ea = new Date(
+            end.getFullYear(),
+            end.getMonth(),
+            end.getDate()
+          ).getTime();
+          return da >= sa && da <= ea;
+        }
+        return false;
       });
     }
 
-    return arr;
+    return this.users;
   }
 }
-
