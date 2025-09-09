@@ -19,9 +19,9 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String cpf;
 
-    private String cep;
-    private String telefone;
-    private String password;
+    // private String cep;
+    // private String telefone;
+    // private String password;
 
     protected Usuario() {}
 
@@ -29,8 +29,8 @@ public class Usuario {
         this.email = email;
         this.nome = nome;
         this.cpf = cpf;
-        this.cep = cep;
-        this.telefone = telefone;
+      //   this.cep = cep;
+      //   this.telefone = telefone;
     }
 
     public String getEmail() { return email; }

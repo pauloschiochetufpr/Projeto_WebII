@@ -7,6 +7,12 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  filter,
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +22,11 @@ import { AuthService } from '../../services/auth';
 export class LoginComponent {
   loginForm: FormGroup;
   cadastroForm: FormGroup;
+  isSubmittingCadastro = false;
+  isSubmittingLogin = false;
+  emailValidoLogin: boolean | null = null;
+  emailValidoCadastro: boolean | null = null;
+  telefoneValidoCadastro: boolean | null = null;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
@@ -35,6 +46,39 @@ export class LoginComponent {
       cep: ['', Validators.required],
       telefone: ['', Validators.required],
     });
+
+    this.loginForm
+      .get('email')
+      ?.valueChanges.pipe(
+        debounceTime(3000),
+        distinctUntilChanged(),
+        filter((email: string) => !!email && email.includes('@')),
+        switchMap((email: string) => this.authService.validarEmail(email))
+      )
+      .subscribe((valido) => (this.emailValidoLogin = valido));
+
+    this.cadastroForm
+      .get('email')
+      ?.valueChanges.pipe(
+        debounceTime(3000),
+        distinctUntilChanged(),
+        filter((email: string) => !!email && email.includes('@')),
+        switchMap((email: string) => this.authService.validarEmail(email))
+      )
+      .subscribe((valido) => (this.emailValidoCadastro = valido));
+
+    this.cadastroForm
+      .get('telefone')
+      ?.valueChanges.pipe(
+        debounceTime(2000),
+        distinctUntilChanged(),
+        switchMap((telefone: string) => {
+          const numeros = telefone.replace(/\D/g, '');
+          if (!numeros || numeros.length < 10) return [null]; // não verifica ainda
+          return this.authService.validarTelefone(numeros); // chama o backend
+        })
+      )
+      .subscribe((valido) => (this.telefoneValidoCadastro = valido));
   }
 
   // --------|
@@ -42,25 +86,48 @@ export class LoginComponent {
   // --------|
 
   onLoginSubmit() {
-    if (this.loginForm.valid) {
+    if (
+      this.loginForm.valid &&
+      this.emailValidoLogin &&
+      !this.isSubmittingLogin
+    ) {
+      this.isSubmittingLogin = true;
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
-        next: (res) => console.log('Login OK:', res),
-        error: (err) => console.error('Erro login:', err),
+        next: (res) => {
+          console.log('Login OK:', res);
+          this.isSubmittingLogin = false;
+        },
+        error: (err) => {
+          console.error('Erro login:', err);
+          this.isSubmittingLogin = false;
+        },
       });
     }
   }
 
   onCadastroSubmit() {
-    if (this.cadastroForm.valid) {
+    if (
+      this.cadastroForm.valid &&
+      !this.isSubmittingCadastro &&
+      this.emailValidoCadastro
+    ) {
+      this.isSubmittingCadastro = true;
+
       const formValue = { ...this.cadastroForm.value };
       formValue.cpf = formValue.cpf.replace(/\D/g, '');
       formValue.cep = formValue.cep.replace(/\D/g, '');
       formValue.telefone = formValue.telefone.replace(/\D/g, '');
 
       this.authService.cadastro(formValue).subscribe({
-        next: (res) => console.log('Cadastro OK:', res),
-        error: (err) => console.error('Erro cadastro:', err),
+        next: (res) => {
+          console.log('Cadastro OK:', res);
+          this.isSubmittingCadastro = false; // libera botão
+        },
+        error: (err) => {
+          console.error('Erro cadastro:', err);
+          this.isSubmittingCadastro = false; // libera botão
+        },
       });
     }
   }
