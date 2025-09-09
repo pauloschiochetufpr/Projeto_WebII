@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 
 import { JsonTestService } from '../../services/jsontest';
 
-interface RawEntry {
+interface Entrada {
   name?: string;
   date?: string;
   id?: string;
@@ -50,11 +50,11 @@ export class Listar {
           console.error('Erro ao carregar JSON', err);
           this.error = 'Erro ao carregar JSON';
           this.loading = false;
-          return of([] as RawEntry[]);
+          return of([] as Entrada[]);
         })
       )
       .subscribe({
-        next: (data: RawEntry[]) => {
+        next: (data: Entrada[]) => {
           this.users = (data || []).map((r, idx) => ({
             ...r,
             id: r.id ?? `r${idx + 1}`,
@@ -75,7 +75,7 @@ export class Listar {
 
   goToMostrarSolicitacao(item: any): void {
     const id = item?.id ?? item?.requesterName ?? item?.name ?? null;
-    this.router.navigate(['/mostrarsolicitacoes'], { queryParams: { id } });
+    this.router.navigate(['/pages/crud-workers/crud-workers.component'], { queryParams: { id } });
   }
 
   get listaFiltrada(): any[] {
