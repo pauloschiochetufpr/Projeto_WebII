@@ -27,6 +27,7 @@ interface Entrada {
   templateUrl: './listar.html',
   styleUrls: ['./listar.css'],
 })
+  
 export class Listar {
   users: any[] = [];
   loading = false;
@@ -37,7 +38,19 @@ export class Listar {
   dateTo?: string;
 
   constructor(private router: Router, private jsonService: JsonTestService) {}
+  
+  get inicio(): number {
+  return (this.paginaAtual - 1) * this.itensPorPagina;
+}
 
+  get fim(): number {
+  return this.inicio + this.itensPorPagina;
+}
+
+  get totalPaginas(): number {
+  return Math.ceil(this.users.length / this.itensPorPagina);
+}
+  
   onRefresh(): void {
     this.loading = true;
     this.error = null;
@@ -78,34 +91,41 @@ export class Listar {
     this.router.navigate(['/pages/crud-workers/crud-workers.component'], { queryParams: { id } });
   }
 
-  get listaFiltrada(): any[] {
+  mudarPagina(direcao: number): void {
+  this.paginaAtual = Math.min(Math.max(1, this.paginaAtual + direcao), this.totalPaginas);
+
+ get listaFiltrada(): any[] {
     if (!this.users || this.users.length === 0) return [];
+
     const arr = this.users.slice();
-    const toDate = (d: any): Date => {
-      if (!d) return new Date(NaN);
-      if (d instanceof Date) return d;
-      return new Date(d);
-    };
+
     if (this.filtro === 'HOJE') {
       const now = new Date();
-      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const end = new Date(start);
-      end.setDate(start.getDate() + 1);
+      const startTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const endTs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).getTime();
       return arr.filter(u => {
-        const d = toDate(u.createdAt || u.date);
-        return !isNaN(d.getTime()) && d >= start && d < end;
+        const ts = Number(u.createdAtTs);
+        return !isNaN(ts) && ts >= startTs && ts <= endTs;
       });
     }
+
     if (this.filtro === 'PERIODO') {
-      if (!this.dateFrom && !this.dateTo) return [];
-      const start = this.dateFrom ? new Date(this.dateFrom) : new Date(-8640000000000000);
-      const end = this.dateTo ? new Date(this.dateTo) : new Date(8640000000000000);
-      end.setDate(end.getDate() + 1);
+      if (!this.dateFromObj && !this.dateToObj) return [];
+
+      const startTs = this.dateFromObj
+        ? new Date(this.dateFromObj.getFullYear(), this.dateFromObj.getMonth(), this.dateFromObj.getDate()).getTime()
+        : -8640000000000000;
+      const endTs = this.dateToObj
+        ? new Date(this.dateToObj.getFullYear(), this.dateToObj.getMonth(), this.dateToObj.getDate(), 23, 59, 59, 999).getTime()
+        : 8640000000000000;
+
       return arr.filter(u => {
-        const d = toDate(u.createdAt || u.date);
-        return !isNaN(d.getTime()) && d >= start && d < end;
+        const ts = Number(u.createdAtTs);
+        return !isNaN(ts) && ts >= startTs && ts <= endTs;
       });
     }
+
     return arr;
   }
 }
+
