@@ -65,13 +65,12 @@
         <th>Descrição</th>
         <th>Estado</th>
         <th>Destino</th>
-        <th>Ações</th> <!-- nova coluna para o botão -->
+        <th>Ações</th> 
       </tr>
     </thead>
 
     <tbody>
-      <!-- usa o getter listaFiltrada (já mapeado no TS) -->
-      <tr *ngFor="let s of listaFiltrada; let i = index">
+      <tr *ngFor="let s of Listar; let i = index">
         <!-- uso de ORs para suportar diferentes shapes do JSON -->
         <td>{{ (s.createdAt || s.date) | date: 'short' }}</td>
         <td>{{ s.id || ('r' + (i + 1)) }}</td>
@@ -86,10 +85,21 @@
         </td>
       </tr>
 
-      <!-- lista vazia -->
-      <tr *ngIf="!loading && listaFiltrada.length === 0">
+      <tr *ngIf="!loading && Listar.length === 0">
         <td colspan="7" style="text-align:center">Nenhuma solicitação encontrada.</td>
       </tr>
     </tbody>
   </table>
+
+  <!-- paginação -->
+  <div class="controle-paginas">
+    <button (click)="mudarPagina(paginaAtual - 1)" [disabled]="paginaAtual === 1">
+      Anterior
+    </button>
+    <span>Página {{ paginaAtual }} de {{ totalPaginas }}</span>
+    <button (click)="mudarPagina(paginaAtual + 1)" [disabled]="paginaAtual === totalPaginas">
+      Próxima
+    </button>
+  </div>
+</div>
 </div>
