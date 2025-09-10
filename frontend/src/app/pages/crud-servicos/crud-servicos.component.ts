@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
 
 type Status = "Aberto" | "Em Andamento" | "Concluído" | "Inativo";
 
@@ -10,6 +12,7 @@ interface Servico {
 
 @Component({
   selector: 'app-crud-servicos',
+  imports: [CommonModule],
   templateUrl: './crud-servicos.component.html',
   styleUrls: ['./crud-servicos.component.css']
 })
