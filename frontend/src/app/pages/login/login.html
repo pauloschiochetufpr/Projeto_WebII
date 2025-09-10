@@ -7,6 +7,14 @@
       formControlName="email"
       placeholder="Digite seu email"
     />
+    <div *ngIf="loginForm.get('email')?.touched">
+      <span *ngIf="emailValidoLogin === true" style="color: green">
+        E-mail válido
+      </span>
+      <span *ngIf="emailValidoLogin === false" style="color: red">
+        E-mail inválido
+      </span>
+    </div>
 
     <label>Senha:</label>
     <input
@@ -16,7 +24,14 @@
       placeholder="Digite sua senha"
     />
 
-    <button type="submit">Entrar</button>
+    <button
+      type="submit"
+      [disabled]="
+        loginForm.invalid || isSubmittingLogin || emailValidoLogin === false
+      "
+    >
+      Entrar
+    </button>
   </form>
 
   <hr />
@@ -50,7 +65,14 @@
       formControlName="email"
       placeholder="Digite seu email"
     />
-
+    <div *ngIf="cadastroForm.get('email')?.touched">
+      <span *ngIf="emailValidoCadastro === true" style="color: green">
+        E-mail válido
+      </span>
+      <span *ngIf="emailValidoCadastro === false" style="color: red">
+        E-mail inválido
+      </span>
+    </div>
     <label>CEP:</label>
     <input
       type="text"
@@ -68,7 +90,25 @@
       maxlength="15"
       placeholder="(00) 00000-0000"
     />
+    <div *ngIf="cadastroForm.get('telefone')?.touched">
+      <span *ngIf="telefoneValidoCadastro === true" style="color: green">
+        Telefone válido
+      </span>
+      <span *ngIf="telefoneValidoCadastro === false" style="color: red">
+        Telefone inválido
+      </span>
+    </div>
 
-    <button type="submit">Cadastrar</button>
+    <button
+      type="submit"
+      [disabled]="
+        cadastroForm.invalid ||
+        isSubmittingCadastro ||
+        emailValidoCadastro === false ||
+        telefoneValidoCadastro === false
+      "
+    >
+      Cadastrar
+    </button>
   </form>
 </div>
