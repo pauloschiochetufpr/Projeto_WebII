@@ -1,4 +1,38 @@
 [
-  { "name": "Gerson", "date": "2025-09-01T10:00:00Z" },
-  { "name": "Claudio", "date": "2026-03-15T14:30:00Z" }
+  {
+    "idSolicitacao": 1,
+    "nome": "Celular Motorola G5",
+    "descricao": "Quebra da tela",
+    "dataHora": "2025-09-01T10:15:00-03:00",
+    "idCliente": 101,
+    "valor": 450.0,
+    "idStatus": 1
+  },
+  {
+    "idSolicitacao": 2,
+    "nome": "Notebook Dell Inspiron",
+    "descricao": "Limpeza e troca de pasta térmica",
+    "dataHora": "2025-09-01T10:15:00-03:00",
+    "idCliente": 101,
+    "valor": 200.0,
+    "idStatus": 2
+  },
+  {
+    "idSolicitacao": 3,
+    "nome": "Tablet Samsung Galaxy Tab",
+    "descricao": "Substituição da bateria",
+    "dataHora": "2025-09-02T14:30:00-03:00",
+    "idCliente": 102,
+    "valor": 150.0,
+    "idStatus": 1
+  },
+  {
+    "idSolicitacao": 4,
+    "nome": "iPhone 12",
+    "descricao": "Atualização de software e restauração",
+    "dataHora": "2025-09-03T09:00:00-03:00",
+    "idCliente": 103,
+    "valor": 100.0,
+    "idStatus": 3
+  }
 ]

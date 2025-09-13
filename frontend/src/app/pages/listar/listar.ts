@@ -9,18 +9,13 @@ import { JsonTestService, User } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
 
-/**
- * View model usado pelo template (contém todos os campos que o HTML espera).
- * Todos opcionais para evitar problemas, mas declarados para que o template compile.
- */
 interface DisplayUser {
   id?: number | string | null;
-  createdAt?: string | null; // string ISO (usado no template com | date)
+  createdAt?: string | null;
   requesterName?: string | null;
   description?: string | null;
   state?: string | null;
   redirectDestinationName?: string | null;
-  // manter também name e date caso queira usar diretamente
   name?: string | null;
   date?: string | null;
 }
@@ -77,10 +72,10 @@ export class Listar {
               item.date ?? item.createdAt ?? item.created_at ?? null;
 
             return {
-              id: item.id ?? item.ID ?? null,
+              idSolicitacao: item.idSolicitacao ?? item.ID ?? null,
               createdAt: dateStr,
               requesterName: item.requesterName ?? item.name ?? null,
-              description: item.description ?? item.desc ?? null,
+              description: item.description ?? item.descricao ?? null,
               state: item.state ?? item.status ?? null,
               redirectDestinationName:
                 item.redirectDestinationName ?? item.destination ?? null,
