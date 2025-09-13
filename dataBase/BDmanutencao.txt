@@ -80,6 +80,7 @@ CREATE TABLE solicitacao (
     idSolicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
+    dataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     idCliente INT UNSIGNED,
     valor DECIMAL(10 , 2 ),
     idStatus INT UNSIGNED NOT NULL,
