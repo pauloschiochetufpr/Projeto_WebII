@@ -1,105 +1,91 @@
-<div class="container">
-  <div class="header">
-    <h2>Listar solicitações (parte do Funcionário)</h2>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Listar solicitações</title>
 
-    <div class="controls" aria-label="controles de filtro">
-      <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="TODAS"
-        />
-        Todas
-      </label>
+    <link rel="stylesheet" href="listar.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Listar solicitações (parte do Funcionário)</h2>
+        <div class="controls" aria-label="controles de filtro">
+          <label>
+            <input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="TODAS"
+              checked
+            />
+            Todas
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="HOJE"
+            />
+            Hoje
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="filtro"
+              [(ngModel)]="filtro"
+              value="PERIODO"
+            />
+            Período
+          </label>
 
-      <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="HOJE"
-        />
-        Hoje
-      </label>
+          <ng-container *ngIf="filtro === 'PERIODO'">
+            <rangeDatePicker></rangeDatePicker>
+          </ng-container>
 
-      <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="PERIODO"
-        />
-        Período
-      </label>
+          <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
+        </div>
+      </div>
 
-      <ng-container *ngIf="filtro === 'PERIODO'">
-        <label>
-          De
-          <input type="date" [(ngModel)]="dateFrom" name="dateFrom" />
-        </label>
-        <label>
-          Até
-          <input type="date" [(ngModel)]="dateTo" name="dateTo" />
-        </label>
-        <button type="button" (click)="dateFrom = dateTo = undefined">Limpar</button>
-      </ng-container>
+      <!-- resumo do status da leitura -->
+      <p class="summary" id="summary">
+        <ng-container *ngIf="loading">Carregando...</ng-container>
+        <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
+        <ng-container *ngIf="error" class="error">{{ error }}</ng-container>
+      </p>
 
-      <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
+      <table class="table" id="table">
+        <thead>
+          <tr>
+            <th>Data / Hora</th>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Descrição</th>
+            <th>Estado</th>
+            <th>Destino</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of listaFiltrada">
+            <td>{{ s.createdAt | date : "short" }}</td>
+            <td>{{ s.id }}</td>
+            <td>{{ s.requesterName || "-" }}</td>
+            <td>{{ s.description || "-" }}</td>
+            <td>{{ s.state }}</td>
+            <td>{{ s.redirectDestinationName || "-" }}</td>
+          </tr>
+
+          <!-- lista vazia -->
+          <tr *ngIf="!loading && listaFiltrada.length === 0">
+            <td colspan="6" style="text-align: center">
+              Nenhuma solicitação encontrada.
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
-
-  <!-- resumo do status da leitura -->
-  <p class="summary" id="summary">
-    <ng-container *ngIf="loading">Carregando...</ng-container>
-    <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
-    <ng-container *ngIf="error" class="error">{{ error }}</ng-container>
-  </p>
-
-  <table class="table" id="table">
-    <thead>
-      <tr>
-        <th>Data / Hora</th>
-        <th>ID</th>
-        <th>Cliente</th>
-        <th>Descrição</th>
-        <th>Estado</th>
-        <th>Destino</th>
-        <th>Ações</th> 
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr *ngFor="let s of Listar; let i = index">
-        <!-- uso de ORs para suportar diferentes shapes do JSON -->
-        <td>{{ (s.createdAt || s.date) | date: 'short' }}</td>
-        <td>{{ s.id || ('r' + (i + 1)) }}</td>
-        <td>{{ s.requesterName || s.name || '-' }}</td>
-        <td>{{ s.description || '-' }}</td>
-        <td>{{ s.state || '-' }}</td>
-        <td>{{ s.redirectDestinationName || '-' }}</td>
-
-        <td>
-          <!-- botao que leva pra pagina de crud services -->
-          <button (click)="goToMostrarSolicitacao(s.id)">Abrir</button>
-        </td>
-      </tr>
-
-      <tr *ngIf="!loading && Listar.length === 0">
-        <td colspan="7" style="text-align:center">Nenhuma solicitação encontrada.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- paginação -->
-  <div class="controle-paginas">
-    <button (click)="mudarPagina(paginaAtual - 1)" [disabled]="paginaAtual === 1">
-      Anterior
-    </button>
-    <span>Página {{ paginaAtual }} de {{ totalPaginas }}</span>
-    <button (click)="mudarPagina(paginaAtual + 1)" [disabled]="paginaAtual === totalPaginas">
-      Próxima
-    </button>
-  </div>
-</div>
-</div>
+    <script type="module" src="listar.ts"></script>
+  </body>
+</html>
