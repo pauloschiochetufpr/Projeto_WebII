@@ -1,52 +1,48 @@
 <div class="container">
   <div class="header">
     <h2>Listar solicitações (parte do Funcionário)</h2>
-
     <div class="controls" aria-label="controles de filtro">
       <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="TODAS"
-        />
-        Todas
+        <input type="radio" name="filtro" [(ngModel)]="filtro" value="TODAS" checked /> Todas
       </label>
-
       <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="HOJE"
-        />
-        Hoje
+        <input type="radio" name="filtro" [(ngModel)]="filtro" value="HOJE" /> Hoje
       </label>
-
       <label>
-        <input
-          type="radio"
-          name="filtro"
-          [(ngModel)]="filtro"
-          value="PERIODO"
-        />
-        Período
+        <input type="radio" name="filtro" [(ngModel)]="filtro" value="PERIODO" /> Período
       </label>
 
       <ng-container *ngIf="filtro === 'PERIODO'">
-        <label>
-          De
-          <input type="date" [(ngModel)]="dateFrom" name="dateFrom" />
-        </label>
-        <label>
-          Até
-          <input type="date" [(ngModel)]="dateTo" name="dateTo" />
-        </label>
-        <button type="button" (click)="dateFrom = dateTo = undefined">Limpar</button>
+        <rangeDatePicker></rangeDatePicker>
       </ng-container>
 
       <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
     </div>
+
+    <!-- Estatísticas rápidas (detalhes extras) -->
+    <div class="stats">
+      <p>Total de solicitações: {{ totalSolicitacoes }}</p>
+      <p>Pendentes: {{ totalPendentes }}</p>
+      <p>Concluídas: {{ totalConcluidas }}</p>
+      <p>Solicitações de hoje: {{ totalHoje }}</p>
+    </div>
+
+    <!-- Filtros extras simples -->
+    <div class="extra-filters">
+      <label>
+        Buscar por cliente:
+        <input type="text" [(ngModel)]="searchClient" placeholder="Nome do cliente"/>
+      </label>
+      <label>
+        Buscar por estado:
+        <select [(ngModel)]="searchState">
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Concluído">Concluído</option>
+        </select>
+      </label>
+    </div>
+
   </div>
 
   <!-- resumo do status da leitura -->
@@ -65,41 +61,39 @@
         <th>Descrição</th>
         <th>Estado</th>
         <th>Destino</th>
-        <th>Ações</th> 
       </tr>
     </thead>
-
     <tbody>
-      <tr *ngFor="let s of Listar; let i = index">
-        <!-- uso de ORs para suportar diferentes shapes do JSON -->
-        <td>{{ (s.createdAt || s.date) | date: 'short' }}</td>
-        <td>{{ s.id || ('r' + (i + 1)) }}</td>
-        <td>{{ s.requesterName || s.name || '-' }}</td>
-        <td>{{ s.description || '-' }}</td>
-        <td>{{ s.state || '-' }}</td>
-        <td>{{ s.redirectDestinationName || '-' }}</td>
-
+      <tr *ngFor="let s of listaFiltrada">
+        <td>{{ s.createdAt | date : "short" }}</td>
+        <td>{{ s.id }}</td>
+        <td>{{ s.requesterName || "-" }}</td>
         <td>
-          <!-- botao que leva pra pagina de crud services -->
-          <button (click)="goToMostrarSolicitacao(s.id)">Abrir</button>
+          {{ s.description ? (s.description | slice:0:30) + '...' : '-' }}
+          <button (click)="openModal(s.description, s)">Ver</button>
+          <button (click)="copyDescription(s.description)">Copiar</button>
+          <button (click)="enviarParaAprovacao(s)">Enviar</button>
         </td>
+        <td>{{ s.state }}</td>
+        <td>{{ s.redirectDestinationName || "-" }}</td>
       </tr>
 
-      <tr *ngIf="!loading && Listar.length === 0">
-        <td colspan="7" style="text-align:center">Nenhuma solicitação encontrada.</td>
+      <tr *ngIf="!loading && listaFiltrada.length === 0">
+        <td colspan="6" style="text-align: center">Nenhuma solicitação encontrada.</td>
       </tr>
     </tbody>
   </table>
-
-  <!-- paginação -->
-  <div class="controle-paginas">
-    <button (click)="mudarPagina(paginaAtual - 1)" [disabled]="paginaAtual === 1">
-      Anterior
-    </button>
-    <span>Página {{ paginaAtual }} de {{ totalPaginas }}</span>
-    <button (click)="mudarPagina(paginaAtual + 1)" [disabled]="paginaAtual === totalPaginas">
-      Próxima
-    </button>
-  </div>
 </div>
+
+<!-- Modal -->
+<div *ngIf="modalOpen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:2000">
+  <div style="background:#fff;padding:1rem 1.5rem;border-radius:6px;max-width:700px;width:90%;position:relative;box-shadow:0 8px 30px rgba(0,0,0,0.3);">
+    <button (click)="closeModal()" aria-label="Fechar" style="position:absolute;top:8px;right:10px;border:none;background:transparent;font-size:1.4rem;cursor:pointer;">&times;</button>
+    <h3>Descrição completa</h3>
+    <p style="white-space:pre-wrap;word-break:break-word">{{ modalDescription || '-' }}</p>
+
+    <p><strong>Cliente:</strong> {{ modalUser?.requesterName || '-' }}</p>
+    <p><strong>Estado:</strong> {{ modalUser?.state || '-' }}</p>
+    <p><strong>Destino:</strong> {{ modalUser?.redirectDestinationName || '-' }}</p>
+  </div>
 </div>
