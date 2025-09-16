@@ -45,6 +45,11 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       cep: ['', Validators.required],
       telefone: ['', Validators.required],
+      logradouro: [{ value: '', disabled: true }],
+      bairro: [{ value: '', disabled: true }],
+      cidade: [{ value: '', disabled: true }],
+      uf: [{ value: '', disabled: true }],
+      complemento: [''],
     });
 
     this.loginForm
@@ -79,6 +84,27 @@ export class LoginComponent {
         })
       )
       .subscribe((valido) => (this.telefoneValidoCadastro = valido));
+
+    this.cadastroForm
+      .get('cep')
+      ?.valueChanges.pipe(
+        debounceTime(1500),
+        distinctUntilChanged(),
+        filter((cep: string) => !!cep && cep.replace(/\D/g, '').length === 8),
+        switchMap((cep: string) =>
+          this.authService.validarCep(cep.replace(/\D/g, ''))
+        )
+      )
+      .subscribe((dados) => {
+        if (dados) {
+          this.cadastroForm.patchValue({
+            logradouro: dados.logradouro || '',
+            bairro: dados.bairro || '',
+            cidade: dados.localidade || '',
+            uf: dados.uf || '',
+          });
+        }
+      });
   }
 
   // --------|

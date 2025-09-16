@@ -38,4 +38,10 @@ export class AuthService {
         catchError(() => of(false))
       );
   }
+
+  validarCep(cep: string): Observable<any> {
+    return this.http
+      .get(`${this.api}/validate-cep`, { params: { cep } })
+      .pipe(catchError(() => of(null)));
+  }
 }
