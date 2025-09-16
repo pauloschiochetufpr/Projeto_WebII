@@ -4,6 +4,7 @@ import { CategoriaEquipamentoComponent } from './categoria-equipamento.component
 
 describe('CategoriaEquipamentoComponent', () => {
   let component: CategoriaEquipamentoComponent;
+  
   let fixture: ComponentFixture<CategoriaEquipamentoComponent>;
 
   beforeEach(async () => {

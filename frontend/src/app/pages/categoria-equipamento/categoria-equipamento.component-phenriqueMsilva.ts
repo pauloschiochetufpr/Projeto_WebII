@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-categoria-equipamento',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './categoria-equipamento.component.html',
-  styleUrls: ['./categoria-equipamento.component.css']
+  styleUrl: './categoria-equipamento.component.css'
 })
 export class CategoriaEquipamentoComponent {
 
