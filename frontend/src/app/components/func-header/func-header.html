@@ -1,0 +1,31 @@
+<nav
+  class="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 shadow-sm"
+>
+  <!-- Brand -->
+  <a
+    class="text-gray-900 font-semibold text-base hover:text-blue-600 transition"
+    [routerLink]="['/home-funcionario']"
+    aria-label="Home funcionário"
+  >
+    Painel Funcionário
+  </a>
+
+  <!-- Links -->
+  <div class="flex gap-3">
+    <a
+      class="px-3 py-1 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
+      routerLink="/home-funcionario"
+      routerLinkActive="bg-blue-600 text-white"
+      aria-current="page"
+    >
+      Home
+    </a>
+    <a
+      class="px-3 py-1 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
+      routerLink="/solicitacao/listar"
+      routerLinkActive="bg-blue-600 text-white"
+    >
+      Todas Solicitações
+    </a>
+  </div>
+</nav>

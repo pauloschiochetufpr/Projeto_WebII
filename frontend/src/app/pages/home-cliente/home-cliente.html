@@ -35,13 +35,27 @@
           </ng-container>
 
           <!-- Se Rejeitada: Resgatar -->
-          <ng-container *ngIf="showActionsFor(s).showRescue">
-            <button (click)="rescue(s)" class="btn-rescue">Resgatar</button>
+          <ng-container *ngIf="showActionsFor(s).showRescueRejeitada">
+            <button (click)="rescueFromRejected(s)" class="btn-rescue">
+              Resgatar
+            </button>
           </ng-container>
 
           <!-- Se Arrumada: Pagar -->
           <ng-container *ngIf="showActionsFor(s).showPay">
             <button (click)="pay(s)" class="btn-pay">Pagar</button>
+          </ng-container>
+
+          <!-- Se ainda não arrumada: Cancelar -->
+          <ng-container *ngIf="showActionsFor(s).showCancel">
+            <button (click)="cancel(s)" class="btn-cancel">Cancelar</button>
+          </ng-container>
+
+          <!-- Se Cancelada: Voltar para Aberta -->
+          <ng-container *ngIf="showActionsFor(s).showRescueCancelled">
+            <button (click)="rescueFromCancelled(s)" class="btn-rescue">
+              Resgatar
+            </button>
           </ng-container>
         </td>
       </tr>

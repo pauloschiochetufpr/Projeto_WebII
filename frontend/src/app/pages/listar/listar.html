@@ -1,91 +1,74 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Listar solicitações</title>
+<func-header></func-header>
+<div class="container">
+  <div class="header">
+    <h2>Listar solicitações (parte do Funcionário)</h2>
+    <div class="controls" aria-label="controles de filtro">
+      <label>
+        <input
+          type="radio"
+          name="filtro"
+          [(ngModel)]="filtro"
+          value="TODAS"
+          checked
+        />
+        Todas
+      </label>
+      <label>
+        <input type="radio" name="filtro" [(ngModel)]="filtro" value="HOJE" />
+        Hoje
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="filtro"
+          [(ngModel)]="filtro"
+          value="PERIODO"
+        />
+        Período
+      </label>
 
-    <link rel="stylesheet" href="listar.css" />
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h2>Listar solicitações (parte do Funcionário)</h2>
-        <div class="controls" aria-label="controles de filtro">
-          <label>
-            <input
-              type="radio"
-              name="filtro"
-              [(ngModel)]="filtro"
-              value="TODAS"
-              checked
-            />
-            Todas
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="filtro"
-              [(ngModel)]="filtro"
-              value="HOJE"
-            />
-            Hoje
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="filtro"
-              [(ngModel)]="filtro"
-              value="PERIODO"
-            />
-            Período
-          </label>
+      <ng-container *ngIf="filtro === 'PERIODO'">
+        <rangeDatePicker></rangeDatePicker>
+      </ng-container>
 
-          <ng-container *ngIf="filtro === 'PERIODO'">
-            <rangeDatePicker></rangeDatePicker>
-          </ng-container>
-
-          <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
-        </div>
-      </div>
-
-      <!-- resumo do status da leitura -->
-      <p class="summary" id="summary">
-        <ng-container *ngIf="loading">Carregando...</ng-container>
-        <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
-        <ng-container *ngIf="error" class="error">{{ error }}</ng-container>
-      </p>
-
-      <table class="table" id="table">
-        <thead>
-          <tr>
-            <th>Data / Hora</th>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Descrição</th>
-            <th>Estado</th>
-            <th>Destino</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let s of listaFiltrada">
-            <td>{{ s.createdAt | date : "short" }}</td>
-            <td>{{ s.id }}</td>
-            <td>{{ s.requesterName || "-" }}</td>
-            <td>{{ s.description || "-" }}</td>
-            <td>{{ s.state }}</td>
-            <td>{{ s.redirectDestinationName || "-" }}</td>
-          </tr>
-
-          <!-- lista vazia -->
-          <tr *ngIf="!loading && listaFiltrada.length === 0">
-            <td colspan="6" style="text-align: center">
-              Nenhuma solicitação encontrada.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
     </div>
-    <script type="module" src="listar.ts"></script>
-  </body>
-</html>
+  </div>
+
+  <!-- resumo do status da leitura -->
+  <p class="summary" id="summary">
+    <ng-container *ngIf="loading">Carregando...</ng-container>
+    <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
+    <ng-container *ngIf="error" class="error">{{ error }}</ng-container>
+  </p>
+
+  <table class="table" id="table">
+    <thead>
+      <tr>
+        <th>Data / Hora</th>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Descrição</th>
+        <th>Estado</th>
+        <th>Destino</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of listaFiltrada">
+        <td>{{ s.createdAt | date : "short" }}</td>
+        <td>{{ s.id }}</td>
+        <td>{{ s.requesterName || "-" }}</td>
+        <td>{{ s.description || "-" }}</td>
+        <td>{{ s.state }}</td>
+        <td>{{ s.redirectDestinationName || "-" }}</td>
+      </tr>
+
+      <!-- lista vazia -->
+      <tr *ngIf="!loading && listaFiltrada.length === 0">
+        <td colspan="6" style="text-align: center">
+          Nenhuma solicitação encontrada.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

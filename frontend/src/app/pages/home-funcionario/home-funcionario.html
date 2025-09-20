@@ -1,0 +1,41 @@
+<func-header></func-header>
+<div class="func-container p-4">
+  <h2>Página Inicial (Funcionário)</h2>
+
+  <p *ngIf="loading">Carregando solicitações...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <table class="table-auto w-full border-collapse">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="p-2 text-left">Data / Hora</th>
+        <th class="p-2 text-left">Cliente</th>
+        <th class="p-2 text-left">Descrição (produto)</th>
+        <th class="p-2 text-left">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of solicitations" class="border-t">
+        <td class="p-2">{{ formatDateDisplay(s) }}</td>
+        <td class="p-2">{{ getClientName(s) }}</td>
+        <td class="p-2">{{ getDescriptionTruncated(s, 30) }}</td>
+        <td class="p-2">
+          <!-- Link para a tela de orçar (rota ainda não existe) -->
+          <a
+            [routerLink]="['/solicitacao/orcar']"
+            [queryParams]="{ id: s.idSolicitacao ?? s.id }"
+            class="btn-orcar"
+          >
+            Efetuar Orçamento
+          </a>
+        </td>
+      </tr>
+
+      <tr *ngIf="!loading && solicitations.length === 0">
+        <td colspan="4" class="p-4 text-center">
+          Nenhuma solicitação ABERTA no momento.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

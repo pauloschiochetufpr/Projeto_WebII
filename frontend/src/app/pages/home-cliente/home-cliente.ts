@@ -1,13 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { JsonTestService } from '../../services/jsontest'; // Mudar para o banco de dados quando fizermos o backend
-import { DateSelection } from '../../services/date-selection';
+import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+
+import { JsonTestService } from '../../services/jsontest'; // Mudar para o banco de dados quando fizermos o backend
+import { DateSelection } from '../../services/date-selection';
 
 export interface Solicitation {
   idSolicitacao?: number;
   id?: number | string;
+  idCliente?: number;
   nome?: string;
   name?: string;
   descricao?: string;
@@ -18,6 +21,7 @@ export interface Solicitation {
   idStatus?: number;
   state?: string;
   valor?: number;
+  [key: string]: any;
 }
 
 @Component({
@@ -27,7 +31,7 @@ export interface Solicitation {
   templateUrl: './home-cliente.html',
   styleUrl: './home-cliente.css',
 })
-export class HomeCliente {
+export class HomeCliente implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
@@ -35,13 +39,19 @@ export class HomeCliente {
   // item selecionado para visualizar
   selected: Solicitation | null = null;
 
+  private sub = new Subscription();
+
   //ids de status
   statusMapById: Record<number, string> = {
-    1: 'Orçada',
-    2: 'Aprovada',
-    3: 'Rejeitada',
-    4: 'Arrumada',
-    5: 'Paga',
+    1: 'ABERTA',
+    2: 'ORÇADA',
+    3: 'REJEITADA',
+    4: 'APROVADA',
+    5: 'REDIRECIONADA',
+    6: 'ARRUMADA',
+    7: 'PAGA',
+    8: 'FINALIZADA',
+    9: 'CANCELADA',
   };
 
   constructor(
@@ -50,17 +60,10 @@ export class HomeCliente {
   ) {}
 
   ngOnInit(): void {
-    this.loadSolicitations();
-  }
-
-  // carrega e normaliza os dados
-  loadSolicitations() {
     this.loading = true;
-    this.error = null;
-    this.jsonService.getUsers().subscribe({
-      next: (data: any[]) => {
-        this.solicitations = (data || []).map((d) => this.normalize(d));
-        // ordenar crescente por data/hora
+    const s = this.jsonService.users$.subscribe({
+      next: (arr) => {
+        this.solicitations = (arr || []).map((d) => this.normalize(d));
         this.solicitations.sort((a, b) => {
           const da =
             this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
@@ -76,6 +79,17 @@ export class HomeCliente {
         this.loading = false;
       },
     });
+    this.sub.add(s);
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
+
+  // verifica se pode cancelar
+  canCancel(s: Solicitation): boolean {
+    const status = this.getStatus(s);
+    return !['ARRUMADA', 'PAGA', 'FINALIZADA', 'CANCELADA'].includes(status);
   }
 
   normalize(d: any): Solicitation {
@@ -128,49 +142,73 @@ export class HomeCliente {
   }
 
   // atualizar o status localmente e simular chamada ao backend
-  private updateStatusLocal(
+  private updateStatusRemote(
     s: Solicitation,
     newStatusName: string,
-    newStatusId?: number
+    newStatusId?: number,
+    actor: 'CLIENTE' | 'FUNCIONARIO' | 'SYSTEM' = 'CLIENTE'
   ) {
-    const prev = this.getStatus(s);
-    if (newStatusId !== undefined) s.idStatus = newStatusId;
-    s.state = newStatusName;
-    console.log(
-      `Histórico: solicitação ${
-        s.id ?? s.idSolicitacao
-      } - ${prev} -> ${newStatusName}`
-    );
-    // Fazer aqui a chamada para o backend por service, quando tivermos o backend
+    const id = s.idSolicitacao ?? s.id;
+    if (id === undefined) {
+      console.error('Solicitação sem ID, não é possível atualizar status', s);
+      return;
+    }
+
+    this.jsonService
+      .updateStatus(id, newStatusId, newStatusName, actor)
+      .subscribe({
+        next: (updated) => console.log('Status atualizado (mock):', updated),
+        error: (err) => console.error('Erro ao atualizar status (mock):', err),
+      });
   }
 
   approve(s: Solicitation) {
-    // Orçada -> Aprovada
-    this.updateStatusLocal(s, 'Aprovada', 2);
+    // Orçada -> Aprovada (ex.: id 4)
+    this.updateStatusRemote(s, 'APROVADA', 4, 'CLIENTE');
   }
 
   reject(s: Solicitation) {
-    // Orçada -> Rejeitada
-    this.updateStatusLocal(s, 'Rejeitada', 3);
+    // Orçada -> Rejeitada (ex.: id 3)
+    this.updateStatusRemote(s, 'REJEITADA', 3, 'CLIENTE');
   }
 
-  rescue(s: Solicitation) {
-    // Rejeitada -> Orçada (resgatar)
-    this.updateStatusLocal(s, 'Orçada', 1);
+  //resgatar de CANCELADA -> ABERTA
+  rescueFromCancelled(s: Solicitation) {
+    const ok = window.confirm(
+      'Deseja resgatar esta solicitação e reabrí-la (ABERTA)?'
+    );
+    if (!ok) return;
+    this.updateStatusRemote(s, 'ABERTA', 1, 'CLIENTE');
+  }
+
+  //resgatar de REJEITADA -> ORÇADA
+  rescueFromRejected(s: Solicitation) {
+    this.updateStatusRemote(s, 'ORÇADA', 2, 'CLIENTE');
   }
 
   pay(s: Solicitation) {
-    // Arrumada -> Paga
-    this.updateStatusLocal(s, 'Paga', 5);
+    this.updateStatusRemote(s, 'PAGA', 7, 'CLIENTE');
+  }
+
+  // cancelar (com confirmação)
+  cancel(s: Solicitation) {
+    if (!this.canCancel(s)) return;
+    const ok = window.confirm('Deseja cancelar esta solicitação?');
+    if (!ok) return;
+    this.updateStatusRemote(s, 'CANCELADA', 9, 'CLIENTE');
   }
 
   // decidir quais botões mostrar
   showActionsFor(s: Solicitation) {
     const status = this.getStatus(s);
     return {
-      showApproveReject: status === 'Orçada',
-      showRescue: status === 'Rejeitada',
-      showPay: status === 'Arrumada',
+      showApproveReject: status === 'ORÇADA',
+      showRescueRejeitada: status === 'REJEITADA',
+      showPay: status === 'ARRUMADA',
+      showCancel: !['ARRUMADA', 'PAGA', 'FINALIZADA', 'CANCELADA'].includes(
+        status
+      ),
+      showRescueCancelled: status === 'CANCELADA',
     };
   }
 

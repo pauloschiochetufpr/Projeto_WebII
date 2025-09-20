@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { JsonTestService, User } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
+import { FuncHeader } from '../../components/func-header/func-header';
 
 interface DisplayUser {
   id?: number | string | null;
@@ -23,7 +24,13 @@ interface DisplayUser {
 @Component({
   selector: 'app-listar',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, RangeDatePicker],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    RangeDatePicker,
+    FuncHeader,
+  ],
   templateUrl: './listar.html',
   styleUrls: ['./listar.css'],
 })
