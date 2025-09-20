@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { JsonTestService, User } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
+
 import { FuncHeader } from '../../components/func-header/func-header';
 
 interface DisplayUser {
@@ -64,7 +65,7 @@ export class Listar {
           this.loading = false;
           return of([] as User[]);
         }),
-        // garantir que temos um array (se for envelope, extrair)
+
         map((res: any) => {
           const arr = Array.isArray(res) ? res : res?.data ?? res?.items ?? [];
           return arr;
@@ -103,7 +104,6 @@ export class Listar {
       });
   }
 
-  // ---------- helpers de data ----------
   private parseDate(value?: string | null): Date | null {
     if (!value) return null;
     const d = new Date(value);
@@ -124,6 +124,7 @@ export class Listar {
 
     if (this.filtro === 'TODAS') return this.users;
 
+    // filtro principal
     if (this.filtro === 'HOJE') {
       const today = new Date();
       return this.users.filter((u) => {

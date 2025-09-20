@@ -33,6 +33,34 @@
 
       <button (click)="onRefresh()" class="btn-refresh">Atualizar</button>
     </div>
+
+    <!-- Estatísticas rápidas (detalhes extras) -->
+    <div class="stats">
+      <p>Total de solicitações: {{ totalSolicitacoes }}</p>
+      <p>Pendentes: {{ totalPendentes }}</p>
+      <p>Concluídas: {{ totalConcluidas }}</p>
+      <p>Solicitações de hoje: {{ totalHoje }}</p>
+    </div>
+
+    <!-- Filtros extras simples -->
+    <div class="extra-filters">
+      <label>
+        Buscar por cliente:
+        <input
+          type="text"
+          [(ngModel)]="searchClient"
+          placeholder="Nome do cliente"
+        />
+      </label>
+      <label>
+        Buscar por estado:
+        <select [(ngModel)]="searchState">
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Concluído">Concluído</option>
+        </select>
+      </label>
+    </div>
   </div>
 
   <!-- resumo do status da leitura -->
