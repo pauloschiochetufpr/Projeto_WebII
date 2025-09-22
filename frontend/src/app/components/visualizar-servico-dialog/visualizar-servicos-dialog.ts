@@ -37,7 +37,7 @@ export class VisualizarServicoDialog {
     @Inject(MAT_DIALOG_DATA) public data: { user: Solicitation }
   ) {}
 
-  // RF012 - Efetuar Orçamento
+  // Efetuar Orçamento
   efetuarOrcamento() {
     const valor = prompt('Digite o valor do orçamento:');
     if (valor) {
@@ -46,12 +46,12 @@ export class VisualizarServicoDialog {
     }
   }
 
-  // RF006 - Aprovar Serviço
+  // Aprovar Serviço
   aprovar() {
     this.dialogRef.close({ action: 'APROVAR', user: this.data.user });
   }
 
-  // RF007 - Rejeitar Serviço
+  // Rejeitar Serviço
   rejeitar() {
     const motivo = prompt('Informe o motivo da rejeição:');
     if (motivo) {
@@ -59,12 +59,12 @@ export class VisualizarServicoDialog {
     }
   }
 
-  // RF009 - Resgatar serviço rejeitado
+  // Resgatar serviço rejeitado
   resgatar() {
     this.dialogRef.close({ action: 'RESGATAR', user: this.data.user });
   }
 
-  // RF014 - Efetuar Manutenção
+  // Efetuar Manutenção
   registrarManutencao() {
     this.dialogRef.close({
       action: 'ARRUMAR',
@@ -74,18 +74,18 @@ export class VisualizarServicoDialog {
     });
   }
 
-  // RF014 - Redirecionar Manutenção
+  // Redirecionar Manutenção
   redirecionar() {
     const destino = prompt('Digite o destino para redirecionamento:');
     this.dialogRef.close({ action: 'REDIRECIONAR', user: this.data.user, destino });
   }
 
-  // RF010 - Pagar Serviço
+  // Pagar Serviço
   pagar() {
     this.dialogRef.close({ action: 'PAGAR', user: this.data.user });
   }
 
-  // RF016 - Finalizar Solicitação
+  // Finalizar Solicitação
   finalizar() {
     this.dialogRef.close({ action: 'FINALIZAR', user: this.data.user });
   }
