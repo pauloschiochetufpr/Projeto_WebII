@@ -1,7 +1,7 @@
 <div class="dialog-container">
   <h2>Detalhes da Solicitação</h2>
 
-  <!-- RF008 - Dados principais -->
+  <!-- Dados principais -->
   <p><strong>ID:</strong> {{ data.user.id }}</p>
   <p><strong>Cliente:</strong> {{ data.user.requesterName }}</p>
   <p><strong>Descrição:</strong> {{ data.user.description }}</p>
@@ -9,7 +9,7 @@
   <p><strong>Estado Atual:</strong> {{ data.user.state }}</p>
   <p><strong>Destino:</strong> {{ data.user.redirectDestinationName || '-' }}</p>
 
-  <!-- RF008 - Histórico -->
+  <!-- Histórico -->
   <h3>Histórico</h3>
   <ul>
     <li *ngFor="let step of data.user.history">
@@ -18,19 +18,17 @@
     </li>
   </ul>
 
-  <!-- Ações dinâmicas -->
   <div class="acoes">
-    <!-- RF012 -->
     <button *ngIf="data.user.state === 'ABERTA'" (click)="efetuarOrcamento()">Efetuar Orçamento</button>
 
-    <!-- RF005, RF006, RF007 -->
+    <!-- mostrar orçamento aprovar/rejeitar serviço -->
     <div *ngIf="data.user.state === 'ORÇADA'">
       <p><strong>Orçamento:</strong> R$ {{ data.user.budget }}</p>
       <button (click)="aprovar()">Aprovar</button>
       <button (click)="rejeitar()">Rejeitar</button>
     </div>
 
-    <!-- RF014 -->
+    <!-- efetuar manutenção -->
     <div *ngIf="data.user.state === 'APROVADA' || data.user.state === 'REDIRECIONADA'">
       <textarea [(ngModel)]="descricaoManutencao" placeholder="Descrição da manutenção"></textarea>
       <textarea [(ngModel)]="orientacoesCliente" placeholder="Orientações para o cliente"></textarea>
@@ -38,16 +36,15 @@
       <button (click)="redirecionar()">Redirecionar</button>
     </div>
 
-    <!-- RF010 -->
+    <!-- pagar serviço -->
     <div *ngIf="data.user.state === 'ARRUMADA'">
       <p><strong>Valor:</strong> R$ {{ data.user.budget }}</p>
       <button (click)="pagar()">Confirmar Pagamento</button>
     </div>
 
-    <!-- RF016 -->
     <button *ngIf="data.user.state === 'PAGA'" (click)="finalizar()">Finalizar</button>
 
-    <!-- RF009 -->
+    <!-- resgatar serviço -->
     <button *ngIf="data.user.state === 'REJEITADA'" (click)="resgatar()">Resgatar</button>
   </div>
 
