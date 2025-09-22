@@ -101,6 +101,8 @@ export class HomeCliente implements OnInit, OnDestroy {
     };
   }
 
+  
+
   getDateString(s: Solicitation): string | null {
     return s.dataHora ?? s.createdAt ?? s.date ?? null;
   }
