@@ -24,7 +24,7 @@
     "dataHora": "2025-09-02T14:30:00-03:00",
     "idCliente": 102,
     "valor": 150.0,
-    "idStatus": 1
+    "idStatus": 3
   },
   {
     "idSolicitacao": 4,
@@ -33,6 +33,33 @@
     "dataHora": "2025-09-03T09:00:00-03:00",
     "idCliente": 103,
     "valor": 100.0,
-    "idStatus": 3
+    "idStatus": 4
+  },
+  {
+    "idSolicitacao": 5,
+    "nome": "Sansung A31",
+    "descricao": "Entrada do chip não funciona",
+    "dataHora": "2025-09-21T09:00:00-03:00",
+    "idCliente": 104,
+    "valor": 70.0,
+    "idStatus": 5
+  },
+  {
+    "idSolicitacao": 6,
+    "nome": "iPhone 11",
+    "descricao": "Troca da tela",
+    "dataHora": "2025-09-21T09:00:00-03:00",
+    "idCliente": 105,
+    "valor": 300.0,
+    "idStatus": 6
+  },
+  {
+    "idSolicitacao": 7,
+    "nome": "Motorola G9",
+    "descricao": "Celular não liga",
+    "dataHora": "2025-09-21T09:00:00-03:00",
+    "idCliente": 107,
+    "valor": 90.0,
+    "idStatus": 7
   }
 ]

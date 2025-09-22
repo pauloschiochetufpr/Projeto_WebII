@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -39,10 +40,13 @@ interface DisplayUser {
   styleUrls: ['./listar.css'],
 })
 export class Listar implements OnInit {
+export class Listar implements OnInit {
   users: DisplayUser[] = [];
   loading = false;
   error: string | null = null;
   summary = 'Pressione "Atualizar" para carregar';
+  periodStartMs: number | null = null;
+  periodEndMs: number | null = null;
   periodStartMs: number | null = null;
   periodEndMs: number | null = null;
 
