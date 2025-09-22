@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { JsonTestService } from '../../services/jsontest'; // Mudar para o banco de dados quando fizermos o backend
+import { JsonTestService } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
+import { VisualizarServicoClienteDialog } from '../../components/visualizar-servico-cliente/visualizar-servico-cliente';
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -27,7 +29,7 @@ export interface Solicitation {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule],
   templateUrl: './home-cliente.html',
   styleUrl: './home-cliente.css',
 })
@@ -36,12 +38,9 @@ export class HomeCliente implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
 
-  // item selecionado para visualizar
-  selected: Solicitation | null = null;
-
   private sub = new Subscription();
 
-  //ids de status
+  // ids de status
   statusMapById: Record<number, string> = {
     1: 'ABERTA',
     2: 'ORÇADA',
@@ -56,7 +55,8 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   constructor(
     private jsonService: JsonTestService,
-    private dateSelection: DateSelection
+    private dateSelection: DateSelection,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -84,12 +84,6 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
-  }
-
-  // verifica se pode cancelar
-  canCancel(s: Solicitation): boolean {
-    const status = this.getStatus(s);
-    return !['ARRUMADA', 'PAGA', 'FINALIZADA', 'CANCELADA'].includes(status);
   }
 
   normalize(d: any): Solicitation {
@@ -135,10 +129,22 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   // ----------------- Ações -----------------
 
-  // abrir visualização
+  // abrir dialog de visualização (RF008 + demais RFs do cliente)
   view(s: Solicitation) {
-    this.selected = s;
-    console.log('Visualizar solicitação', s);
+    const ref = this.dialog.open(VisualizarServicoClienteDialog, {
+      width: '600px',
+      data: s,
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.updateStatusRemote(
+        s,
+        result.newStatusName,
+        result.newStatusId,
+        'CLIENTE'
+      );
+    });
   }
 
   // atualizar o status localmente e simular chamada ao backend
@@ -160,56 +166,6 @@ export class HomeCliente implements OnInit, OnDestroy {
         next: (updated) => console.log('Status atualizado (mock):', updated),
         error: (err) => console.error('Erro ao atualizar status (mock):', err),
       });
-  }
-
-  approve(s: Solicitation) {
-    // Orçada -> Aprovada (ex.: id 4)
-    this.updateStatusRemote(s, 'APROVADA', 4, 'CLIENTE');
-  }
-
-  reject(s: Solicitation) {
-    // Orçada -> Rejeitada (ex.: id 3)
-    this.updateStatusRemote(s, 'REJEITADA', 3, 'CLIENTE');
-  }
-
-  //resgatar de CANCELADA -> ABERTA
-  rescueFromCancelled(s: Solicitation) {
-    const ok = window.confirm(
-      'Deseja resgatar esta solicitação e reabrí-la (ABERTA)?'
-    );
-    if (!ok) return;
-    this.updateStatusRemote(s, 'ABERTA', 1, 'CLIENTE');
-  }
-
-  //resgatar de REJEITADA -> ORÇADA
-  rescueFromRejected(s: Solicitation) {
-    this.updateStatusRemote(s, 'ORÇADA', 2, 'CLIENTE');
-  }
-
-  pay(s: Solicitation) {
-    this.updateStatusRemote(s, 'PAGA', 7, 'CLIENTE');
-  }
-
-  // cancelar (com confirmação)
-  cancel(s: Solicitation) {
-    if (!this.canCancel(s)) return;
-    const ok = window.confirm('Deseja cancelar esta solicitação?');
-    if (!ok) return;
-    this.updateStatusRemote(s, 'CANCELADA', 9, 'CLIENTE');
-  }
-
-  // decidir quais botões mostrar
-  showActionsFor(s: Solicitation) {
-    const status = this.getStatus(s);
-    return {
-      showApproveReject: status === 'ORÇADA',
-      showRescueRejeitada: status === 'REJEITADA',
-      showPay: status === 'ARRUMADA',
-      showCancel: !['ARRUMADA', 'PAGA', 'FINALIZADA', 'CANCELADA'].includes(
-        status
-      ),
-      showRescueCancelled: status === 'CANCELADA',
-    };
   }
 
   // função util para formatar a data exibida

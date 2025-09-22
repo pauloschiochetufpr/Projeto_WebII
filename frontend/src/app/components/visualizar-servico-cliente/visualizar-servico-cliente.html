@@ -1,0 +1,40 @@
+<div class="p-4 space-y-4">
+  <h2 class="text-lg font-bold">Detalhes da Solicitação</h2>
+
+  <div class="space-y-1 text-sm">
+    <p><strong>ID:</strong> {{ data.id ?? data.idSolicitacao }}</p>
+    <p><strong>Nome:</strong> {{ data.nome ?? data.name }}</p>
+    <p><strong>Data/Hora:</strong> {{ data.dataHora ?? data.createdAt | date:'short' }}</p>
+    <p><strong>Estado:</strong> {{ data.state }}</p>
+    <p><strong>Descrição:</strong> {{ data.descricao ?? data.description ?? '—' }}</p>
+    <p *ngIf="data.valor"><strong>Valor:</strong> R$ {{ data.valor }}</p>
+  </div>
+
+  <!-- Ações -->
+  <div class="flex flex-wrap gap-2">
+    <button *ngIf="data.state === 'ORÇADA'"
+            (click)="aprovar()"
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+      Aprovar
+    </button>
+    <button *ngIf="data.state === 'ORÇADA'"
+            (click)="rejeitar()"
+            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+      Rejeitar
+    </button>
+    <button *ngIf="data.state === 'REJEITADA'"
+            (click)="resgatar()"
+            class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">
+      Resgatar
+    </button>
+    <button *ngIf="data.state === 'ARRUMADA'"
+            (click)="pagar()"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+      Pagar
+    </button>
+  </div>
+
+  <div class="mt-4 text-right">
+    <button (click)="close()" class="px-3 py-1 border rounded">Fechar</button>
+  </div>
+</div>
