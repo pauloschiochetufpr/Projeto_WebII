@@ -1,0 +1,57 @@
+<div class="dialog-container">
+  <h2>Detalhes da Solicitação</h2>
+
+  <!-- RF008 - Dados principais -->
+  <p><strong>ID:</strong> {{ data.user.id }}</p>
+  <p><strong>Cliente:</strong> {{ data.user.requesterName }}</p>
+  <p><strong>Descrição:</strong> {{ data.user.description }}</p>
+  <p><strong>Data de Abertura:</strong> {{ data.user.createdAt | date: 'short' }}</p>
+  <p><strong>Estado Atual:</strong> {{ data.user.state }}</p>
+  <p><strong>Destino:</strong> {{ data.user.redirectDestinationName || '-' }}</p>
+
+  <!-- RF008 - Histórico -->
+  <h3>Histórico</h3>
+  <ul>
+    <li *ngFor="let step of data.user.history">
+      {{ step.date | date: 'short' }} - {{ step.state }} ({{ step.by }})
+      <span *ngIf="step.note"> — {{ step.note }}</span>
+    </li>
+  </ul>
+
+  <!-- Ações dinâmicas -->
+  <div class="acoes">
+    <!-- RF012 -->
+    <button *ngIf="data.user.state === 'ABERTA'" (click)="efetuarOrcamento()">Efetuar Orçamento</button>
+
+    <!-- RF005, RF006, RF007 -->
+    <div *ngIf="data.user.state === 'ORÇADA'">
+      <p><strong>Orçamento:</strong> R$ {{ data.user.budget }}</p>
+      <button (click)="aprovar()">Aprovar</button>
+      <button (click)="rejeitar()">Rejeitar</button>
+    </div>
+
+    <!-- RF014 -->
+    <div *ngIf="data.user.state === 'APROVADA' || data.user.state === 'REDIRECIONADA'">
+      <textarea [(ngModel)]="descricaoManutencao" placeholder="Descrição da manutenção"></textarea>
+      <textarea [(ngModel)]="orientacoesCliente" placeholder="Orientações para o cliente"></textarea>
+      <button (click)="registrarManutencao()">Efetuar Manutenção</button>
+      <button (click)="redirecionar()">Redirecionar</button>
+    </div>
+
+    <!-- RF010 -->
+    <div *ngIf="data.user.state === 'ARRUMADA'">
+      <p><strong>Valor:</strong> R$ {{ data.user.budget }}</p>
+      <button (click)="pagar()">Confirmar Pagamento</button>
+    </div>
+
+    <!-- RF016 -->
+    <button *ngIf="data.user.state === 'PAGA'" (click)="finalizar()">Finalizar</button>
+
+    <!-- RF009 -->
+    <button *ngIf="data.user.state === 'REJEITADA'" (click)="resgatar()">Resgatar</button>
+  </div>
+
+  <div class="acoes-secundarias">
+    <button (click)="close()">Fechar</button>
+  </div>
+</div>

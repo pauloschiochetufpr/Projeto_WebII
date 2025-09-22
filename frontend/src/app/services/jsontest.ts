@@ -13,8 +13,8 @@ export interface User {
   descricao?: string;
   description?: string;
   dataHora?: string;
-  createdAt?: string;
-  date?: string;
+  createdAt?: string | number | null;
+  date?: string | number | null;
   idStatus?: number;
   state?: string;
   valor?: number;
@@ -117,9 +117,16 @@ export class JsonTestService {
             }
             return d;
           });
-          this.users$$.next(normalized);
+
+          // aplicar normalização mais completa (datas/estado) antes de emitir
+          const fullyNormalized = this.normalizeUsers(normalized);
+
+          this.users$$.next(fullyNormalized);
           // salva no localStorage (opcional)
-          localStorage.setItem(this.storageKey, JSON.stringify(normalized));
+          localStorage.setItem(
+            this.storageKey,
+            JSON.stringify(fullyNormalized)
+          );
         })
       )
       .subscribe();
@@ -204,11 +211,7 @@ export class JsonTestService {
     this.hist$$.next(newHistArr);
     localStorage.setItem(this.histStorageKey, JSON.stringify(newHistArr));
 
-    // log para debug
-    console.log('updateStatus: ', { id, newStatusId, newStatusName, actor });
-    console.log('hist created (mock):', hist);
-
-    // retornar o item atualizado como Observable (imitando uma resposta HTTP)
+    // retornamos o item atualizado
     return of(arr[idx]);
   }
 
@@ -260,5 +263,165 @@ export class JsonTestService {
     this.fetchFromAssets();
     this.hist$$.next([]);
     this.histCounter = 1;
+  }
+
+  // ------------------ NOVOS UTILITÁRIOS (NORMALIZAÇÃO / DATA) ------------------
+
+  /**
+   * Normaliza um array cru vindo do JSON para um formato consistente:
+   * - infere campo de data (createdAt)
+   * - tenta inferir state (state/status/statusName ou idStatus)
+   * - normaliza state (sem acento/UPPERCASE)
+   *
+   * Retorna um array pronto para ser consumido por componentes.
+   */
+  normalizeUsers(data: any[]): any[] {
+    // mapa default de idStatus -> nome (ajuste se seu backend tiver ids diferentes)
+    const statusMapById: Record<number, string> = {
+      1: 'ABERTA',
+      2: 'ORCADA',
+      3: 'REJEITADA',
+      4: 'APROVADA',
+      5: 'REDIRECIONADA',
+      6: 'ARRUMADA',
+      7: 'PAGA',
+      8: 'FINALIZADA',
+      9: 'CANCELADA',
+    };
+
+    return (data || []).map((item: any) => {
+      const dateStr = this.inferDateFromItem(item);
+
+      // estado textual preferido, cair para idStatus se houver
+      let stateRaw = item.state ?? item.status ?? item.statusName ?? null;
+      const idStatus = item.idStatus ?? item.statusId ?? item.StatusId ?? null;
+      if (!stateRaw && idStatus != null) {
+        const sid = Number(idStatus);
+        stateRaw = statusMapById[sid] ?? stateRaw;
+      }
+
+      const stateNormalized = stateRaw
+        ? this.normalizeStateForCompare(stateRaw)
+        : null;
+
+      return {
+        ...item, // preserva campos originais
+        idSolicitacao: item.idSolicitacao ?? item.ID ?? item.id ?? null,
+        id: item.id ?? item.idSolicitacao ?? item.ID ?? null,
+        createdAt: dateStr,
+        requesterName: item.requesterName ?? item.name ?? item.nome ?? null,
+        description: item.description ?? item.descricao ?? null,
+        state: stateNormalized,
+        redirectDestinationName:
+          item.redirectDestinationName ?? item.destination ?? null,
+        date: item.date ?? dateStr ?? null,
+      } as User;
+    });
+  }
+
+  /**
+   * Heurística para encontrar um campo de data no objeto.
+   * Retorna string|number|null (valor original detectado) — sem parse ainda.
+   */
+  inferDateFromItem(item: any): string | number | null {
+    if (!item || typeof item !== 'object') return null;
+
+    const candidates = [
+      'createdAt',
+      'created_at',
+      'date',
+      'data',
+      'dataHora',
+      'data_hora',
+      'datahora',
+      'created',
+      'timestamp',
+      'dt',
+      'dt_criacao',
+      'data_criacao',
+      'dataHoraCriacao',
+      'createdAtUtc',
+      'createdAtLocal',
+      'dataHoraEntrada',
+    ];
+
+    for (const key of candidates) {
+      if (key in item) {
+        const v = item[key];
+        if (v != null && this.isParsableDate(v)) return v;
+      }
+    }
+
+    // fallback: varre todas as propriedades
+    for (const k of Object.keys(item)) {
+      const v = item[k];
+      if (v == null) continue;
+      if (this.isParsableDate(v)) return v;
+    }
+
+    return null;
+  }
+
+  isParsableDate(v: any): boolean {
+    if (typeof v === 'number') {
+      // números grandes plausíveis como timestamp
+      if (v > 1e8) return true;
+      return false;
+    }
+    if (typeof v === 'string') {
+      const s = v.trim();
+      if (s.length === 0) return false;
+      const parsed = Date.parse(s);
+      if (!isNaN(parsed)) return true;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s) || /^\d{4}\/\d{2}\/\d{2}$/.test(s))
+        return true;
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Parse flexível que aceita number (s ou ms) e strings (ISO, DD/MM/YYYY, YYYYMMDD).
+   * Retorna Date|null.
+   */
+  parseDate(value?: string | number | null): Date | null {
+    if (value == null) return null;
+
+    if (typeof value === 'number') {
+      const v = value < 1e11 ? value * 1000 : value;
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if (typeof value === 'string') {
+      const s = value.trim();
+      const dmY = /^(\d{2})\/(\d{2})\/(\d{4})(?:\s+.*)?$/;
+      const m = s.match(dmY);
+      let candidate = s;
+      if (m) {
+        candidate = `${m[3]}-${m[2]}-${m[1]}`;
+      }
+
+      const parsed = Date.parse(candidate);
+      if (!isNaN(parsed)) return new Date(parsed);
+
+      const ymd = candidate.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if (ymd) {
+        const d = new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
+        return isNaN(d.getTime()) ? null : d;
+      }
+    }
+
+    return null;
+  }
+
+  // remove acentos e uppercase — idempotente
+  private normalizeStateForCompare(s: string | null | undefined): string {
+    if (!s) return '';
+    return s
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
   }
 }
