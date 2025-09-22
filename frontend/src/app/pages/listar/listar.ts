@@ -150,7 +150,7 @@ export class Listar implements OnInit {
     }
   }
 
-  // ✅ Corrigido: sempre retorna um array
+
   get listaFiltrada(): DisplayUser[] {
     if (!this.users || this.users.length === 0) return [];
 
@@ -196,7 +196,7 @@ export class Listar implements OnInit {
     });
   }
 
-  // ✅ RF008: abrir dialog e aplicar updates locais (RF012, RF006, RF007, RF009, RF014, RF010, RF016)
+  // Abre o dialog e aplica os updates locais na solicitacao
   abrirVisualizar(user: DisplayUser) {
     const ref = this.dialog.open(VisualizarServicoDialog, {
       width: '700px',
@@ -246,7 +246,7 @@ export class Listar implements OnInit {
     });
   }
 
-    // --- Totais usados no HTML ---
+    // totais que o html puxa
   get totalSolicitacoes(): number {
     return this.users.length;
   }
@@ -273,3 +273,4 @@ export class Listar implements OnInit {
   }
 
 }
+
