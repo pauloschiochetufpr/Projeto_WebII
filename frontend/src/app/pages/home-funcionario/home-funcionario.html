@@ -11,7 +11,6 @@
         <th class="p-2 text-left">Data / Hora</th>
         <th class="p-2 text-left">Cliente</th>
         <th class="p-2 text-left">Descrição (produto)</th>
-        <th class="p-2 text-left">Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -24,9 +23,7 @@
           <a
             [routerLink]="['/solicitacao/orcar']"
             [queryParams]="{ id: s.idSolicitacao ?? s.id }"
-            class="btn-orcar"
           >
-            Efetuar Orçamento
           </a>
         </td>
       </tr>
