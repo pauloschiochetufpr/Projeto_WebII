@@ -1,0 +1,122 @@
+<div class="p-4 max-w-2xl mx-auto">
+
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Solicitação de Manutenção</h2>
+      <p class="text-gray-600">Preencha o formulário abaixo para solicitar um serviço de manutenção</p>
+    </div>
+    <button 
+      (click)="goBack()" 
+      class="btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+      type="button">
+      Voltar
+    </button>
+  </div>
+
+  <div *ngIf="success" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+    <div class="flex items-center">
+      <span class="text-green-600 mr-2">✓</span>
+      <span class="text-green-800 font-medium">{{ success }}</span>
+    </div>
+    <p class="text-green-700 text-sm mt-1">
+      Sua solicitação foi ABERTA. Redirecionando...
+    </p>
+  </div>
+
+  <div *ngIf="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-center">
+      <span class="text-red-600 mr-2">✗</span>
+      <span class="text-red-800 font-medium">{{ error }}</span>
+    </div>
+  </div>
+
+  <div class="bg-white border rounded-lg p-6 shadow-sm">
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+
+      <div class="mb-4">
+        <label for="descricaoEquipamento" class="block text-sm font-medium text-gray-700 mb-2">
+          Descrição do Equipamento *
+        </label>
+        <input
+          type="text"
+          id="descricaoEquipamento"
+          name="descricaoEquipamento"
+          [(ngModel)]="formData.descricaoEquipamento"
+          required
+          maxlength="100"
+          placeholder="Ex: Notebook Dell Inspiron 15 3000"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+        <div class="mt-1 text-xs text-gray-500 text-right">
+          {{ formData.descricaoEquipamento?.length || 0 }}/100 caracteres
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="categoriaEquipamento" class="block text-sm font-medium text-gray-700 mb-2">
+          Categoria do Equipamento *
+        </label>
+        <select
+          id="categoriaEquipamento"
+          name="categoriaEquipamento"
+          [(ngModel)]="formData.categoriaEquipamento"
+          required
+          [disabled]="loadingCategorias"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
+          
+          <option value="">
+            {{ loadingCategorias ? 'Carregando.' : 'Selecione uma categoria' }}
+          </option>
+          
+          <option *ngFor="let categoria of categorias" [value]="categoria.nome">
+            {{ categoria.nome }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-6">
+        <label for="descricaoDefeito" class="block text-sm font-medium text-gray-700 mb-2">
+          Descrição do Defeito *
+        </label>
+        <textarea
+          id="descricaoDefeito"
+          name="descricaoDefeito"
+          [(ngModel)]="formData.descricaoDefeito"
+          required
+          rows="4"
+          maxlength="500"
+          placeholder="Qual o problema?"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical">
+        </textarea>
+        <div class="mt-1 text-xs text-gray-500 text-right">
+          {{ formData.descricaoDefeito?.length || 0 }}/500 caracteres
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          [disabled]="loading || form.invalid"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-6 rounded-md transition-colors disabled:cursor-not-allowed flex items-center">
+          
+          <span *ngIf="loading" class="mr-2">
+            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+          
+          {{ loading ? 'Enviando...' : 'Solicitar Manutenção' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+  <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-blue-800 text-sm">
+      <strong>E agora?:</strong> 
+      Você será notificado por e-mail quando nós fizermos e mandarmos
+      o orçamento, fique no aguardo e atento.
+    </p>
+  </div>
+
+</div>
