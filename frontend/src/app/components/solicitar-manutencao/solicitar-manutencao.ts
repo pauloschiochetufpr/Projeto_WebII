@@ -5,20 +5,22 @@ import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { SolicitacaoService } from '../../services/solicitacao';
-import { SolicitacaoCreateDto, CategoriaEquipamento } from '../../models/solicitacao.model'
+import {
+  SolicitacaoCreateDto,
+  CategoriaEquipamento,
+} from '../../models/solicitacao.model';
 
 @Component({
   selector: 'app-solicitar-manutencao',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './solicitar-manutencao.component.html'
+  templateUrl: './solicitar-manutencao.html',
 })
 export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
-  
   formData: SolicitacaoCreateDto = {
     descricaoEquipamento: '',
     categoriaEquipamento: '',
-    descricaoDefeito: ''
+    descricaoDefeito: '',
   };
 
   categorias: CategoriaEquipamento[] = [];
@@ -58,9 +60,9 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
           { id: 2, nome: 'Desktop', ativo: true },
           { id: 3, nome: 'Impressora', ativo: true },
           { id: 4, nome: 'Mouse', ativo: true },
-          { id: 5, nome: 'Teclado', ativo: true }
+          { id: 5, nome: 'Teclado', ativo: true },
         ];
-      }
+      },
     });
     this.sub.add(s);
   }
@@ -74,23 +76,25 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
     this.error = null;
     this.success = null;
 
-    const s = this.solicitacaoService.criarSolicitacao(this.formData).subscribe({
-      next: (response) => {
-        this.success = 'Solicitação enviada com sucesso!';
-        this.loading = false;
-        
-        // Limpar formulário após 2 segundos e redirecionar
-        setTimeout(() => {
-          this.resetForm();
-          this.router.navigate(['/cliente/home']);
-        }, 2000);
-      },
-      error: (err) => {
-        console.error('Erro ao enviar solicitação', err);
-        this.error = 'Erro ao enviar solicitação. Tente novamente.';
-        this.loading = false;
-      }
-    });
+    const s = this.solicitacaoService
+      .criarSolicitacao(this.formData)
+      .subscribe({
+        next: (response) => {
+          this.success = 'Solicitação enviada com sucesso!';
+          this.loading = false;
+
+          // Limpar formulário após 2 segundos e redirecionar
+          setTimeout(() => {
+            this.resetForm();
+            this.router.navigate(['/home-cliente']);
+          }, 2000);
+        },
+        error: (err) => {
+          console.error('Erro ao enviar solicitação', err);
+          this.error = 'Erro ao enviar solicitação. Tente novamente.';
+          this.loading = false;
+        },
+      });
     this.sub.add(s);
   }
 
@@ -117,18 +121,18 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
     }
     return true;
   }
- //
+  //
   private resetForm(): void {
     this.formData = {
       descricaoEquipamento: '',
       categoriaEquipamento: '',
-      descricaoDefeito: ''
+      descricaoDefeito: '',
     };
     this.error = null;
     this.success = null;
   }
   //voltar p inicio
   goBack(): void {
-    this.router.navigate(['/cliente/home']);
+    this.router.navigate(['/home-cliente']);
   }
 }
