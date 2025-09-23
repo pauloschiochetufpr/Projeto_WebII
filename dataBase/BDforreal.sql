@@ -7,6 +7,7 @@ Use manutencao;
 Create table cep(
     cep VARCHAR(8) PRIMARY KEY,      
     logradouro VARCHAR(255),
+    complemento VARCHAR(255),
     bairro VARCHAR(128),
     localidade VARCHAR(128),
     uf CHAR(2),
@@ -19,12 +20,11 @@ Create table cep(
 CREATE TABLE endereco (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
-    uf VARCHAR(2) NOT NULL,
-    cidade VARCHAR(128) NOT NULL,
-    logradouro VARCHAR(128) NOT NULL,
-    bairro VARCHAR(128) NOT NULL,
-    numero INT UNSIGNED NOT NULL,
-    complemento VARCHAR(255),
+    uf varchar(2) NOT NULL,
+    cidade varchar(128) NOT NULL,
+    logradouro varchar(128) NOT NULL,
+    bairro varchar(128) NOT NULL,
+    complemento INT UNSIGNED NOT NULL,
     principal BOOLEAN DEFAULT FALSE,
     ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (cep)

@@ -1,17 +1,11 @@
 <div>
-  <h2 class="pl-12 pt-12">Login</h2>
-  <form
-    [formGroup]="loginForm"
-    (ngSubmit)="onLoginSubmit()"
-    class="flex flex-col justify-start items-start pl-12 w-fit h-fit pb-12"
-  >
-    <label for="loginEmail">Email:</label>
+  <h2>Login</h2>
+  <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+    <label>Email:</label>
     <input
-      id="loginEmail"
       type="email"
       formControlName="email"
       placeholder="Digite seu email"
-      autocomplete="email"
     />
     <div *ngIf="loginForm.get('email')?.touched">
       <span *ngIf="emailValidoLogin === true" style="color: green">
@@ -22,14 +16,12 @@
       </span>
     </div>
 
-    <label for="loginPassword">Senha:</label>
+    <label>Senha:</label>
     <input
-      id="loginPassword"
       type="password"
       formControlName="password"
       maxlength="4"
       placeholder="Digite sua senha"
-      autocomplete="current-password"
     />
 
     <button
@@ -37,7 +29,6 @@
       [disabled]="
         loginForm.invalid || isSubmittingLogin || emailValidoLogin === false
       "
-      class="rounded-md bg-slate-500 text-white py-2 px-3 mt-5"
     >
       Entrar
     </button>
@@ -45,48 +36,34 @@
 
   <hr />
 
-  <h2 class="pl-12 pt-12">Cadastro</h2>
-  <form
-    [formGroup]="cadastroForm"
-    (ngSubmit)="onCadastroSubmit()"
-    class="flex flex-col justify-start items-start pl-12 w-fit h-fit"
-  >
-    <label for="cadastroCpf">CPF:</label>
+  <h2>Cadastro</h2>
+  <form [formGroup]="cadastroForm" (ngSubmit)="onCadastroSubmit()">
+    <label>CPF:</label>
     <input
-      id="cadastroCpf"
       type="text"
       formControlName="cpf"
       (input)="applyCpfMask()"
       maxlength="14"
       placeholder="000.000.000-00"
-      autocomplete="off"
     />
     <div
       *ngIf="
-        cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
-        cadastroForm.get('cpf')?.touched
-      "
+      cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
+      cadastroForm.get('cpf')?.touched
+    "
       style="color: red"
     >
       CPF inválido
     </div>
 
-    <label for="cadastroNome">Nome:</label>
-    <input
-      id="cadastroNome"
-      type="text"
-      formControlName="nome"
-      placeholder="Digite seu nome"
-      autocomplete="name"
-    />
+    <label>Nome:</label>
+    <input type="text" formControlName="nome" placeholder="Digite seu nome" />
 
-    <label for="cadastroEmail">E-mail:</label>
+    <label>E-mail:</label>
     <input
-      id="cadastroEmail"
       type="email"
       formControlName="email"
       placeholder="Digite seu email"
-      autocomplete="email"
     />
     <div *ngIf="cadastroForm.get('email')?.touched">
       <span *ngIf="emailValidoCadastro === true" style="color: green">
@@ -96,79 +73,43 @@
         E-mail inválido
       </span>
     </div>
-
-    <div *ngIf="isBuscandoCep" class="cep-loading">
-      Buscando CEP, por favor aguarde...
-    </div>
-    <label for="cadastroCep">CEP:</label>
+    <label>CEP:</label>
     <input
-      id="cadastroCep"
       type="text"
       formControlName="cep"
       (input)="applyCepMask()"
       maxlength="9"
       placeholder="00000-000"
-      autocomplete="postal-code"
     />
 
-    <label for="cadastroLogradouro">Logradouro:</label>
-    <input
-      id="cadastroLogradouro"
-      type="text"
-      formControlName="logradouro"
-      readonly
-      class="w-96"
-      autocomplete="address-line1"
-    />
+    <label>Logradouro:</label>
+    <input type="text" formControlName="logradouro" readonly />
 
-    <label for="cadastroBairro">Bairro:</label>
-    <input
-      id="cadastroBairro"
-      type="text"
-      formControlName="bairro"
-      readonly
-      autocomplete="address-line2"
-    />
+    <label>Bairro:</label>
+    <input type="text" formControlName="bairro" readonly />
 
-    <label for="cadastroCidade">Cidade:</label>
-    <input
-      id="cadastroCidade"
-      type="text"
-      formControlName="localidade"
-      readonly
-      autocomplete="address-level2"
-    />
+    <label>Cidade:</label>
+    <input type="text" formControlName="cidade" readonly />
 
-    <label for="cadastroUf">UF:</label>
-    <input
-      id="cadastroUf"
-      type="text"
-      formControlName="uf"
-      readonly
-      autocomplete="address-level1"
-    />
+    <label>UF:</label>
+    <input type="text" formControlName="uf" readonly />
 
-    <label for="cadastroNumero">Número:</label>
+    <label>Número:</label>
     <input
-      id="cadastroNumero"
       type="text"
       formControlName="numero"
       (input)="applyNumeroMask()"
       maxlength="8"
       placeholder="Número de sua residência"
-      class="w-64"
-      autocomplete="address-line2"
     />
 
-    <label for="cadastroTelefone">Telefone:</label>
+    <label>Telefone:</label>
     <input
-      id="cadastroTelefone"
       type="text"
       formControlName="telefone"
       (input)="applyPhoneMask()"
       maxlength="15"
       placeholder="(00) 00000-0000"
-      autocomplete="tel"
     />
     <div *ngIf="cadastroForm.get('telefone')?.touched">
       <span *ngIf="telefoneValidoCadastro === true" style="color: green">
@@ -187,7 +128,6 @@
         emailValidoCadastro === false ||
         telefoneValidoCadastro === false
       "
-      class="rounded-md bg-slate-500 text-white py-2 px-3 mt-5"
     >
       Cadastrar
     </button>

@@ -12,10 +12,7 @@ import {
   distinctUntilChanged,
   switchMap,
   filter,
-  takeWhile,
-  startWith,
 } from 'rxjs/operators';
-import { interval, of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -30,8 +27,6 @@ export class LoginComponent {
   emailValidoLogin: boolean | null = null;
   emailValidoCadastro: boolean | null = null;
   telefoneValidoCadastro: boolean | null = null;
-
-  isBuscandoCep = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
@@ -52,7 +47,7 @@ export class LoginComponent {
       telefone: ['', Validators.required],
       logradouro: [{ value: '', disabled: true }],
       bairro: [{ value: '', disabled: true }],
-      localidade: [{ value: '', disabled: true }],
+      cidade: [{ value: '', disabled: true }],
       uf: [{ value: '', disabled: true }],
       numero: [''],
     });
@@ -93,34 +88,21 @@ export class LoginComponent {
     this.cadastroForm
       .get('cep')
       ?.valueChanges.pipe(
+        debounceTime(1500),
         distinctUntilChanged(),
         filter((cep: string) => !!cep && cep.replace(/\D/g, '').length === 8),
-        switchMap((cep: string) => {
-          const numeros = cep.replace(/\D/g, '');
-          this.isBuscandoCep = true;
-          let tentativas = 0;
-
-          return interval(60000).pipe(
-            startWith(0),
-            switchMap(() => {
-              tentativas++;
-              return this.authService.validarCep(numeros);
-            }),
-            takeWhile((dados) => !dados && tentativas < 5, true)
-          );
-        })
+        switchMap((cep: string) =>
+          this.authService.validarCep(cep.replace(/\D/g, ''))
+        )
       )
       .subscribe((dados) => {
         if (dados) {
           this.cadastroForm.patchValue({
             logradouro: dados.logradouro || '',
             bairro: dados.bairro || '',
-            localidade: dados.localidade || '',
+            cidade: dados.localidade || '',
             uf: dados.uf || '',
           });
-          this.isBuscandoCep = false;
-        } else {
-          this.isBuscandoCep = true;
         }
       });
   }
