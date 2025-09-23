@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { SolicitacaoService } from './solicitacao.service';
-import { SolicitacaoCreateDto, CategoriaEquipamento } from './solicitacao.model';
+import { SolicitacaoService } from '../../services/solicitacao';
+import { SolicitacaoCreateDto, CategoriaEquipamento } from '../../models/solicitacao.model'
 
 @Component({
   selector: 'app-solicitar-manutencao',

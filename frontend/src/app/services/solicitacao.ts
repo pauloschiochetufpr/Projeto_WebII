@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { SolicitacaoCreateDto, CategoriaEquipamento } from './solicitacao.model';
+import { SolicitacaoCreateDto, CategoriaEquipamento } from '../models/solicitacao.model';
 
 @Injectable({
   providedIn: 'root'
