@@ -1,20 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
+import { JsonTestService, User } from '../../services/jsontest';
 
-import { JsonTestService } from '../../services/jsontest';
-import { DateSelection } from '../../services/date-selection';
-import { VisualizarServicoClienteDialog } from '../../components/visualizar-servico-cliente/visualizar-servico-cliente';
+import { FuncHeader } from '../../components/func-header/func-header';
 
 export interface Solicitation {
   idSolicitacao?: number;
   id?: number | string;
   idCliente?: number;
   nome?: string;
-  name?: string;
+  requesterName?: string;
   descricao?: string;
   description?: string;
   dataHora?: string;
@@ -22,25 +20,24 @@ export interface Solicitation {
   date?: string;
   idStatus?: number;
   state?: string;
-  valor?: number;
   [key: string]: any;
 }
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-home-funcionario',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule],
-  templateUrl: './home-cliente.html',
-  styleUrl: './home-cliente.css',
+  imports: [CommonModule, FormsModule, RouterModule, FuncHeader],
+  templateUrl: './home-funcionario.html',
+  styleUrls: ['./home-funcionario.css'],
 })
-export class HomeCliente implements OnInit, OnDestroy {
+export class HomeFuncionarioComponent implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
 
   private sub = new Subscription();
 
-  // ids de status
+  //ids de status
   statusMapById: Record<number, string> = {
     1: 'ABERTA',
     2: 'ORÇADA',
@@ -53,17 +50,18 @@ export class HomeCliente implements OnInit, OnDestroy {
     9: 'CANCELADA',
   };
 
-  constructor(
-    private jsonService: JsonTestService,
-    private dateSelection: DateSelection,
-    private dialog: MatDialog
-  ) {}
+  constructor(private jsonService: JsonTestService) {}
 
   ngOnInit(): void {
     this.loading = true;
     const s = this.jsonService.users$.subscribe({
       next: (arr) => {
-        this.solicitations = (arr || []).map((d) => this.normalize(d));
+        const all = (arr || []).map((d) => this.normalize(d));
+        // filtra apenas ABERTA
+        this.solicitations = all.filter(
+          (item) => this.getStatus(item) === 'ABERTA'
+        );
+        // ordena crescente por data/hora
         this.solicitations.sort((a, b) => {
           const da =
             this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
@@ -74,7 +72,7 @@ export class HomeCliente implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erro ao carregar solicitações', err);
+        console.error('Erro carregando solicitações (funcionario)', err);
         this.error = 'Erro ao carregar solicitações';
         this.loading = false;
       },
@@ -86,22 +84,21 @@ export class HomeCliente implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
+  // normaliza payload vindo do JSON para o formato usado aqui
   normalize(d: any): Solicitation {
     return {
       idSolicitacao:
         d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
       id: d.id ?? d.idSolicitacao,
       nome: d.nome ?? d.requesterName ?? d.name,
+      requesterName: d.requesterName ?? d.nome ?? d.name,
       descricao: d.descricao ?? d.description,
       dataHora: d.dataHora ?? d.createdAt ?? d.date,
       idStatus: d.idStatus,
       state: d.state ?? d.statusName ?? null,
-      valor: d.valor ?? d.value,
       ...d,
     };
   }
-
-  
 
   getDateString(s: Solicitation): string | null {
     return s.dataHora ?? s.createdAt ?? s.date ?? null;
@@ -113,13 +110,13 @@ export class HomeCliente implements OnInit, OnDestroy {
     return isNaN(d.getTime()) ? null : d;
   }
 
-  getName(s: Solicitation): string {
-    return (s.nome ?? s.name ?? '—') as string;
+  getClientName(s: Solicitation): string {
+    return (s.nome ?? s.requesterName ?? '—') as string;
   }
 
-  truncateName(s: Solicitation, max = 30) {
-    const n = this.getName(s);
-    return n.length > max ? n.slice(0, max - 1) + '…' : n;
+  getDescriptionTruncated(s: Solicitation, max = 30): string {
+    const desc = (s.descricao ?? s.description ?? '—') as string;
+    return desc.length > max ? desc.slice(0, max - 1) + '…' : desc;
   }
 
   getStatus(s: Solicitation): string {
@@ -129,48 +126,6 @@ export class HomeCliente implements OnInit, OnDestroy {
     return 'Desconhecido';
   }
 
-  // ----------------- Ações -----------------
-
-  // abrir dialog de visualização (RF008 + demais RFs do cliente)
-  view(s: Solicitation) {
-    const ref = this.dialog.open(VisualizarServicoClienteDialog, {
-      width: '600px',
-      data: s,
-    });
-
-    ref.afterClosed().subscribe((result) => {
-      if (!result) return;
-      this.updateStatusRemote(
-        s,
-        result.newStatusName,
-        result.newStatusId,
-        'CLIENTE'
-      );
-    });
-  }
-
-  // atualizar o status localmente e simular chamada ao backend
-  private updateStatusRemote(
-    s: Solicitation,
-    newStatusName: string,
-    newStatusId?: number,
-    actor: 'CLIENTE' | 'FUNCIONARIO' | 'SYSTEM' = 'CLIENTE'
-  ) {
-    const id = s.idSolicitacao ?? s.id;
-    if (id === undefined) {
-      console.error('Solicitação sem ID, não é possível atualizar status', s);
-      return;
-    }
-
-    this.jsonService
-      .updateStatus(id, newStatusId, newStatusName, actor)
-      .subscribe({
-        next: (updated) => console.log('Status atualizado (mock):', updated),
-        error: (err) => console.error('Erro ao atualizar status (mock):', err),
-      });
-  }
-
-  // função util para formatar a data exibida
   formatDateDisplay(s: Solicitation): string {
     const d = this.parseDateString(this.getDateString(s));
     return d ? d.toLocaleString() : '-';
