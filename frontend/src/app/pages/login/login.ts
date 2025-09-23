@@ -49,7 +49,7 @@ export class LoginComponent {
       bairro: [{ value: '', disabled: true }],
       cidade: [{ value: '', disabled: true }],
       uf: [{ value: '', disabled: true }],
-      complemento: [''],
+      numero: [''],
     });
 
     this.loginForm
@@ -184,6 +184,11 @@ export class LoginComponent {
     v = v.replace(/^(\d{2})(\d)/, '($1) $2');
     v = v.replace(/(\d{5})(\d)/, '$1-$2');
     this.cadastroForm.patchValue({ telefone: v }, { emitEvent: false });
+  }
+
+  applyNumeroMask() {
+    let v = this.cadastroForm.value.numero.replace(/\D/g, '');
+    this.cadastroForm.patchValue({ numero: v }, { emitEvent: false });
   }
 
   // ------------------------|

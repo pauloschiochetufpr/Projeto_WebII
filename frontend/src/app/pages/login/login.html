@@ -94,11 +94,13 @@
     <label>UF:</label>
     <input type="text" formControlName="uf" readonly />
 
-    <label>Complemento:</label>
+    <label>Número:</label>
     <input
       type="text"
-      formControlName="complemento"
-      placeholder="Número do endereço"
+      formControlName="numero"
+      (input)="applyNumeroMask()"
+      maxlength="8"
+      placeholder="Número de sua residência"
     />
 
     <label>Telefone:</label>
