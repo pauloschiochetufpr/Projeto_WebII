@@ -18,8 +18,11 @@ export interface Solicitation {
   [key: string]: any;
 }
 
-export interface CategoriaEquipamento {
-  id: number;
-  nome: string;
-  ativo: boolean;
+
+export class CategoriaEquipamento {
+  constructor(
+    public id: number = 0,
+    public nome: string = '',
+    public ativo: boolean = true
+  ) {}
 }

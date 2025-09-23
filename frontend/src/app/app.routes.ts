@@ -1,18 +1,21 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
-import { BtnFormCrudWorkersComponent } from './components/btn-form-crud-workers/btn-form-crud-workers.component';
+import { CadastroCategoriaComponent } from './pages/categoria-equipamento/cadastro-categoria/cadastro-categoria.component';
 import { CrudWorkersComponent } from './pages/crud-workers/crud-workers.component';
 import { Listar } from './pages/listar/listar';
 import { HomeCliente } from './pages/home-cliente/home-cliente';
 import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario';
 import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/solicitar-manutencao';
+import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component'
+
 
 export const routes: Routes = [
   { path: 'solicitacao/listar', component: Listar },
-  { path: 'btn-form-crud-workers', component: BtnFormCrudWorkersComponent },
+  { path: 'categoriaEquipamento/cadastrar', component: CadastroCategoriaComponent },
   { path: 'crud-workers', component: CrudWorkersComponent },
   { path: 'home-cliente', component: HomeCliente },
   { path: 'home-funcionario', component: HomeFuncionarioComponent },
   { path: 'solicitacao/criar', component: SolicitarManutencaoComponent },
   { path: '', component: LoginComponent },
+  { path: 'categoriaEquipamento', component: CategoriaEquipamentoComponent}
 ];

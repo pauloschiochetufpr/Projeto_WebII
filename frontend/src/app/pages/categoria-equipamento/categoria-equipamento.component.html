@@ -1,39 +1,31 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <h1>Gerenciar Categorias de Equipamento</h1>
-
-  <!-- Formulário de Inserção -->
-  <form id="formCategoria">
-    <label for="nomeCategoria">Nova Categoria:</label>
-    <input type="text" id="nomeCategoria" name="nomeCategoria" required>
-    <button type="submit">Adicionar</button>
-  </form>
-
-  <!-- Tabela de Listagem -->
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nome da Categoria</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="listaCategorias">
-      <tr>
-        <td>1</td>
-        <td>Notebook</td>
-        <td>
-          <button>Editar</button>
-          <button>Remover</button>
-        </td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>Impressora</td>
-        <td>
-          <button>Editar</button>
-          <button>Remover</button>
-        </td>
-      </tr>
-      <!-- Outras categorias podem ser adicionadas dinamicamente -->
-    </tbody>
-  </table>
+<h1>Categoria de Equipamento</h1>
+<table class="table table-striped table-bordered table-hover">
+<tbody>
+<tr>
+<th>Descrição</th>
+<th>Ativo</th>
+  <th class="text-center">
+    <a [routerLink]="['/categoriaEquipamento/cadastrar']" href="#" title="Novo" alt="Novo" class="btn btn-xs btn-success">
+      <i class="fa fa-plus" aria-hidden="true"></i> Novo
+    </a>
+</th>
+</tr>
+<tr *ngFor="let categoriaEquipamento of listaCategorias">
+<td>{{categoriaEquipamento.nome}}</td>
+<td>{{categoriaEquipamento.ativo}}</td>
+<td class="text-center" style="width: 300px">
+<a href="#" title="Editar" alt="Editar"
+class="btn btn-xs btn-info">
+<i class="fa fa-edit" aria-hidden="true"></i> Editar
+</a>
+<a href="#" title="Remover" alt="Remover"
+class="btn btn-xs btn-danger">
+<i class="fa fa-times" aria-hidden="true"></i> Remover
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+<p *ngIf="listaCategorias.length===0">Nenhuma categoria cadastrada.</p>
