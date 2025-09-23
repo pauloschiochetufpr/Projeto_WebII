@@ -3,7 +3,7 @@
   <div class="mb-6 flex items-center justify-between">
     <div>
       <h2 class="text-2xl font-bold text-gray-900 mb-2">Solicitação de Manutenção</h2>
-      <p class="text-gray-600">Preencha o formulário abaixo para solicitar um serviço de manutenção</p>
+      <p class="text-gray-600">Preencha o formulário abaixo para solicitar nossa manutenção</p>
     </div>
     <button 
       (click)="goBack()" 
@@ -19,7 +19,7 @@
       <span class="text-green-800 font-medium">{{ success }}</span>
     </div>
     <p class="text-green-700 text-sm mt-1">
-      Sua solicitação foi ABERTA. Redirecionando...
+      Sua solicitação foi ABERTA.
     </p>
   </div>
 
@@ -44,7 +44,7 @@
           [(ngModel)]="formData.descricaoEquipamento"
           required
           maxlength="100"
-          placeholder="Ex: Notebook Dell Inspiron 15 3000"
+          placeholder="Ex: Notebook Dell"
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         <div class="mt-1 text-xs text-gray-500 text-right">
@@ -113,7 +113,7 @@
   </div>
   <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
     <p class="text-blue-800 text-sm">
-      <strong>E agora?:</strong> 
+      <strong>E depois dissogit ?:</strong> 
       Você será notificado por e-mail quando nós fizermos e mandarmos
       o orçamento, fique no aguardo e atento.
     </p>
