@@ -55,7 +55,7 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   constructor(
     private jsonService: JsonTestService,
-    private dateSelection: DateSelection,
+    public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
 
@@ -100,8 +100,6 @@ export class HomeCliente implements OnInit, OnDestroy {
       ...d,
     };
   }
-
-  
 
   getDateString(s: Solicitation): string | null {
     return s.dataHora ?? s.createdAt ?? s.date ?? null;
@@ -168,11 +166,5 @@ export class HomeCliente implements OnInit, OnDestroy {
         next: (updated) => console.log('Status atualizado (mock):', updated),
         error: (err) => console.error('Erro ao atualizar status (mock):', err),
       });
-  }
-
-  // função util para formatar a data exibida
-  formatDateDisplay(s: Solicitation): string {
-    const d = this.parseDateString(this.getDateString(s));
-    return d ? d.toLocaleString() : '-';
   }
 }
