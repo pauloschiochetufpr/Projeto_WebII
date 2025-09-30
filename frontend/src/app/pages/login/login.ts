@@ -12,7 +12,10 @@ import {
   distinctUntilChanged,
   switchMap,
   filter,
+  takeWhile,
+  startWith,
 } from 'rxjs/operators';
+import { interval, of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +30,7 @@ export class LoginComponent {
   emailValidoLogin: boolean | null = null;
   emailValidoCadastro: boolean | null = null;
   telefoneValidoCadastro: boolean | null = null;
+  isBuscandoCep = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
@@ -47,18 +51,24 @@ export class LoginComponent {
       telefone: ['', Validators.required],
       logradouro: [{ value: '', disabled: true }],
       bairro: [{ value: '', disabled: true }],
-      cidade: [{ value: '', disabled: true }],
+      localidade: [{ value: '', disabled: true }],
       uf: [{ value: '', disabled: true }],
-      complemento: [''],
+      numero: ['', Validators.required],
+      complemento: ['', Validators.required],
     });
 
     this.loginForm
       .get('email')
       ?.valueChanges.pipe(
-        debounceTime(3000),
+        debounceTime(1000),
         distinctUntilChanged(),
-        filter((email: string) => !!email && email.includes('@')),
-        switchMap((email: string) => this.authService.validarEmail(email))
+        filter(
+          (email: string) =>
+            !!email && email.includes('@') && email.split('@')[1].length > 0
+        ),
+        switchMap((email: string) =>
+          this.authService.validarEmail(email.trim())
+        )
       )
       .subscribe((valido) => (this.emailValidoLogin = valido));
 
@@ -88,21 +98,35 @@ export class LoginComponent {
     this.cadastroForm
       .get('cep')
       ?.valueChanges.pipe(
-        debounceTime(1500),
         distinctUntilChanged(),
         filter((cep: string) => !!cep && cep.replace(/\D/g, '').length === 8),
-        switchMap((cep: string) =>
-          this.authService.validarCep(cep.replace(/\D/g, ''))
-        )
+        switchMap((cep: string) => {
+          const numeros = cep.replace(/\D/g, '');
+          this.isBuscandoCep = true;
+          let tentativas = 0;
+
+          return interval(120000).pipe(
+            // polling a cada 2 minutos
+            startWith(0),
+            switchMap(() => {
+              tentativas++;
+              return this.authService.validarCep(numeros);
+            }),
+            takeWhile((dados) => !dados && tentativas < 10, true)
+          );
+        })
       )
       .subscribe((dados) => {
         if (dados) {
           this.cadastroForm.patchValue({
             logradouro: dados.logradouro || '',
             bairro: dados.bairro || '',
-            cidade: dados.localidade || '',
+            localidade: dados.localidade || '',
             uf: dados.uf || '',
           });
+          this.isBuscandoCep = false;
+        } else {
+          this.isBuscandoCep = true;
         }
       });
   }
@@ -184,6 +208,11 @@ export class LoginComponent {
     v = v.replace(/^(\d{2})(\d)/, '($1) $2');
     v = v.replace(/(\d{5})(\d)/, '$1-$2');
     this.cadastroForm.patchValue({ telefone: v }, { emitEvent: false });
+  }
+
+  applyNumeroMask() {
+    let v = this.cadastroForm.value.numero.replace(/\D/g, ''); // remove tudo que não for número
+    this.cadastroForm.patchValue({ numero: v }, { emitEvent: false });
   }
 
   // ------------------------|
