@@ -224,11 +224,15 @@ export class Listar implements OnInit {
   }
 
   // Abre o dialog e aplica os updates locais na solicitacao
-  abrirVisualizar(user: DisplayUser) {
-    const ref = this.dialog.open(VisualizarServicoDialog, {
-      width: '700px',
-      data: { user, action: 'VISUALIZAR' },
-    });
+ abrirVisualizar(user: DisplayUser) {
+  const ref = this.dialog.open(VisualizarServicoDialog, {
+    width: '700px',
+    data: { 
+      user, 
+      action: 'VISUALIZAR',
+      currentDestination: this.currentEmployeeDestinationName  // 👈 passa pro dialog
+    }
+  });
 
     ref.afterClosed().subscribe((result: any) => {
       if (!result) return;
@@ -257,9 +261,12 @@ export class Listar implements OnInit {
           break;
         case 'REDIRECIONAR':
           this.users[idx].state = 'REDIRECIONADA';
+
           this.users[idx].redirectDestinationName =
-            result.destino ?? this.users[idx].redirectDestinationName;
-          break;
+            result.destino === 'CURRENT'
+          ? this.currentEmployeeDestinationName
+          : result.destino ?? this.users[idx].redirectDestinationName;
+             break;
         case 'PAGAR':
           this.users[idx].state = 'PAGA';
           break;
