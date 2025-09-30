@@ -83,4 +83,49 @@ export class DateSelection {
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   }
+
+  formatDateDisplay(
+    date?: string | number | Date | null,
+    showTime = false
+  ): string {
+    if (date === undefined || date === null || date === '') return '-';
+
+    let d: Date | null = null;
+
+    if (date instanceof Date) {
+      d = date;
+    } else if (typeof date === 'number') {
+      // número pode ser segundos (ex: 163...) ou ms (ex: 1630000000000)
+      // considerar números pequenos como segundos (<= 1e10)
+      const ms = date < 1e11 ? date * 1000 : date;
+      d = new Date(ms);
+    } else if (typeof date === 'string') {
+      const parsed = Date.parse(date);
+      if (!isNaN(parsed)) {
+        d = new Date(parsed);
+      } else {
+        // tentar DD/MM/YYYY -> converter para YYYY-MM-DD
+        const dmY = /^(\d{2})\/(\d{2})\/(\d{4})(?:\s+.*)?$/;
+        const m = date.trim().match(dmY);
+        if (m) {
+          const candidate = `${m[3]}-${m[2]}-${m[1]}`;
+          const p2 = Date.parse(candidate);
+          if (!isNaN(p2)) d = new Date(p2);
+        }
+      }
+    }
+
+    if (!d || isNaN(d.getTime())) return '-';
+
+    if (showTime) {
+      const datePart = d.toLocaleDateString('pt-BR');
+      const timePart = d.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      return `${datePart} ${timePart}`;
+    }
+
+    return d.toLocaleDateString('pt-BR'); // 'dd/mm/yyyy'
+  }
 }

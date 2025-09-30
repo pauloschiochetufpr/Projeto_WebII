@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { JsonTestService, User } from '../../services/jsontest';
 
 import { FuncHeader } from '../../components/func-header/func-header';
+import { DateSelection } from '../../services/date-selection';
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -50,7 +51,10 @@ export class HomeFuncionarioComponent implements OnInit, OnDestroy {
     9: 'CANCELADA',
   };
 
-  constructor(private jsonService: JsonTestService) {}
+  constructor(
+    private jsonService: JsonTestService,
+    public dateSelection: DateSelection
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
@@ -124,10 +128,5 @@ export class HomeFuncionarioComponent implements OnInit, OnDestroy {
     if (s.idStatus && this.statusMapById[s.idStatus])
       return this.statusMapById[s.idStatus];
     return 'Desconhecido';
-  }
-
-  formatDateDisplay(s: Solicitation): string {
-    const d = this.parseDateString(this.getDateString(s));
-    return d ? d.toLocaleString() : '-';
   }
 }

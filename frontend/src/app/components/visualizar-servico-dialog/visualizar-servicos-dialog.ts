@@ -32,10 +32,10 @@ export class VisualizarServicoDialog {
   descricaoManutencao: string = '';
   orientacoesCliente: string = '';
 
-  constructor(
-    public dialogRef: MatDialogRef<VisualizarServicoDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { user: Solicitation }
-  ) {}
+ constructor(
+  public dialogRef: MatDialogRef<VisualizarServicoDialog>,
+  @Inject(MAT_DIALOG_DATA) public data: { user: Solicitation, currentDestination: string }
+) {}
 
   // Efetuar Orçamento
   efetuarOrcamento() {
@@ -43,19 +43,6 @@ export class VisualizarServicoDialog {
     if (valor) {
       this.data.user.budget = parseFloat(valor);
       this.dialogRef.close({ action: 'ORÇAR', user: this.data.user, budget: this.data.user.budget });
-    }
-  }
-
-  // Aprovar Serviço
-  aprovar() {
-    this.dialogRef.close({ action: 'APROVAR', user: this.data.user });
-  }
-
-  // Rejeitar Serviço
-  rejeitar() {
-    const motivo = prompt('Informe o motivo da rejeição:');
-    if (motivo) {
-      this.dialogRef.close({ action: 'REJEITAR', user: this.data.user, motivo });
     }
   }
 
@@ -93,4 +80,13 @@ export class VisualizarServicoDialog {
   close() {
     this.dialogRef.close();
   }
+  // Redirecionar para si mesmo
+redirecionarParaMim() {
+  this.dialogRef.close({
+    action: 'REDIRECIONAR',
+    user: this.data.user,
+    destino: this.data.currentDestination 
+  });
+}
+
 }

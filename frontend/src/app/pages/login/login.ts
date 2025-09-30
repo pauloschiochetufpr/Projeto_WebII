@@ -30,8 +30,9 @@ export class LoginComponent {
   emailValidoLogin: boolean | null = null;
   emailValidoCadastro: boolean | null = null;
   telefoneValidoCadastro: boolean | null = null;
-
   isBuscandoCep = false;
+
+  
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
@@ -54,16 +55,23 @@ export class LoginComponent {
       bairro: [{ value: '', disabled: true }],
       localidade: [{ value: '', disabled: true }],
       uf: [{ value: '', disabled: true }],
-      numero: [''],
+
+      numero: ['', Validators.required],
+      complemento: ['', Validators.required],
     });
 
     this.loginForm
       .get('email')
       ?.valueChanges.pipe(
-        debounceTime(3000),
+        debounceTime(1000),
         distinctUntilChanged(),
-        filter((email: string) => !!email && email.includes('@')),
-        switchMap((email: string) => this.authService.validarEmail(email))
+        filter(
+          (email: string) =>
+            !!email && email.includes('@') && email.split('@')[1].length > 0
+        ),
+        switchMap((email: string) =>
+          this.authService.validarEmail(email.trim())
+        )
       )
       .subscribe((valido) => (this.emailValidoLogin = valido));
 
@@ -100,13 +108,18 @@ export class LoginComponent {
           this.isBuscandoCep = true;
           let tentativas = 0;
 
-          return interval(60000).pipe(
+
+          return interval(120000).pipe(
+            // polling a cada 2 minutos
             startWith(0),
             switchMap(() => {
               tentativas++;
               return this.authService.validarCep(numeros);
             }),
-            takeWhile((dados) => !dados && tentativas < 5, true)
+
+
+            takeWhile((dados) => !dados && tentativas < 10, true)
+
           );
         })
       )
@@ -205,7 +218,8 @@ export class LoginComponent {
   }
 
   applyNumeroMask() {
-    let v = this.cadastroForm.value.numero.replace(/\D/g, '');
+
+    let v = this.cadastroForm.value.numero.replace(/\D/g, ''); // remove tudo que não for número
     this.cadastroForm.patchValue({ numero: v }, { emitEvent: false });
   }
 

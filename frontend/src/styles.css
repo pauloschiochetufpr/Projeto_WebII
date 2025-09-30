@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sansation&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+
+
+@layer components {
+  .glass-background {
+    background: rgba(255, 255, 255, 0.19);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4.3px);
+    -webkit-backdrop-filter: blur(4.3px);
+    border: 1px solid rgba(255, 255, 255, 0.48);
+  }
+}
+
 /* 1) Dim do backdrop */
 .cdk-overlay-backdrop {
   background-color: rgba(0, 0, 0, 0.35) !important;

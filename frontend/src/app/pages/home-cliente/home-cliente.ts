@@ -101,8 +101,6 @@ export class HomeCliente implements OnInit, OnDestroy {
     };
   }
 
-  
-
   getDateString(s: Solicitation): string | null {
     return s.dataHora ?? s.createdAt ?? s.date ?? null;
   }
@@ -175,4 +173,10 @@ export class HomeCliente implements OnInit, OnDestroy {
     const d = this.parseDateString(this.getDateString(s));
     return d ? d.toLocaleString() : '-';
   }
+
+  // getter
+  formatDate(value?: string | number | null, withTime: boolean = true): string {
+  return this.dateSelection.formatDateDisplay(value, withTime);
+}
+
 }

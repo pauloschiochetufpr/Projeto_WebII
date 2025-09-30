@@ -22,54 +22,91 @@ public class CepService {
     private static final double RANDOM_FACTOR = 0.35;
     private static final Random RANDOM = new Random();
 
-    private final BlockingQueue<String> filaCep = new LinkedBlockingQueue<>();
+
+    private final BlockingQueue<PedidoCep> filaCep = new LinkedBlockingQueue<>();
     private volatile long ultimaRequisicao = 0;
     private RestTemplate restTemplate = new RestTemplate();
 
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
 
+    /**
+     * Estrutura interna para transportar CEP + future associado.
+     */
+    private static class PedidoCep {
+        String cep;
+        CompletableFuture<CepResponse> future;
+
+        PedidoCep(String cep, CompletableFuture<CepResponse> future) {
+            this.cep = cep;
+            this.future = future;
+        }
+    }
+
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
     @PostConstruct
     public void init() {
         worker.submit(() -> {
             while (true) {
                 try {
-                    String cep = filaCep.take();
-                    processarViaCep(cep);
+
+                    PedidoCep pedido = filaCep.take();
+                    CepModel dados = processarViaCep(pedido.cep);
+                    if (dados != null) {
+                        pedido.future.complete(buildCepResponse(dados));
+                    } else {
+                        pedido.future.complete(null);
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
+                } catch (Exception e) {
+                    e.printStackTrace(); // log simples
                 }
             }
         });
     }
 
-    public CepResponse validarCep(String cep) {
-        cep = cep.replaceAll("\\D", "");
 
-        if (cepRepository.existsByCep(cep)) {
-            CepModel entity = cepRepository.findByCep(cep);
-            return new CepResponse(
-                    entity.getCep(),
-                    entity.getLogradouro(),
-                    entity.getBairro(),
-                    entity.getLocalidade(),
-                    entity.getUf());
+    /**
+     * Valida ou agenda busca de CEP.
+     */
+    public CompletableFuture<CepResponse> validarCep(String cep) {
+        final String normalizedCep = cep.replaceAll("\\D", ""); // nova variável final
+
+        // se já estiver no banco, retorna direto
+        if (cepRepository.existsByCep(normalizedCep)) {
+            CepModel entity = cepRepository.findByCep(normalizedCep);
+            return CompletableFuture.completedFuture(buildCepResponse(entity));
         }
 
-        if (cep.endsWith("000")) { // qualquer CEP terminando com 000 é considerado desqualificado, por não definir logradouro
-            return null;
+        // CEP terminado com "000" é inválido
+        if (normalizedCep.endsWith("000")) {
+            return CompletableFuture.completedFuture(null);
         }
 
-        // Coloca na fila para processar
-        if (!filaCep.contains(cep)) {
-        filaCep.offer(cep);
+        // cria um future e coloca na fila
+        CompletableFuture<CepResponse> future = new CompletableFuture<>();
+
+        // evita duplicatas na fila
+        boolean jaNaFila = filaCep.stream().anyMatch(p -> p.cep.equals(normalizedCep));
+        if (!jaNaFila) {
+            filaCep.offer(new PedidoCep(normalizedCep, future));
+        } else {
+            // se já estiver na fila, devolve um future que só espera pelo processamento
+            future.complete(null);
         }
-        return null;
+
+        return future;
     }
-    
+
+
+    /**
+     * Processa consulta na API ViaCEP.
+     */
     private synchronized CepModel processarViaCep(String cep) {
         try {
-            // Timer global
+            // controle de intervalo global
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
             long agora = System.currentTimeMillis();
             long tempoDesdeUltima = agora - ultimaRequisicao;
             long intervaloRandom = INTERVALO_MINIMO_MS
@@ -81,7 +118,7 @@ public class CepService {
 
             ultimaRequisicao = System.currentTimeMillis();
 
-            // Chamada ViaCEP
+            // chamada ViaCEP
             String url = "https://viacep.com.br/ws/" + cep + "/json/";
             CepModel dados = restTemplate.getForObject(url, CepModel.class);
 
@@ -90,15 +127,29 @@ public class CepService {
 
                 dados.setCep(dados.getCep().replaceAll("-", ""));
 
-                // Salva no banco para próximas requisições
+
+                // salva no banco
                 cepRepository.save(dados);
                 return dados;
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // aqui vai para console/log padrão do Spring Boot
+            e.printStackTrace();
         }
-
         return null;
     }
+
+    /**
+     * Constrói o DTO de resposta a partir do modelo salvo.
+     */
+    private CepResponse buildCepResponse(CepModel entity) {
+        return new CepResponse(
+                entity.getCep(),
+                entity.getLogradouro(),
+                entity.getBairro(),
+                entity.getLocalidade(),
+                entity.getUf()
+        );
+    }
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
 }

@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -34,7 +33,7 @@ interface DisplayUser {
     RouterModule,
     RangeDatePicker,
     FuncHeader,
-    MatDialogModule
+    MatDialogModule,
   ],
   templateUrl: './listar.html',
   styleUrls: ['./listar.css'],
@@ -55,7 +54,7 @@ export class Listar implements OnInit {
 
   constructor(
     private jsonService: JsonTestService,
-    private dateSelection: DateSelection,
+    public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
 
@@ -76,8 +75,14 @@ export class Listar implements OnInit {
         const normalized = this.jsonService.normalizeUsers(data || []);
 
         normalized.sort((a: any, b: any) => {
-          const da = this.jsonService.parseDate(a.createdAt ?? a.date ?? null)?.getTime() ?? 0;
-          const db = this.jsonService.parseDate(b.createdAt ?? b.date ?? null)?.getTime() ?? 0;
+          const da =
+            this.jsonService
+              .parseDate(a.createdAt ?? a.date ?? null)
+              ?.getTime() ?? 0;
+          const db =
+            this.jsonService
+              .parseDate(b.createdAt ?? b.date ?? null)
+              ?.getTime() ?? 0;
           return da - db;
         });
 
@@ -100,9 +105,11 @@ export class Listar implements OnInit {
   }
 
   private isSameDay(a: Date, b: Date): boolean {
-    return a.getFullYear() === b.getFullYear() &&
-           a.getMonth() === b.getMonth() &&
-           a.getDate() === b.getDate();
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
   }
 
   private computePeriodFromSelection(): void {
@@ -123,33 +130,51 @@ export class Listar implements OnInit {
 
   private normalizeTextForCompare(s?: string | null): string {
     if (!s) return '';
-    return s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+    return s
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
   }
 
   isState(u: DisplayUser, expected: string): boolean {
-    return this.normalizeTextForCompare(u.state) === this.normalizeTextForCompare(expected);
+    return (
+      this.normalizeTextForCompare(u.state) ===
+      this.normalizeTextForCompare(expected)
+    );
   }
 
   private redirectAllowed(u: DisplayUser): boolean {
     if (this.normalizeTextForCompare(u.state) !== 'REDIRECIONADA') return true;
-    return this.normalizeTextForCompare(u.redirectDestinationName) === this.normalizeTextForCompare(this.currentEmployeeDestinationName);
+    return (
+      this.normalizeTextForCompare(u.redirectDestinationName) ===
+      this.normalizeTextForCompare(this.currentEmployeeDestinationName)
+    );
   }
 
   getStatusClass(state?: string | null): string {
     const st = this.normalizeTextForCompare(state);
     switch (st) {
-      case 'ABERTA': return 'bg-gray-300 text-gray-800';
-      case 'ORÇADA': return 'bg-amber-800 text-white';
-      case 'REJEITADA': return 'bg-red-500 text-white';
-      case 'APROVADA': return 'bg-yellow-300 text-black';
-      case 'REDIRECIONADA': return 'bg-purple-600 text-white';
-      case 'ARRUMADA': return 'bg-blue-500 text-white';
-      case 'PAGA': return 'bg-orange-500 text-white';
-      case 'FINALIZADA': return 'bg-green-500 text-white';
-      default: return 'bg-gray-200 text-gray-800';
+      case 'ABERTA':
+        return 'bg-gray-300 text-gray-800';
+      case 'ORCADA':
+        return 'bg-amber-800 text-white';
+      case 'REJEITADA':
+        return 'bg-red-500 text-white';
+      case 'APROVADA':
+        return 'bg-yellow-300 text-black';
+      case 'REDIRECIONADA':
+        return 'bg-purple-600 text-white';
+      case 'ARRUMADA':
+        return 'bg-blue-500 text-white';
+      case 'PAGA':
+        return 'bg-orange-500 text-white';
+      case 'FINALIZADA':
+        return 'bg-green-500 text-white';
+      default:
+        return 'bg-gray-200 text-gray-800';
     }
   }
-
 
   get listaFiltrada(): DisplayUser[] {
     if (!this.users || this.users.length === 0) return [];
@@ -158,17 +183,19 @@ export class Listar implements OnInit {
 
     if (this.searchClient.trim() !== '') {
       const q = this.searchClient.toLowerCase();
-      base = base.filter(u => (u.requesterName ?? '').toLowerCase().includes(q));
+      base = base.filter((u) =>
+        (u.requesterName ?? '').toLowerCase().includes(q)
+      );
     }
 
     if (this.searchState.trim() !== '') {
       const q = this.searchState.toLowerCase();
-      base = base.filter(u => (u.state ?? '').toLowerCase().includes(q));
+      base = base.filter((u) => (u.state ?? '').toLowerCase().includes(q));
     }
 
     if (this.filtro === 'HOJE') {
       const today = new Date();
-      base = base.filter(u => {
+      base = base.filter((u) => {
         const d = this.parseDate(u.createdAt ?? null);
         return d ? this.isSameDay(d, today) : false;
       });
@@ -177,7 +204,7 @@ export class Listar implements OnInit {
     if (this.filtro === 'PERIODO') {
       const startMs = this.periodStartMs;
       const endMs = this.periodEndMs;
-      base = base.filter(u => {
+      base = base.filter((u) => {
         const d = this.parseDate(u.createdAt ?? null);
         if (!d) return false;
         const t = d.getTime();
@@ -187,7 +214,7 @@ export class Listar implements OnInit {
       });
     }
 
-    base = base.filter(u => this.redirectAllowed(u));
+    base = base.filter((u) => this.redirectAllowed(u));
 
     return base.sort((a, b) => {
       const da = this.parseDate(a.createdAt)?.getTime() ?? 0;
@@ -197,16 +224,22 @@ export class Listar implements OnInit {
   }
 
   // Abre o dialog e aplica os updates locais na solicitacao
-  abrirVisualizar(user: DisplayUser) {
-    const ref = this.dialog.open(VisualizarServicoDialog, {
-      width: '700px',
-      data: { user, action: 'VISUALIZAR' }
-    });
+ abrirVisualizar(user: DisplayUser) {
+  const ref = this.dialog.open(VisualizarServicoDialog, {
+    width: '700px',
+    data: { 
+      user, 
+      action: 'VISUALIZAR',
+      currentDestination: this.currentEmployeeDestinationName  // 👈 passa pro dialog
+    }
+  });
 
     ref.afterClosed().subscribe((result: any) => {
       if (!result) return;
 
-      const idx = this.users.findIndex(u => String(u.id) === String(result.user?.id));
+      const idx = this.users.findIndex(
+        (u) => String(u.id) === String(result.user?.id)
+      );
       if (idx === -1) return;
 
       switch (result.action) {
@@ -228,8 +261,12 @@ export class Listar implements OnInit {
           break;
         case 'REDIRECIONAR':
           this.users[idx].state = 'REDIRECIONADA';
-          this.users[idx].redirectDestinationName = result.destino ?? this.users[idx].redirectDestinationName;
-          break;
+
+          this.users[idx].redirectDestinationName =
+            result.destino === 'CURRENT'
+          ? this.currentEmployeeDestinationName
+          : result.destino ?? this.users[idx].redirectDestinationName;
+             break;
         case 'PAGAR':
           this.users[idx].state = 'PAGA';
           break;
@@ -241,27 +278,31 @@ export class Listar implements OnInit {
       // adiciona histórico local
       this.users[idx].history = [
         ...(this.users[idx].history ?? []),
-        { state: this.users[idx].state!, date: new Date().toISOString(), by: 'FUNCIONÁRIO' }
+        {
+          state: this.users[idx].state!,
+          date: new Date().toISOString(),
+          by: 'FUNCIONÁRIO',
+        },
       ];
     });
   }
 
-    // totais que o html puxa
+  // totais que o html puxa
   get totalSolicitacoes(): number {
     return this.users.length;
   }
 
   get totalPendentes(): number {
-    return this.users.filter(u => u.state && u.state !== 'FINALIZADA').length;
+    return this.users.filter((u) => u.state && u.state !== 'FINALIZADA').length;
   }
 
   get totalConcluidas(): number {
-    return this.users.filter(u => u.state === 'FINALIZADA').length;
+    return this.users.filter((u) => u.state === 'FINALIZADA').length;
   }
 
   get totalHoje(): number {
     const hoje = new Date();
-    return this.users.filter(u => {
+    return this.users.filter((u) => {
       const d = this.parseDate(u.createdAt);
       return (
         d &&
@@ -271,6 +312,4 @@ export class Listar implements OnInit {
       );
     }).length;
   }
-
 }
-
