@@ -23,7 +23,7 @@
     <tbody>
       <tr *ngFor="let s of solicitations" class="border-t">
         <td class="p-2">
-          {{ dateSelection.formatDateDisplay(s.createdAt, true) }}
+          {{ formatDate(s.createdAt, true) }}
         </td>
         <td class="p-2">{{ truncateName(s, 30) }}</td>
         <td class="p-2">{{ getStatus(s) }}</td>
