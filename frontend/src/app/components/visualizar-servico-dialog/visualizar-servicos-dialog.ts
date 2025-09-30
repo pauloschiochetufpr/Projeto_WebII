@@ -46,19 +46,6 @@ export class VisualizarServicoDialog {
     }
   }
 
-  // Aprovar Serviço
-  aprovar() {
-    this.dialogRef.close({ action: 'APROVAR', user: this.data.user });
-  }
-
-  // Rejeitar Serviço
-  rejeitar() {
-    const motivo = prompt('Informe o motivo da rejeição:');
-    if (motivo) {
-      this.dialogRef.close({ action: 'REJEITAR', user: this.data.user, motivo });
-    }
-  }
-
   // Resgatar serviço rejeitado
   resgatar() {
     this.dialogRef.close({ action: 'RESGATAR', user: this.data.user });
