@@ -16,11 +16,13 @@ import {
   startWith,
 } from 'rxjs/operators';
 import { interval, of } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   templateUrl: './login.html',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, LucideAngularModule],
 })
 export class LoginComponent {
   loginForm: FormGroup;
