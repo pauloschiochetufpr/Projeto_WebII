@@ -27,10 +27,6 @@ export class VisualizarServicoClienteDialog {
     }
   }
 
-  resgatar() {
-    this.dialogRef.close({ action: 'RESGATAR', newStatusName: 'APROVADA', newStatusId: 4 });
-  }
-
   pagar() {
     this.dialogRef.close({ action: 'PAGAR', newStatusName: 'PAGA', newStatusId: 7 });
   }
@@ -38,4 +34,20 @@ export class VisualizarServicoClienteDialog {
   close() {
     this.dialogRef.close();
   }
+  // Calcula quanto tempo se passou desde a criação da solicitação
+calcularTempoDecorrido(dataCriacao: string): string {
+  const inicio = new Date(dataCriacao).getTime();
+  const agora = Date.now();
+  const diff = agora - inicio;
+
+  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (dias > 0) return `${dias} dia(s) atrás`;
+
+  const horas = Math.floor(diff / (1000 * 60 * 60));
+  if (horas > 0) return `${horas} hora(s) atrás`;
+
+  const minutos = Math.floor(diff / (1000 * 60));
+  return `${minutos} minuto(s) atrás`;
+}
+
 }

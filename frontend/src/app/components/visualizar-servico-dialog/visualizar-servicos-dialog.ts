@@ -89,4 +89,14 @@ redirecionarParaMim() {
   });
 }
 
+get diasDesdeAbertura(): number | null {
+  if (!this.data?.user?.createdAt) return null;
+  const created = new Date(this.data.user.createdAt);
+  if (isNaN(created.getTime())) return null;
+
+  const diffMs = Date.now() - created.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
 }

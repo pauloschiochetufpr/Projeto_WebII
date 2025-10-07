@@ -8,41 +8,44 @@
     <span
       class="px-3 py-1 text-xs rounded-full"
       [ngClass]="{
-        'bg-gray-200 text-gray-700': data.user.state === 'ABERTA',
-        'bg-yellow-100 text-yellow-700': data.user.state === 'ORÇADA',
-        'bg-green-100 text-green-700': data.user.state === 'APROVADA',
-        'bg-red-100 text-red-700': data.user.state === 'REJEITADA',
-        'bg-blue-100 text-blue-700': data.user.state === 'ARRUMADA',
-        'bg-purple-100 text-purple-700': data.user.state === 'REDIRECIONADA',
-        'bg-orange-100 text-orange-700': data.user.state === 'PAGA',
-        'bg-emerald-100 text-emerald-700': data.user.state === 'FINALIZADA'
+        'bg-gray-200 text-gray-700': data?.user?.state === 'ABERTA',
+        'bg-yellow-100 text-yellow-700': data?.user?.state === 'ORÇADA',
+        'bg-green-100 text-green-700': data?.user?.state === 'APROVADA',
+        'bg-red-100 text-red-700': data?.user?.state === 'REJEITADA',
+        'bg-blue-100 text-blue-700': data?.user?.state === 'ARRUMADA',
+        'bg-purple-100 text-purple-700': data?.user?.state === 'REDIRECIONADA',
+        'bg-orange-100 text-orange-700': data?.user?.state === 'PAGA',
+        'bg-emerald-100 text-emerald-700': data?.user?.state === 'FINALIZADA'
       }"
     >
-      {{ data.user.state }}
+      {{ data?.user?.state }}
     </span>
   </div>
 
   <!-- Dados principais -->
   <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg mb-6">
-    <p><span class="font-semibold">ID:</span> {{ data.user.id }}</p>
-    <p><span class="font-semibold">Cliente:</span> {{ data.user.requesterName }}</p>
+    <p><span class="font-semibold">ID:</span> {{ data?.user?.id }}</p>
+    <p><span class="font-semibold">Cliente:</span> {{ data?.user?.requesterName }}</p>
     <p class="col-span-2">
       <span class="font-semibold">Descrição:</span>
-      {{ data.user.description }}
+      {{ data?.user?.description }}
     </p>
-    <p><span class="font-semibold">Data de Abertura:</span> {{ data.user.createdAt | date: 'short' }}</p>
-    <p><span class="font-semibold">Destino:</span> {{ data.user.redirectDestinationName || '-' }}</p>
+    <p>
+      <span class="font-semibold">Data de Abertura:</span>
+      {{ data?.user?.createdAt | date: 'short' }}
+    </p>
+    <p><span class="font-semibold">Destino:</span> {{ data?.user?.redirectDestinationName || '-' }}</p>
   </div>
 
   <!-- Histórico -->
   <div class="mb-6">
     <h3 class="text-lg font-semibold mb-3">Histórico</h3>
     <ul
-      *ngIf="data.user.history?.length; else semHistorico"
+      *ngIf="data?.user?.history?.length; else semHistorico"
       class="relative border-l border-gray-300 pl-4 space-y-3"
     >
       <li
-        *ngFor="let step of data.user.history"
+        *ngFor="let step of data?.user?.history"
         class="relative flex flex-col text-sm"
       >
         <span
@@ -66,7 +69,7 @@
   <!-- Ações -->
   <div class="space-y-6">
     <!-- Orçamento -->
-    <div *ngIf="data.user.state === 'ABERTA'" class="bg-white p-3 rounded shadow">
+    <div *ngIf="data?.user?.state === 'ABERTA'" class="bg-white p-3 rounded shadow">
       <button
         (click)="efetuarOrcamento()"
         class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow"
@@ -76,7 +79,7 @@
     </div>
 
     <!-- Manutenção -->
-    <div *ngIf="data.user.state === 'APROVADA' || data.user.state === 'REDIRECIONADA'" class="space-y-3 bg-gray-50 p-3 rounded shadow">
+    <div *ngIf="data?.user?.state === 'APROVADA' || data?.user?.state === 'REDIRECIONADA'" class="space-y-3 bg-gray-50 p-3 rounded shadow">
       <textarea
         [(ngModel)]="descricaoManutencao"
         placeholder="Descrição da manutenção"
@@ -102,17 +105,16 @@
         </button>
         <button
           (click)="redirecionarParaMim()"
-            class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
+          class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
         >
           Redirecionar para mim
-</button>
-
+        </button>
       </div>
     </div>
 
     <!-- Pagamento -->
-    <div *ngIf="data.user.state === 'ARRUMADA'" class="space-y-2 bg-orange-50 p-3 rounded shadow">
-      <p><strong>Valor:</strong> R$ {{ data.user.budget }}</p>
+    <div *ngIf="data?.user?.state === 'ARRUMADA'" class="space-y-2 bg-orange-50 p-3 rounded shadow">
+      <p><strong>Valor:</strong> R$ {{ data?.user?.budget }}</p>
       <button
         (click)="pagar()"
         class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded"
@@ -122,7 +124,7 @@
     </div>
 
     <!-- Finalizar -->
-    <div *ngIf="data.user.state === 'PAGA'" class="bg-indigo-50 p-3 rounded shadow">
+    <div *ngIf="data?.user?.state === 'PAGA'" class="bg-indigo-50 p-3 rounded shadow">
       <button
         (click)="finalizar()"
         class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
@@ -132,7 +134,7 @@
     </div>
 
     <!-- Resgatar -->
-    <div *ngIf="data.user.state === 'REJEITADA'" class="bg-purple-50 p-3 rounded shadow">
+    <div *ngIf="data?.user?.state === 'REJEITADA'" class="bg-purple-50 p-3 rounded shadow">
       <button
         (click)="resgatar()"
         class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded"
