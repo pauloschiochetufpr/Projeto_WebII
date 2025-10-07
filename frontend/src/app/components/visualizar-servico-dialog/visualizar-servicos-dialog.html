@@ -8,14 +8,14 @@
     <span
       class="px-3 py-1 text-xs rounded-full"
       [ngClass]="{
-        'bg-gray-200 text-gray-700': data?.user?.state === 'ABERTA',
-        'bg-yellow-100 text-yellow-700': data?.user?.state === 'ORÇADA',
-        'bg-green-100 text-green-700': data?.user?.state === 'APROVADA',
-        'bg-red-100 text-red-700': data?.user?.state === 'REJEITADA',
-        'bg-blue-100 text-blue-700': data?.user?.state === 'ARRUMADA',
-        'bg-purple-100 text-purple-700': data?.user?.state === 'REDIRECIONADA',
-        'bg-orange-100 text-orange-700': data?.user?.state === 'PAGA',
-        'bg-emerald-100 text-emerald-700': data?.user?.state === 'FINALIZADA'
+        'bg-gray-200 text-gray-700': data.user.state === 'ABERTA',
+        'bg-yellow-100 text-yellow-700': data.user.state === 'ORÇADA',
+        'bg-green-100 text-green-700': data.user.state === 'APROVADA',
+        'bg-red-100 text-red-700': data.user.state === 'REJEITADA',
+        'bg-blue-100 text-blue-700': data.user.state === 'ARRUMADA',
+        'bg-purple-100 text-purple-700': data.user.state === 'REDIRECIONADA',
+        'bg-orange-100 text-orange-700': data.user.state === 'PAGA',
+        'bg-emerald-100 text-emerald-700': data.user.state === 'FINALIZADA'
       }"
     >
       {{ data?.user?.state }}
