@@ -42,7 +42,6 @@ public class CepService {
         }
     }
 
->>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
     @PostConstruct
     public void init() {
         worker.submit(() -> {
@@ -106,7 +105,6 @@ public class CepService {
     private synchronized CepModel processarViaCep(String cep) {
         try {
             // controle de intervalo global
->>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
             long agora = System.currentTimeMillis();
             long tempoDesdeUltima = agora - ultimaRequisicao;
             long intervaloRandom = INTERVALO_MINIMO_MS
@@ -151,5 +149,4 @@ public class CepService {
                 entity.getUf()
         );
     }
->>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
 }

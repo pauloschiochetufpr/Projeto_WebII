@@ -1,4 +1,3 @@
-
 <div class="flex flex-row w-screen h-screen">
   <div class="flex justify-center items-center w-[50vw] h-screen bg-azul-main">
     <div
@@ -15,23 +14,40 @@
         (ngSubmit)="onLoginSubmit()"
       >
         <div class="flex flex-col gap-1">
-          <label class="text-white text-xl font-robotoFlex">EMAIL</label>
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >EMAIL</label
+          >
           <input
             [ngClass]="{
-              'placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out': true,
-              '': emailValidoLogin === true,
-              '': emailValidoLogin === false
+              'placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out': true,
+              'text-green-400': emailValidoLogin === true,
+              'text-red-500': emailValidoLogin === false
             }"
             type="email"
             formControlName="email"
             placeholder="usuario@gmail.com"
           />
+          <!-- Ícone de certo -->
+          <lucide-icon
+            *ngIf="emailValidoLogin === true"
+            name="check"
+            class="absolute right-3 top-9 text-green-400 w-5 h-5 select-none"
+          ></lucide-icon>
+
+          <!-- Ícone de errado -->
+          <lucide-icon
+            *ngIf="emailValidoLogin === false"
+            name="x"
+            class="absolute right-3 top-9 text-red-500 w-5 h-5 select-none"
+          ></lucide-icon>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-white text-xl font-robotoFlex">SENHA</label>
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >SENHA</label
+          >
           <input
-            class="placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            class="placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
             type="password"
             formControlName="password"
             maxlength="4"
@@ -54,7 +70,7 @@
               isSubmittingLogin ||
               emailValidoLogin === false
             ),
-            'px-4 py-2 rounded-md transition-all duration-300 font-extrabold text-lg font-robotoFlex': true
+            'px-4 py-2 rounded-md transition-all duration-300 font-extrabold text-lg font-robotoFlex select-none': true
           }"
         >
           ENTRAR
@@ -63,126 +79,246 @@
     </div>
   </div>
 
-  <div class="flex flex-col w-[50vw] h-screen bg-red-400">
-    <h2>Cadastro</h2>
-    <form
-      class="flex flex-col"
-      [formGroup]="cadastroForm"
-      (ngSubmit)="onCadastroSubmit()"
+  <div
+    class="flex flex-col w-[50vw] h-screen bg-red-400 justify-center items-center"
+  >
+    <!-- Fundo de vidro -->
+    <div
+      class="flex flex-col glass-background p-8 gap-6 w-[25vw] h-[76vh] py-10"
     >
-      <label>CPF:</label>
-      <input
-        type="text"
-        formControlName="cpf"
-        (input)="applyCpfMask()"
-        maxlength="14"
-        placeholder="000.000.000-00"
-      />
-      <div
-        *ngIf="
-      cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
-      cadastroForm.get('cpf')?.touched
-    "
-        style="color: red"
+      <!-- Título -->
+      <h2
+        class="font-robotoFlex font-semibold text-white text-5xl place-self-center select-none"
       >
-        CPF inválido
-      </div>
+        Cadastro
+      </h2>
+      <!-- Inicio do forms -->
+      <form
+        class="flex flex-col gap-1.5"
+        [formGroup]="cadastroForm"
+        (ngSubmit)="onCadastroSubmit()"
+      >
+        <!-- Primeira linha de agrupamento ( CPF + Telefone ) -->
+        <div class="flex flex-row w-full h-fit gap-14">
+          <!-- Parte do CPF -->
+          <div class="flex flex-col w-1/2 h-fit">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >CPF</label
+            >
+            <input
+              type="text"
+              formControlName="cpf"
+              (input)="applyCpfMask()"
+              maxlength="14"
+              placeholder="000.000.000-00"
+              class="w-[145px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            />
+            <div
+              *ngIf="
+                cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
+                cadastroForm.get('cpf')?.touched
+              "
+              style="color: red"
+            >
+              CPF inválido
+            </div>
+          </div>
 
-      <label>Nome:</label>
-      <input type="text" formControlName="nome" placeholder="Digite seu nome" />
+          <!-- Parte do telefone -->
+          <div class="w-/12 h-fit flex flex-col">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >Telefone</label
+            >
+            <input
+              type="text"
+              formControlName="telefone"
+              (input)="applyPhoneMask()"
+              maxlength="15"
+              placeholder="(00) 00000-0000"
+              class="w-[150px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            />
+            <div *ngIf="cadastroForm.get('telefone')?.touched">
+              <span
+                *ngIf="telefoneValidoCadastro === true"
+                style="color: green"
+              >
+                Telefone válido
+              </span>
+              <span *ngIf="telefoneValidoCadastro === false" style="color: red">
+                Telefone inválido
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Fim primeira linha de agrupamento ( CPF + Telefone ) -->
 
-      <label>E-mail:</label>
-      <input
-        type="email"
-        formControlName="email"
-        placeholder="Digite seu email"
-      />
-      <div *ngIf="cadastroForm.get('email')?.touched">
-        <span *ngIf="emailValidoCadastro === true" style="color: green">
-          E-mail válido
-        </span>
-        <span *ngIf="emailValidoCadastro === false" style="color: red">
-          E-mail inválido
-        </span>
-      </div>
+        <!-- Inicio Email -->
+        <div class="flex flex-col">
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >E-mail</label
+          >
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Digite seu email favorito"
+            class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+          />
+          <div *ngIf="cadastroForm.get('email')?.touched">
+            <span *ngIf="emailValidoCadastro === true" style="color: green">
+              E-mail válido
+            </span>
+            <span *ngIf="emailValidoCadastro === false" style="color: red">
+              E-mail inválido
+            </span>
+          </div>
+        </div>
 
-      <div *ngIf="isBuscandoCep" class="cep-loading">
-        Buscando CEP, por favor aguarde...
-      </div>
-      <label>CEP:</label>
-      <input
-        type="text"
-        formControlName="cep"
-        (input)="applyCepMask()"
-        maxlength="9"
-        placeholder="00000-000"
-      />
+        <!-- Fim Email -->
 
-      <label>Logradouro:</label>
-      <input type="text" formControlName="logradouro" readonly />
+        <!-- Inicio nome e CEP -->
+        <div class="flex flex-row gap-3 w-full">
+          <div class="flex flex-col w-full">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >Nome</label
+            >
+            <input
+              type="text"
+              formControlName="nome"
+              placeholder="Digite seu nome"
+              class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            />
+          </div>
+          <div class="flex flex-col">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >CEP</label
+            >
+            <input
+              type="text"
+              formControlName="cep"
+              (input)="applyCepMask()"
+              maxlength="9"
+              placeholder="00000-000"
+              class="w-[100px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            />
+            <div *ngIf="isBuscandoCep" class="cep-loading">
+              Buscando CEP, por favor aguarde...
+            </div>
+          </div>
+        </div>
+        <!-- Fim nome e CEP -->
 
-      <label>Bairro:</label>
-      <input type="text" formControlName="bairro" readonly />
+        <!-- Inicio parte do endereço auto-completado -->
+        <div class="flex flex-col">
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >Logradouro</label
+          >
+          <input
+            type="text"
+            formControlName="logradouro"
+            readonly
+            class="w-full select-none px-3 py-1.5 rounded-md outline-none transition-all duration-300 ease-in-out"
+          />
+        </div>
 
-      <label>Cidade:</label>
-      <input type="text" formControlName="localidade" readonly />
+        <div class="flex flex-col">
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >Bairro</label
+          >
+          <input
+            type="text"
+            formControlName="bairro"
+            readonly
+            class="w-full select-none px-3 py-1.5 rounded-md outline-none transition-all duration-300 ease-in-out"
+          />
+        </div>
 
-      <label>UF:</label>
-      <input type="text" formControlName="uf" readonly />
+        <div class="flex flex-row gap-3">
+          <div class="flex flex-col">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >Cidade</label
+            >
+            <input
+              type="text"
+              formControlName="localidade"
+              readonly
+              class="w-full select-none px-3 py-1.5 rounded-md outline-none transition-all duration-300 ease-in-out"
+            />
+          </div>
+          <div class="flex flex-col">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >UF</label
+            >
+            <input
+              type="text"
+              formControlName="uf"
+              readonly
+              class="w-full select-none px-3 py-1.5 rounded-md outline-none transition-all duration-300 ease-in-out"
+            />
+          </div>
+          <div class="flex flex-col">
+            <label class="text-white text-xl font-robotoFlex select-none"
+              >Número</label
+            >
+            <input
+              type="text"
+              formControlName="numero"
+              (input)="applyNumeroMask()"
+              maxlength="5"
+              placeholder="0000"
+              class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+            />
+            <div *ngIf="cadastroForm.get('numero')?.touched">
+              <span
+                *ngIf="cadastroForm.get('numero')?.errors?.['pattern']"
+                style="color: red"
+              >
+                Apenas números são permitidos
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Fim parte do endereço auto-completado -->
 
-      <label>Número:</label>
-      <input
-        type="text"
-        formControlName="numero"
-        (input)="applyNumeroMask()"
-        maxlength="5"
-        placeholder="O número de sua residência"
-      />
-      <div *ngIf="cadastroForm.get('numero')?.touched">
-        <span
-          *ngIf="cadastroForm.get('numero')?.errors?.['pattern']"
-          style="color: red"
+        <!-- Inicio complemento -->
+        <div class="flex flex-col">
+          <label class="text-white text-xl font-robotoFlex select-none"
+            >Complemento</label
+          >
+          <input
+            type="text"
+            formControlName="complemento"
+            placeholder="Alguma informação adicional?"
+            class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
+          />
+        </div>
+        <!-- Fim complemento -->
+
+        <button
+          type="submit"
+          [disabled]="
+            cadastroForm.invalid ||
+            isSubmittingCadastro ||
+            emailValidoCadastro === false ||
+            telefoneValidoCadastro === false
+          "
+          [ngClass]="{
+            'from-gray-300 to-gray-400 bg-gradient-to-r text-gray-700 cursor-not-allowed':
+              cadastroForm.invalid ||
+              isSubmittingCadastro ||
+              emailValidoCadastro === false ||
+              telefoneValidoCadastro === false,
+            'bg-indigo-400 hover:bg-roxo-terc text-white': !(
+              cadastroForm.invalid ||
+              isSubmittingCadastro ||
+              emailValidoCadastro === false ||
+              telefoneValidoCadastro === false
+            ),
+            'px-4 py-2 mt-4 rounded-md transition-all duration-300 font-extrabold text-lg font-robotoFlex select-none': true
+          }"
         >
-          Apenas números são permitidos
-        </span>
-      </div>
-
-      <label>Complemento:</label>
-      <input
-        type="text"
-        formControlName="complemento"
-        placeholder="Alguma informação adicional?"
-      />
-
-      <label>Telefone:</label>
-      <input
-        type="text"
-        formControlName="telefone"
-        (input)="applyPhoneMask()"
-        maxlength="15"
-        placeholder="(00) 00000-0000"
-      />
-      <div *ngIf="cadastroForm.get('telefone')?.touched">
-        <span *ngIf="telefoneValidoCadastro === true" style="color: green">
-          Telefone válido
-        </span>
-        <span *ngIf="telefoneValidoCadastro === false" style="color: red">
-          Telefone inválido
-        </span>
-      </div>
-
-      <button
-        type="submit"
-        [disabled]="
-          cadastroForm.invalid ||
-          isSubmittingCadastro ||
-          emailValidoCadastro === false ||
-          telefoneValidoCadastro === false
-        "
-      >
-        Cadastrar
-      </button>
-    </form>
+          Cadastrar
+        </button>
+      </form>
+    </div>
   </div>
->>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
 </div>
