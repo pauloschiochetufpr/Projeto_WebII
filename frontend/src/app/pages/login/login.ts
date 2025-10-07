@@ -34,6 +34,8 @@ export class LoginComponent {
   telefoneValidoCadastro: boolean | null = null;
   isBuscandoCep = false;
 
+  
+
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
     this.loginForm = this.fb.group({
@@ -55,6 +57,7 @@ export class LoginComponent {
       bairro: [{ value: '', disabled: true }],
       localidade: [{ value: '', disabled: true }],
       uf: [{ value: '', disabled: true }],
+
       numero: ['', Validators.required],
       complemento: ['', Validators.required],
     });
@@ -107,6 +110,7 @@ export class LoginComponent {
           this.isBuscandoCep = true;
           let tentativas = 0;
 
+
           return interval(120000).pipe(
             // polling a cada 2 minutos
             startWith(0),
@@ -114,7 +118,10 @@ export class LoginComponent {
               tentativas++;
               return this.authService.validarCep(numeros);
             }),
+
+
             takeWhile((dados) => !dados && tentativas < 10, true)
+
           );
         })
       )
@@ -213,6 +220,7 @@ export class LoginComponent {
   }
 
   applyNumeroMask() {
+
     let v = this.cadastroForm.value.numero.replace(/\D/g, ''); // remove tudo que não for número
     this.cadastroForm.patchValue({ numero: v }, { emitEvent: false });
   }

@@ -6,4 +6,5 @@ public record CepResponse(
         String bairro,
         String localidade,
         String uf
+
 ) {}

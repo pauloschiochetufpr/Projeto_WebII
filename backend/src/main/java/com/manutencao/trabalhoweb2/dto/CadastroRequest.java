@@ -5,5 +5,6 @@ public record CadastroRequest(
     String nome,
     String email,
     String cep,
+    Integer numero,
     String telefone
 ) {}

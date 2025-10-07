@@ -1,6 +1,8 @@
 package com.manutencao.trabalhoweb2.model;
 
+
 import jakarta.persistence.Column;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -24,10 +26,12 @@ public class CepModel {
     private String ddd;
     private String siafi;
 
+
     // Getters
     public String getCep() { return cep; }
     public String getLogradouro() { return logradouro; }
     public String getComplemento() { return complemento; }
+
     public String getBairro() { return bairro; }
     public String getLocalidade() { return localidade; }
     public String getUf() { return uf; }
@@ -50,4 +54,5 @@ public class CepModel {
             this.cep = null;
         }
     }
+
 }

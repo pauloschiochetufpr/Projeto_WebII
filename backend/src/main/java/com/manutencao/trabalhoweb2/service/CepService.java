@@ -22,6 +22,7 @@ public class CepService {
     private static final double RANDOM_FACTOR = 0.35;
     private static final Random RANDOM = new Random();
 
+
     private final BlockingQueue<PedidoCep> filaCep = new LinkedBlockingQueue<>();
     private volatile long ultimaRequisicao = 0;
     private RestTemplate restTemplate = new RestTemplate();
@@ -41,11 +42,13 @@ public class CepService {
         }
     }
 
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
     @PostConstruct
     public void init() {
         worker.submit(() -> {
             while (true) {
                 try {
+
                     PedidoCep pedido = filaCep.take();
                     CepModel dados = processarViaCep(pedido.cep);
                     if (dados != null) {
@@ -62,6 +65,7 @@ public class CepService {
             }
         });
     }
+
 
     /**
      * Valida ou agenda busca de CEP.
@@ -102,6 +106,7 @@ public class CepService {
     private synchronized CepModel processarViaCep(String cep) {
         try {
             // controle de intervalo global
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
             long agora = System.currentTimeMillis();
             long tempoDesdeUltima = agora - ultimaRequisicao;
             long intervaloRandom = INTERVALO_MINIMO_MS
@@ -121,6 +126,7 @@ public class CepService {
                     && !dados.getLogradouro().isEmpty()) {
 
                 dados.setCep(dados.getCep().replaceAll("-", ""));
+
 
                 // salva no banco
                 cepRepository.save(dados);
@@ -145,4 +151,5 @@ public class CepService {
                 entity.getUf()
         );
     }
+>>>>>>> b5c49fab5506fe4221888b73ae334fb79fa84ec8
 }

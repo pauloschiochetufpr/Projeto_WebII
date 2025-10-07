@@ -24,6 +24,7 @@ public class DataValidationController {
     private DDDRepository dddRepository;
 
     private final CepService cepService;
+
     private final EmailValidationService emailValidationService;
 
     public DataValidationController(CepService cepService,
@@ -66,6 +67,7 @@ public class DataValidationController {
     }
     
     @GetMapping("/validate-cep")
+
     public CompletableFuture<ResponseEntity<CepResponse>> validarCep(@RequestParam String cep) {
         return cepService.validarCep(cep)
                 .thenApply(ResponseEntity::ok);

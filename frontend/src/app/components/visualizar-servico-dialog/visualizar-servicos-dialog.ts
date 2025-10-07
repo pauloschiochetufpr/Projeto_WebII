@@ -32,10 +32,10 @@ export class VisualizarServicoDialog {
   descricaoManutencao: string = '';
   orientacoesCliente: string = '';
 
-  constructor(
-    public dialogRef: MatDialogRef<VisualizarServicoDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { user: Solicitation }
-  ) {}
+ constructor(
+  public dialogRef: MatDialogRef<VisualizarServicoDialog>,
+  @Inject(MAT_DIALOG_DATA) public data: { user: Solicitation, currentDestination: string }
+) {}
 
   // Efetuar Orçamento
   efetuarOrcamento() {
@@ -80,4 +80,13 @@ export class VisualizarServicoDialog {
   close() {
     this.dialogRef.close();
   }
+  // Redirecionar para si mesmo
+redirecionarParaMim() {
+  this.dialogRef.close({
+    action: 'REDIRECIONAR',
+    user: this.data.user,
+    destino: this.data.currentDestination 
+  });
+}
+
 }
