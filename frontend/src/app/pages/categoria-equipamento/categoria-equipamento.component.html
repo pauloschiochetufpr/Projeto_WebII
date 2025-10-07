@@ -7,25 +7,62 @@
 <th>Descrição</th>
 <th>Ativo</th>
   <th class="text-center">
-    <a [routerLink]="['/categoriaEquipamento/cadastrar']" href="#" title="Novo" alt="Novo" class="btn btn-xs btn-success">
+    <button (click)="abrirModalNova()" class="btn btn-xs btn-success">
       <i class="fa fa-plus" aria-hidden="true"></i> Novo
-    </a>
+    </button>
 </th>
 </tr>
 <tr *ngFor="let categoriaEquipamento of listaCategorias">
 <td>{{categoriaEquipamento.nome}}</td>
 <td>{{categoriaEquipamento.ativo}}</td>
 <td class="text-center" style="width: 300px">
-<a href="#" title="Editar" alt="Editar"
-class="btn btn-xs btn-info">
-<i class="fa fa-edit" aria-hidden="true"></i> Editar
-</a>
-<a href="#" title="Remover" alt="Remover"
-class="btn btn-xs btn-danger">
-<i class="fa fa-times" aria-hidden="true"></i> Remover
-</a>
+<button (click)="abrirModalEditar(categoriaEquipamento)" class="btn btn-xs btn-info">
+  <i class="fa fa-edit" aria-hidden="true"></i> Editar
+</button>
+<button (click)="removerCategoria(categoriaEquipamento)" class="btn btn-xs btn-danger">
+  <i class="fa fa-times" aria-hidden="true"></i> Remover
+</button>
 </td>
 </tr>
 </tbody>
 </table>
 <p *ngIf="listaCategorias.length===0">Nenhuma categoria cadastrada.</p>
+
+<!-- Modal -->
+<div id="categoriaModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form (ngSubmit)="salvarCategoria()" #formCategoria="ngForm">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editando ? 'Editar Categoria' : 'Nova Categoria' }}</h5>
+          <button type="button" class="close" (click)="fecharModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nome" 
+              [(ngModel)]="categoriaSelecionada.nome" 
+              name="nome" 
+              minlength="2" 
+              required>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="categoriaSelecionada.ativo" name="ativo">
+              Ativo
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" [disabled]="formCategoria.invalid" class="btn btn-primary">
+            <i class="fa fa-save"></i> Salvar
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

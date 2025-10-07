@@ -5,16 +5,23 @@ import { CategoriaEquipamento } from '../../models/solicitacao.model';
 import { RouterModule } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CadastroCategoriaComponent } from './cadastro-categoria/cadastro-categoria.component'
+import { NgModel } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-categoria-equipamento',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './categoria-equipamento.component.html',
   styleUrl: './categoria-equipamento.component.css'
 })
 export class CategoriaEquipamentoComponent implements OnInit {
     listaCategorias : CategoriaEquipamento[] = [];
+
+    categoriaSelecionada: CategoriaEquipamento = new CategoriaEquipamento(0, '', true);
     
+    editando: boolean = false;
+
+
     constructor(private categoriaEquipamentoService : CategoriaEquipamentoService){}
     
     ngOnInit(): void {
@@ -28,5 +35,46 @@ export class CategoriaEquipamentoComponent implements OnInit {
         new CategoriaEquipamento(2, "Teee", true),
       ]
     }
-}
+
+    abrirModalNova() {
+    this.categoriaSelecionada = new CategoriaEquipamento(0, '', true);
+    this.editando = false;
+    (document.getElementById("categoriaModal") as any).style.display = "block";
+  }
+
+  abrirModalEditar(categoria: CategoriaEquipamento) {
+    this.categoriaSelecionada = { ...categoria };
+    this.editando = true;
+    (document.getElementById("categoriaModal") as any).style.display = "block";
+  }
+
+  fecharModal() {
+    (document.getElementById("categoriaModal") as any).style.display = "none";
+  }
+
+  salvarCategoria() {
+    if (this.editando) {
+      const index = this.listaCategorias.findIndex(c => c.id === this.categoriaSelecionada.id);
+      if (index !== -1) {
+        this.listaCategorias[index] = { ...this.categoriaSelecionada };
+      }
+    } else {
+      const novoId = this.listaCategorias.length > 0 ? Math.max(...this.listaCategorias.map(c => c.id)) + 1 : 1;
+      this.categoriaSelecionada.id = novoId;
+      this.listaCategorias.push({ ...this.categoriaSelecionada });
+    }
+    this.fecharModal();
+  }
+
+  removerCategoria(categoria: CategoriaEquipamento) {
+    this.listaCategorias = this.listaCategorias.filter(c => c.id !== categoria.id);
+  }
+    
+
+
+  }
+
+
+  //vffv
+
 
