@@ -9,6 +9,8 @@
 /frontend/.angular/cache
 *.key
 *.crt
+/frontend/src/certs/localhost+2-key.pem
+/frontend/src/certs/localhost+2.pem
 npm-debug.log
 yarn-error.log
 
