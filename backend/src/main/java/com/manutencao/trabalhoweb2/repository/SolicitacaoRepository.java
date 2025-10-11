@@ -9,8 +9,8 @@ import com.manutencao.trabalhoweb2.model.Solicitacao;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
-    List<Solicitacao> findByClienteId(Long clienteId);
-    List<Solicitacao> findByFuncionarioId(Long funcionarioId);
+    List<Solicitacao> findByIdCliente(Long clienteId);
+    List<Solicitacao> findByIdFuncionario(Long funcionarioId);
     List<Solicitacao> findByStatus(String status);
     List<Solicitacao> findByAtivoTrue();
     List<Solicitacao> findByDateToday(LocalDateTime date);

@@ -8,5 +8,5 @@ import com.manutencao.trabalhoweb2.model.HistSolicitacao;
 
 @Repository
 public interface HistSolicitacaoRepository extends JpaRepository<HistSolicitacao, Long> {
-    List<HistSolicitacao> findBySolicitacaoId(Long solicitacaoId);
+    List<HistSolicitacao> findByIdSolicitacao(Long solicitacaoId);
 }
