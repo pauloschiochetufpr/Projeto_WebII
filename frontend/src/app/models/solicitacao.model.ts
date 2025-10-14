@@ -26,3 +26,4 @@ export class CategoriaEquipamento {
     public ativo: boolean = true
   ) {}
 }
+

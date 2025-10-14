@@ -4,7 +4,6 @@ import { CategoriaEquipamentoService } from '../../services/categoria-equipament
 import { CategoriaEquipamento } from '../../models/solicitacao.model';
 import { RouterModule } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { CadastroCategoriaComponent } from './cadastro-categoria/cadastro-categoria.component'
 import { NgModel } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 
