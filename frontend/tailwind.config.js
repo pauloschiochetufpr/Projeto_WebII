@@ -14,6 +14,8 @@ module.exports = {
       colors: {
         "azul-main": "#2D85FF",
         "verde-sec": "#19FFA2",
+        "verde-esc": "#00B56C",
+        "verde-qua": "#54FEBA",
         "roxo-terc": "#6433FF",
       },
     },

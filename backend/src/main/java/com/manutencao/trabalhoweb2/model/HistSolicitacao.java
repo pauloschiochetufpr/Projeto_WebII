@@ -1,31 +1,32 @@
 package com.manutencao.trabalhoweb2.model;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "HistSolicitacao")
 public class HistSolicitacao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idHistorico")
     private Long idHistorico;
 
-    @Column(name = "dataHora", columnDefinition = "TIMESTAMP")
+    @Column(name = "dataHora", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime dataHora;
 
+    // Correção principal: relacionamento com Solicitacao via chave estrangeira
     @ManyToOne
     @JoinColumn(name = "idSolicitacao", nullable = false)
     private Solicitacao solicitacao;
 
-    @Column(name = "Cliente")
+    @Column(name = "cliente")
     private Boolean cliente;
 
-    @Column(name = "StatusOld")
+    @Column(name = "statusOld", length = 32)
     private String statusOld;
 
-    @Column(name = "StatusNew")
+    @Column(name = "statusNew", length = 32)
     private String statusNew;
 
     @Column(name = "funcionarioOld")
@@ -36,8 +37,9 @@ public class HistSolicitacao {
 
     protected HistSolicitacao() {}
 
-    public HistSolicitacao(LocalDateTime dataHora, Solicitacao solicitacao, Boolean cliente, String statusOld,
-            String statusNew, Long funcionarioOld, Long funcionarioNew) {
+    public HistSolicitacao(LocalDateTime dataHora, Solicitacao solicitacao, Boolean cliente,
+                           String statusOld, String statusNew,
+                           Long funcionarioOld, Long funcionarioNew) {
         this.dataHora = dataHora;
         this.solicitacao = solicitacao;
         this.cliente = cliente;
@@ -110,5 +112,4 @@ public class HistSolicitacao {
     public void setFuncionarioNew(Long funcionarioNew) {
         this.funcionarioNew = funcionarioNew;
     }
-    
 }

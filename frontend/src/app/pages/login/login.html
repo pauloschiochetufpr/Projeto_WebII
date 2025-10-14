@@ -1,7 +1,12 @@
 <div class="flex flex-row w-screen h-screen">
-  <div class="flex justify-center items-center w-[50vw] h-screen bg-azul-main">
+  <div
+    class="flex justify-center items-center w-[50vw] duration-500 ease-in-out transition-all hover:w-[70vw] h-screen bg-azul-main relative group"
+  >
     <div
-      class="flex flex-col glass-background p-8 gap-6 w-[20vw] h-[40vh] py-10"
+      class="h-full w-full absolute bg-black z-50 group-hover:z-10 bg-opacity-50 group-hover:bg-opacity-0 duratio-500 ease-in-out transition-all"
+    ></div>
+    <div
+      class="flex flex-col glass-background p-8 gap-6 w-[20vw] h-[40vh] py-10 z-30"
     >
       <h2
         class="font-robotoFlex font-semibold text-white text-5xl place-self-center select-none"
@@ -65,11 +70,12 @@
               loginForm.invalid ||
               isSubmittingLogin ||
               emailValidoLogin === false,
-            'bg-indigo-400 hover:bg-roxo-terc text-white': !(
-              loginForm.invalid ||
-              isSubmittingLogin ||
-              emailValidoLogin === false
-            ),
+            'bg-verde-esc border bg-opacity-45 hover:bg-opacity-100 text-white':
+              !(
+                loginForm.invalid ||
+                isSubmittingLogin ||
+                emailValidoLogin === false
+              ),
             'px-4 py-2 rounded-md transition-all duration-300 font-extrabold text-lg font-robotoFlex select-none': true
           }"
         >
@@ -80,11 +86,14 @@
   </div>
 
   <div
-    class="flex flex-col w-[50vw] h-screen bg-red-400 justify-center items-center"
+    class="flex flex-col w-[50vw] duration-500 ease-in-out transition-all hover:w-[70vw] h-screen bg-verde-esc justify-center items-center relative group"
   >
+    <div
+      class="h-full w-full absolute bg-black z-50 group-hover:z-10 bg-opacity-50 group-hover:bg-opacity-0 duratio-500 ease-in-out transition-all"
+    ></div>
     <!-- Fundo de vidro -->
     <div
-      class="flex flex-col glass-background p-8 gap-6 w-[25vw] h-[76vh] py-10"
+      class="flex flex-col glass-background p-8 gap-6 w-[25vw] h-[76vh] py-10 z-10"
     >
       <!-- Título -->
       <h2
@@ -99,12 +108,22 @@
         (ngSubmit)="onCadastroSubmit()"
       >
         <!-- Primeira linha de agrupamento ( CPF + Telefone ) -->
-        <div class="flex flex-row w-full h-fit gap-14">
+        <div class="flex flex-row w-full h-fit justify-start">
           <!-- Parte do CPF -->
           <div class="flex flex-col w-1/2 h-fit">
-            <label class="text-white text-xl font-robotoFlex select-none"
-              >CPF</label
-            >
+            <label
+              class="text-white text-xl font-robotoFlex select-none flex flex-row gap-3 justify-start items-center"
+              >CPF
+              <div
+                *ngIf="
+                cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
+                cadastroForm.get('cpf')?.touched
+              "
+                class="text-red-600 font-googleSansCode text-xs text-nowrap"
+              >
+                CPF inválido
+              </div>
+            </label>
             <input
               type="text"
               formControlName="cpf"
@@ -113,22 +132,22 @@
               placeholder="000.000.000-00"
               class="w-[145px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
             />
-            <div
-              *ngIf="
-                cadastroForm.get('cpf')?.errors?.['cpfInvalido'] &&
-                cadastroForm.get('cpf')?.touched
-              "
-              style="color: red"
-            >
-              CPF inválido
-            </div>
           </div>
 
           <!-- Parte do telefone -->
           <div class="w-/12 h-fit flex flex-col">
-            <label class="text-white text-xl font-robotoFlex select-none"
-              >Telefone</label
-            >
+            <label
+              class="text-white text-xl font-robotoFlex select-none flex flex-row gap-3 justify-start items-center"
+              >Telefone
+              <div *ngIf="cadastroForm.get('telefone')?.touched">
+                <span
+                  *ngIf="telefoneValidoCadastro === false"
+                  class="text-red-600 font-googleSansCode text-xs text-nowrap"
+                >
+                  Telefone inválido
+                </span>
+              </div>
+            </label>
             <input
               type="text"
               formControlName="telefone"
@@ -137,17 +156,6 @@
               placeholder="(00) 00000-0000"
               class="w-[150px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
             />
-            <div *ngIf="cadastroForm.get('telefone')?.touched">
-              <span
-                *ngIf="telefoneValidoCadastro === true"
-                style="color: green"
-              >
-                Telefone válido
-              </span>
-              <span *ngIf="telefoneValidoCadastro === false" style="color: red">
-                Telefone inválido
-              </span>
-            </div>
           </div>
         </div>
         <!-- Fim primeira linha de agrupamento ( CPF + Telefone ) -->

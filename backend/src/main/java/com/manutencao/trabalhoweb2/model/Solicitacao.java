@@ -5,47 +5,43 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "solicitacao")
 public class Solicitacao {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idSolicitacao")
     private Long idSolicitacao;
 
-    @Column(name = "nome", nullable = false)
+    @Column(name = "nome", nullable = false, length = 64)
     private String nome;
 
-    @Column(name = "descricao", nullable = false)
+    @Column(name = "descricao", nullable = false, length = 255)
     private String descricao;
 
-    @Column(name = "valor", nullable = false)
+    @Column(name = "valor", nullable = true)
     private Double valor;
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 
-    // Foreign key para Usuario
+    // Mapeia o cliente (idCliente) corretamente, substituindo Usuario
     @ManyToOne
-    @JoinColumn(name = "idUsuario", nullable = false)
-    private Usuario usuario;
+    @JoinColumn(name = "idCliente", nullable = true)
+    private Cliente cliente;
 
-    // Foreign key para Categoria (descomentar quando tivermos a entidade Categoria)
-    //@ManyToOne
-    //@JoinColumn(name = "idCategoria", nullable = false)
-    //private Categoria categoria;
     @Column(name = "idCategoria", nullable = false)
     private Integer idCategoria;
 
-    // Foreign key para Status (sem join pois não temos a entidade Status)
     @Column(name = "idStatus", nullable = false)
     private Integer idStatus;
 
     protected Solicitacao() {}
 
-    public Solicitacao(String nome, String descricao, Double valor, Usuario usuario, Integer idCategoria, Integer idStatus) {
+    public Solicitacao(String nome, String descricao, Double valor, Cliente cliente,
+                       Integer idCategoria, Integer idStatus) {
         this.nome = nome;
         this.descricao = descricao;
         this.valor = valor;
-        this.usuario = usuario;
+        this.cliente = cliente;
         this.idCategoria = idCategoria;
         this.idStatus = idStatus;
     }
@@ -90,12 +86,12 @@ public class Solicitacao {
         this.ativo = ativo;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public Integer getIdCategoria() {
