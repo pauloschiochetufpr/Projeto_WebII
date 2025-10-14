@@ -1,5 +1,7 @@
 package com.manutencao.trabalhoweb2.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -33,6 +35,8 @@ public class Solicitacao {
 
     @Column(name = "idStatus", nullable = false)
     private Integer idStatus;
+    
+    private LocalDateTime dataPagamento;
 
     protected Solicitacao() {}
 
@@ -108,5 +112,9 @@ public class Solicitacao {
 
     public void setIdStatus(Integer idStatus) {
         this.idStatus = idStatus;
+    }
+
+    public LocalDateTime getDataPagamento() {
+        return dataPagamento;
     }
 }
