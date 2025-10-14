@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-
-import { CategoriaEquipamento } from './categoria-equipamento';
+import { CategoriaEquipamentoComponent } from '../pages/categoria-equipamento/categoria-equipamento.component';
 
 describe('CategoriaEquipamento', () => {
-  let service: CategoriaEquipamento;
+  let service: CategoriaEquipamentoComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CategoriaEquipamento);
+    service = TestBed.inject(CategoriaEquipamentoComponent);
   });
 
   it('should be created', () => {
