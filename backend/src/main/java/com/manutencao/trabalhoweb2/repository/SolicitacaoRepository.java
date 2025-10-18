@@ -13,31 +13,31 @@ import com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
-    List<Solicitacao> findByIdCliente(Long clienteId);
-    List<Solicitacao> findByIdFuncionario(Long funcionarioId);
-    List<Solicitacao> findByStatus(String status);
-    List<Solicitacao> findByAtivoTrue();
-    List<Solicitacao> findByDateToday(LocalDateTime date);
-    List<Solicitacao> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Solicitacao> findByCliente_IdCliente(Long clienteId);
+    List<Solicitacao> findByIdStatus(Integer status);
+    //List<Solicitacao> findByFuncionario_IdFuncionario(Long funcionarioId);
+    // List<Solicitacao> findByAtivoTrue();
+    // List<Solicitacao> findByDateToday(LocalDateTime date);
+    // List<Solicitacao> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
  /**
   * RF19 nao deu tempo de checar o backend(alterar depois?)
   */  
- @Query("SELECT s FROM Solicitacao s WHERE s.status = 'PAGA' AND " +
-           "(:startDate IS NULL OR s.dataPagamento >= :startDate) AND " +
-           "(:endDate IS NULL OR s.dataPagamento <= :endDate)")
-    List<Solicitacao> findServicosPagosByPeriod(
-        @Param("startDate") LocalDateTime startDate,
-        @Param("endDate") LocalDateTime endDate);
+//  @Query("SELECT s FROM Solicitacao s WHERE s.status = 'PAGA' AND " +
+//            "(:startDate IS NULL OR s.dataPagamento >= :startDate) AND " +
+//            "(:endDate IS NULL OR s.dataPagamento <= :endDate)")
+//     List<Solicitacao> findServicosPagosByPeriod(
+//         @Param("startDate") LocalDateTime startDate,
+//         @Param("endDate") LocalDateTime endDate);
 
     /**
      * RF020
      */
-    @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO(" +
-           "s.categoria.nome, SUM(s.valorOrcado), COUNT(s)) " +
-           "FROM Solicitacao s " +
-           "WHERE s.status = 'PAGA' " +
-           "GROUP BY s.categoria.nome " +
-           "ORDER BY SUM(s.valorOrcado) DESC")
-    List<ReceitaPorCategoriaDTO> aggregateRevenueByCategory();
+    // @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO(" +
+    //        "s.categoria.nome, SUM(s.valorOrcado), COUNT(s)) " +
+    //        "FROM Solicitacao s " +
+    //        "WHERE s.status = 'PAGA' " +
+    //        "GROUP BY s.categoria.nome " +
+    //        "ORDER BY SUM(s.valorOrcado) DESC")
+    // List<ReceitaPorCategoriaDTO> aggregateRevenueByCategory();
 }

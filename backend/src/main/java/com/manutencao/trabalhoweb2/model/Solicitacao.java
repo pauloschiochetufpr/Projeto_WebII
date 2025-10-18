@@ -1,8 +1,7 @@
 package com.manutencao.trabalhoweb2.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "solicitacao")
@@ -19,102 +18,48 @@ public class Solicitacao {
     @Column(name = "descricao", nullable = false, length = 255)
     private String descricao;
 
-    @Column(name = "valor", nullable = true)
-    private Double valor;
-
-    @Column(name = "ativo", nullable = false)
-    private Boolean ativo = true;
-
-    // Mapeia o cliente (idCliente) corretamente, substituindo Usuario
-    @ManyToOne
-    @JoinColumn(name = "idCliente", nullable = true)
+    // relacionamento com cliente (idCliente). Nullable conforme DDL.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idCliente", referencedColumnName = "idCliente", nullable = true)
     private Cliente cliente;
+
+    // valor com precisão DECIMAL(10,2)
+    @Column(name = "valor", precision = 10, scale = 2)
+    private BigDecimal valor;
+
+    @Column(name = "idStatus", nullable = false)
+    private Integer idStatus;
 
     @Column(name = "idCategoria", nullable = false)
     private Integer idCategoria;
 
-    @Column(name = "idStatus", nullable = false)
-    private Integer idStatus;
-    
-    private LocalDateTime dataPagamento;
+    @Column(name = "ativo")
+    private Boolean ativo = Boolean.TRUE;
 
-    protected Solicitacao() {}
+    public Solicitacao() {}
 
-    public Solicitacao(String nome, String descricao, Double valor, Cliente cliente,
-                       Integer idCategoria, Integer idStatus) {
-        this.nome = nome;
-        this.descricao = descricao;
-        this.valor = valor;
-        this.cliente = cliente;
-        this.idCategoria = idCategoria;
-        this.idStatus = idStatus;
-    }
+    // getters / setters
+    public Long getIdSolicitacao() { return idSolicitacao; }
+    public void setIdSolicitacao(Long idSolicitacao) { this.idSolicitacao = idSolicitacao; }
 
-    public Long getIdSolicitacao() {
-        return idSolicitacao;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public void setIdSolicitacao(Long idSolicitacao) {
-        this.idSolicitacao = idSolicitacao;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public String getNome() {
-        return nome;
-    }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public BigDecimal getValor() { return valor; }
+    public void setValor(BigDecimal valor) { this.valor = valor; }
 
-    public String getDescricao() {
-        return descricao;
-    }
+    public Integer getIdStatus() { return idStatus; }
+    public void setIdStatus(Integer idStatus) { this.idStatus = idStatus; }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+    public Integer getIdCategoria() { return idCategoria; }
+    public void setIdCategoria(Integer idCategoria) { this.idCategoria = idCategoria; }
 
-    public Double getValor() {
-        return valor;
-    }
-
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
-
-    public Boolean getAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public Integer getIdCategoria() {
-        return idCategoria;
-    }
-
-    public void setIdCategoria(Integer idCategoria) {
-        this.idCategoria = idCategoria;
-    }
-
-    public Integer getIdStatus() {
-        return idStatus;
-    }
-
-    public void setIdStatus(Integer idStatus) {
-        this.idStatus = idStatus;
-    }
-
-    public LocalDateTime getDataPagamento() {
-        return dataPagamento;
-    }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 }

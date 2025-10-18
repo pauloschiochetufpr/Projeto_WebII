@@ -25,37 +25,37 @@ public class SolicitacaoService {
 
     public List<Solicitacao> buscarPorCliente(Long clienteId) {
         try {
-            return solicitacaoRepository.findByIdCliente(clienteId);
+            return solicitacaoRepository.findByCliente_IdCliente(clienteId);
         } catch (Exception e) {
             System.err.println("Erro ao buscar por cliente: " + e.getMessage());
             return List.of();
         }
     }
 
-    public List<Solicitacao> buscarPorFuncionario(Long funcionarioId) {
-        try {
-            return solicitacaoRepository.findByIdFuncionario(funcionarioId);
-        } catch (Exception e) {
-            System.err.println("Erro ao buscar por funcionário: " + e.getMessage());
-            return List.of();
-        }
+    // public List<Solicitacao> buscarPorFuncionario(Long funcionarioId) {
+    //     try {
+    //         return solicitacaoRepository.findByFuncionario_IdFuncionario(funcionarioId);
+    //     } catch (Exception e) {
+    //         System.err.println("Erro ao buscar por funcionário: " + e.getMessage());
+    //         return List.of();
+    //     }
+    // }
+
+    public List<Solicitacao> buscarPorStatus(Integer status) {
+        return solicitacaoRepository.findByIdStatus(status);
     }
 
-    public List<Solicitacao> buscarPorStatus(String status) {
-        return solicitacaoRepository.findByStatus(status);
-    }
+    // public List<Solicitacao> buscarAtivas() {
+    //     return solicitacaoRepository.findByAtivoTrue();
+    // }
 
-    public List<Solicitacao> buscarAtivas() {
-        return solicitacaoRepository.findByAtivoTrue();
-    }
+    // public List<Solicitacao> buscarHoje() {
+    //     return solicitacaoRepository.findByDateToday(LocalDateTime.now());
+    // }
 
-    public List<Solicitacao> buscarHoje() {
-        return solicitacaoRepository.findByDateToday(LocalDateTime.now());
-    }
-
-    public List<Solicitacao> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
-        return solicitacaoRepository.findByDateBetween(inicio, fim);
-    }
+    // public List<Solicitacao> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
+    //     return solicitacaoRepository.findByDateBetween(inicio, fim);
+    // }
 
     public Solicitacao salvar(Solicitacao solicitacao) {
         if (solicitacao.getAtivo() == null) {

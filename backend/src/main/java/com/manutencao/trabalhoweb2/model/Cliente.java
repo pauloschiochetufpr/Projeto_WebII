@@ -1,7 +1,7 @@
 package com.manutencao.trabalhoweb2.model;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "cliente")
@@ -12,26 +12,26 @@ public class Cliente {
     @Column(name = "idCliente")
     private Long idCliente;
 
-    @Column(name = "cpf", length = 11, nullable = false, unique = true)
+    @Column(name = "cpf", nullable = false, length = 11, unique = true)
     private String cpf;
 
-    @Column(name = "nome", length = 64, nullable = false)
+    @Column(name = "nome", nullable = false, length = 64)
     private String nome;
 
-    @Column(name = "email", length = 128, nullable = false, unique = true)
+    @Column(name = "email", nullable = false, length = 128, unique = true)
     private String email;
 
-    @Column(name = "telefone", length = 13, nullable = false)
+    @Column(name = "telefone", nullable = false, length = 13)
     private String telefone;
 
-    @Column(name = "senha_hash", length = 64, nullable = false)
+    @Column(name = "senha_hash", nullable = false, length = 64)
     private String senhaHash;
 
-    @Column(name = "salt", length = 16, nullable = false)
+    @Column(name = "salt", nullable = false, length = 16)
     private String salt;
 
-    @Column(name = "ativo", nullable = false)
-    private Boolean ativo = true;
+    @Column(name = "ativo")
+    private Boolean ativo = Boolean.TRUE;
 
     @Column(name = "cadastro", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime cadastro;

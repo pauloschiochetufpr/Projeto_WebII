@@ -1,5 +1,6 @@
 package com.manutencao.trabalhoweb2.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ServicoPagoDTO {
@@ -7,15 +8,14 @@ public class ServicoPagoDTO {
     private Long id;
     private String nomeCliente;
     private String descricaoEquipamento;
-    private double valor;
+    private BigDecimal valor;
     private LocalDateTime dataPagamento;
 
-    public ServicoPagoDTO(Long id, String nomeCliente, String descricaoEquipamento, double valor, LocalDateTime dataPagamento) {
+    public ServicoPagoDTO(Long id, String nomeCliente, String descricaoEquipamento, BigDecimal valor) {
         this.id = id;
         this.nomeCliente = nomeCliente;
         this.descricaoEquipamento = descricaoEquipamento;
         this.valor = valor;
-        this.dataPagamento = dataPagamento;
     }
     
     public Long getId() {
@@ -27,7 +27,7 @@ public String getNomeCliente() {
 public String getDescricaoEquipamento() {
     return descricaoEquipamento;
 }
-public double getValor() {
+public BigDecimal getValor() {
     return valor;
 }
 public LocalDateTime getDataPagamento() {
