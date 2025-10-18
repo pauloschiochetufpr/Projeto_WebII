@@ -1,11 +1,13 @@
 package com.manutencao.trabalhoweb2.dto;
 
+import java.math.BigDecimal;
+
 public record SolicitacaoDto(
     Long idSolicitacao,
     String nome,
     String descricao,
     Long idCliente,
-    Double valor,
+    BigDecimal valor,
     Integer idStatus,
     Integer idCategoria,
     Boolean ativo

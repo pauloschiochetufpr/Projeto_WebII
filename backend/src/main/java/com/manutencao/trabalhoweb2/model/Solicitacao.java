@@ -36,7 +36,17 @@ public class Solicitacao {
     @Column(name = "ativo")
     private Boolean ativo = Boolean.TRUE;
 
-    public Solicitacao() {}
+    protected Solicitacao() {}
+
+    protected Solicitacao(String nome, String descricao, Cliente cliente, BigDecimal valor, Integer idStatus, Integer idCategoria) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.cliente = cliente;
+        this.valor = valor;
+        this.idStatus = idStatus;
+        this.idCategoria = idCategoria;
+        this.ativo = true;
+    }
 
     // getters / setters
     public Long getIdSolicitacao() { return idSolicitacao; }
