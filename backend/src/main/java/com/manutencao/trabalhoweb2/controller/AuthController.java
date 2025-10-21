@@ -27,7 +27,6 @@ public class AuthController {
         if (resp == null || resp.accessToken == null) {
             return ResponseEntity.status(401).body(new BasicResponse(401, "Credenciais inválidas"));
         }
-        // Note: aqui você deve também setar cookies HttpOnly/secure com tokens (no service)
         return ResponseEntity.ok(resp);
     }
 }
