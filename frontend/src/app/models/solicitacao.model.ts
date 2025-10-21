@@ -27,3 +27,25 @@ export class CategoriaEquipamento {
   ) {}
 }
 
+export class Cliente {
+  constructor (
+    public idCliente : number, 
+    public cpf: string='',
+    public nome: string='',
+    public email : string='',
+    public telefone : string='',
+    public ativo : boolean=true,
+  ){}
+}
+
+export class Funcionario {
+  constructor(
+    public idFuncionario : number,
+    public nome : string='', 
+    public email : string='',
+    public dataNasc : string='',
+    public telefone : string='',
+	  public ativo : boolean=true,
+  ){}
+}
+
