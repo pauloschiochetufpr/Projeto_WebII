@@ -4,36 +4,36 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "HistSolicitacao")
+@Table(name = "hist_solicitacao")
 public class HistSolicitacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idHistorico")
+    @Column(name = "id_historico")
     private Long idHistorico;
 
     // timestamp no DB tem DEFAULT CURRENT_TIMESTAMP
-    @Column(name = "dataHora", insertable = false, updatable = false)
+    @Column(name = "data_hora", insertable = false, updatable = false)
     private LocalDateTime dataHora;
 
     // relacionamento com solicitacao: idSolicitacao
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idSolicitacao", referencedColumnName = "idSolicitacao", nullable = false)
+    @JoinColumn(name = "id_solicitacao", referencedColumnName = "id_solicitacao", nullable = false)
     private Solicitacao solicitacao;
 
     @Column(name = "cliente")
     private Boolean cliente;
 
-    @Column(name = "statusOld", length = 32)
+    @Column(name = "status_old", length = 32)
     private String statusOld;
 
-    @Column(name = "statusNew", length = 32)
+    @Column(name = "status_new", length = 32)
     private String statusNew;
 
-    @Column(name = "funcionarioOld")
+    @Column(name = "funcionario_old")
     private Integer funcionarioOld;
 
-    @Column(name = "funcionarioNew")
+    @Column(name = "funcionario_new")
     private Integer funcionarioNew;
 
     public HistSolicitacao() {}

@@ -5,9 +5,7 @@ import { Listar } from './pages/listar/listar';
 import { HomeCliente } from './pages/home-cliente/home-cliente';
 import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario';
 import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/solicitar-manutencao';
-import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component'
-import { CrudUsers } from './pages/crud-users/crud-users';
-
+import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component';
 
 export const routes: Routes = [
   { path: 'solicitacao/listar', component: Listar },
@@ -16,6 +14,5 @@ export const routes: Routes = [
   { path: 'home-funcionario', component: HomeFuncionarioComponent },
   { path: 'solicitacao/criar', component: SolicitarManutencaoComponent },
   { path: '', component: LoginComponent },
-  { path: 'categoriaEquipamento', component: CategoriaEquipamentoComponent},
-  { path: 'usuarios', component: CrudUsers}
+  { path: 'categoriaEquipamento', component: CategoriaEquipamentoComponent },
 ];
