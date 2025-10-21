@@ -86,6 +86,7 @@ CREATE TABLE solicitacao (
     descricao VARCHAR(255) NOT NULL,
     idCliente INT UNSIGNED,
     valor DECIMAL(10 , 2 ),
+    dataPagamento TIMESTAMP NULL,
     idStatus INT UNSIGNED NOT NULL,
     idCategoria INT UNSIGNED UNSIGNED NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
