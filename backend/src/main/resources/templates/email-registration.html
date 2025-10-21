@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bem-vindo!</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      color: #333333;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      style="background-color: #f2f2f2"
+    >
+      <tr>
+        <td align="center">
+          <!-- Container principal -->
+          <table
+            role="presentation"
+            width="600"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            style="background-color: #a5cafc; padding: 20px; border-radius: 8px"
+          >
+            <!-- Cabeçalho -->
+            <tr>
+              <td
+                align="center"
+                style="
+                  color: #ffffff;
+                  padding: 15px;
+                  font-size: 45px;
+                  font-weight: bold;
+                  line-height: 1.2;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                  white-space: normal;
+                "
+              >
+                Bem-vindo <span th:text="${nome}">Usuário</span>!
+              </td>
+            </tr>
+
+            <!-- Conteúdo principal -->
+            <tr>
+              <td
+                align="center"
+                style="
+                  background-color: #9dfcd6;
+                  padding: 40px;
+                  border-radius: 6px;
+                  margin-top: 10px;
+                "
+              >
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                >
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        color: #6e6e6e;
+                        font-size: 16px;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      Sua conta foi criada com sucesso. Segue sua senha:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="padding: 10px">
+                      <p
+                        th:text="${senha}"
+                        style="
+                          background-color: #a5cafc;
+                          color: #ffffff;
+                          border: 2px solid #ffffff;
+                          padding: 10px 20px;
+                          font-family: monospace;
+                          font-size: 25px;
+                          font-weight: bold;
+                          border-radius: 4px;
+                          display: inline-block;
+                          margin: 0;
+                        "
+                      >
+                        ***
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      align="center"
+                      style="color: #6e6e6e; font-size: 16px; padding-top: 20px"
+                    >
+                      Para voltar ao login, clique no botão abaixo:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="padding-top: 20px">
+                      <a
+                        th:href="${loginUrl}"
+                        style="
+                          display: inline-block;
+                          padding: 12px 25px;
+                          background-color: #6433ff;
+                          color: #ffffff !important;
+                          text-decoration: none;
+                          border-radius: 5px;
+                          font-weight: bold;
+                          cursor: pointer;
+                        "
+                      >
+                        Ir para o Login
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Rodapé -->
+            <tr>
+              <td
+                align="center"
+                style="
+                  text-align: center;
+                  font-size: 12px;
+                  color: #ffffff;
+                  margin-top: 20px;
+                  padding-top: 20px;
+                "
+              >
+                Este é um e-mail automático, por favor não responda.<br />
+                &copy; 2025 Assistência Técnica
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
