@@ -11,16 +11,17 @@ export class AuthService {
 
   login(email: string, password: string): Observable<any> {
     return this.http.post(
-      `${this.api}/login`,
+      `${this.api}/auth/login`,
       { email, password },
       { responseType: 'text' }
     );
   }
 
-  cadastro(data: any): Observable<any> {
-    return this.http.post(`${this.api}/cadastro`, data, {
-      responseType: 'text',
-    });
+  cadastro(data: any): Observable<{ code: number; message: string }> {
+    return this.http.post<{ code: number; message: string }>(
+      `${this.api}/auth/cadastro`,
+      data
+    );
   }
 
   // Aqui estou usando API gratuita para verificação de email válido, assim já evita passar emails invalidos para as proximas etapas

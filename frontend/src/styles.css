@@ -18,6 +18,17 @@
   }
 }
 
+@layer components {
+  .alert-message {
+    background: rgba(255, 255, 0, 0.22); /* fundo amarelo translúcido */
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5.6px);
+    -webkit-backdrop-filter: blur(5.6px);
+    border: 2.5px solid rgba(255, 255, 0, 0.48); /* borda amarela translúcida */
+  }
+}
+
 /* 1) Dim do backdrop */
 .cdk-overlay-backdrop {
   background-color: rgba(0, 0, 0, 0.35) !important;

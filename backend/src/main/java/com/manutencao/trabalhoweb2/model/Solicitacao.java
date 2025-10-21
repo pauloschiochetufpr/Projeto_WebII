@@ -9,7 +9,7 @@ public class Solicitacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idSolicitacao")
+    @Column(name = "id_solicitacao")
     private Long idSolicitacao;
 
     @Column(name = "nome", nullable = false, length = 64)
@@ -20,17 +20,17 @@ public class Solicitacao {
 
     // relacionamento com cliente (idCliente). Nullable conforme DDL.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCliente", referencedColumnName = "idCliente", nullable = true)
+    @JoinColumn(name = "id_cliente", referencedColumnName = "id_cliente", nullable = true)
     private Cliente cliente;
 
     // valor com precisão DECIMAL(10,2)
     @Column(name = "valor", precision = 10, scale = 2)
     private BigDecimal valor;
 
-    @Column(name = "idStatus", nullable = false)
+    @Column(name = "id_status", nullable = false)
     private Integer idStatus;
 
-    @Column(name = "idCategoria", nullable = false)
+    @Column(name = "id_categoria", nullable = false)
     private Integer idCategoria;
 
     @Column(name = "ativo")

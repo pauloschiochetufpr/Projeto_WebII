@@ -18,7 +18,7 @@ Create table cep(
 );
 
 CREATE TABLE endereco (
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_endereco INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
     uf VARCHAR(2) NOT NULL,
     localidade VARCHAR(128) NOT NULL,
@@ -37,81 +37,79 @@ CREATE TABLE ddd_validos (
 );
 
 CREATE TABLE cliente (
-    idCliente INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     cpf VARCHAR(11) NOT NULL UNIQUE,
     nome VARCHAR(64) NOT NULL,
     email VARCHAR(128) NOT NULL UNIQUE,
     telefone VARCHAR(13) NOT NULL,
     senha_hash VARCHAR(64) NOT NULL,
-    salt VARCHAR(16) NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
     cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ultima_alteração TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ultima_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE cliente_endereco(
     id_cliente int unsigned,
     id_endereco int unsigned,
-    FOREIGN key (id_cliente) references cliente(idCliente),
-    FOREIGN key (id_endereco) references endereco(id),
+    FOREIGN key (id_cliente) references cliente(id_cliente),
+    FOREIGN key (id_endereco) references endereco(id_endereco),
     PRIMARY KEY (id_cliente, id_endereco)
 );
 
 CREATE TABLE categoria (
-    idCategoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     ativo BOOLEAN DEFAULT TRUE,
     nome VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE funcionario (
-    idFuncionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_funcionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,
     email VARCHAR(128) NOT NULL UNIQUE,
-    dataNasc DATE NOT NULL,
+    data_nasc DATE NOT NULL,
     telefone VARCHAR(13) NOT NULL,
 	senha_hash VARCHAR(64) NOT NULL,
-    salt VARCHAR(16) NOT NULL,
     ativo BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE stat (
-    idStatus INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    status VARCHAR(15) NOT NULL
+    id_status INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    stat VARCHAR(15) NOT NULL
 );
 
 CREATE TABLE solicitacao (
-    idSolicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_solicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
-    idCliente INT UNSIGNED,
+    id_cliente INT UNSIGNED,
     valor DECIMAL(10 , 2 ),
-    idStatus INT UNSIGNED NOT NULL,
-    idCategoria INT UNSIGNED UNSIGNED NOT NULL,
+    id_status INT UNSIGNED NOT NULL,
+    id_categoria INT UNSIGNED UNSIGNED NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (idCategoria)
-        REFERENCES categoria (idCategoria),
-    FOREIGN KEY (idStatus)
-        REFERENCES stat (idStatus),
-    FOREIGN KEY (idCliente)
-        REFERENCES cliente (idCliente)
+    FOREIGN KEY (id_categoria)
+        REFERENCES categoria (id_categoria),
+    FOREIGN KEY (id_status)
+        REFERENCES stat (id_status),
+    FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente)
 );
 
-CREATE TABLE HistSolicitacao (
-    idHistorico INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    dataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    idSolicitacao INT UNSIGNED NOT NULL,
+CREATE TABLE Hist_solicitacao (
+    id_historico INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_solicitacao INT UNSIGNED NOT NULL,
     cliente BOOLEAN,
-    statusOld VARCHAR(32),
-    statusNew VARCHAR(32),
-    funcionarioOld INT UNSIGNED,
-    funcionarioNew INT UNSIGNED,
-    FOREIGN KEY (idSolicitacao)
-        REFERENCES solicitacao (idSolicitacao),
-    FOREIGN KEY (funcionarioNew)
-        REFERENCES funcionario (idFuncionario),
-    FOREIGN KEY (funcionarioOld)
-        REFERENCES funcionario (idFuncionario)
+    status_old VARCHAR(32),
+    status_new VARCHAR(32),
+    funcionario_old INT UNSIGNED,
+    funcionario_new INT UNSIGNED,
+    FOREIGN KEY (id_solicitacao)
+        REFERENCES solicitacao (id_solicitacao),
+    FOREIGN KEY (funcionario_new)
+        REFERENCES funcionario (id_funcionario),
+    FOREIGN KEY (funcionario_old)
+        REFERENCES funcionario (id_funcionario)
 );
 
 -- Lista oficial da anantel

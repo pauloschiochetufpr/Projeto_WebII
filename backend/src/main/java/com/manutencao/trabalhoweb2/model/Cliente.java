@@ -9,141 +9,74 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idCliente")
+    @Column(name = "id_cliente")
     private Long idCliente;
 
-    @Column(name = "cpf", nullable = false, length = 11, unique = true)
+    @Column(length = 11, nullable = false, unique = true)
     private String cpf;
 
-    @Column(name = "nome", nullable = false, length = 64)
+    @Column(length = 64, nullable = false)
     private String nome;
 
-    @Column(name = "email", nullable = false, length = 128, unique = true)
+    @Column(length = 128, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "telefone", nullable = false, length = 13)
+    @Column(length = 13, nullable = false)
     private String telefone;
 
-    @Column(name = "senha_hash", nullable = false, length = 64)
+    @Column(name = "senha_hash", length = 64, nullable = false)
     private String senhaHash;
 
-    @Column(name = "salt", nullable = false, length = 16)
-    private String salt;
+    @Column(nullable = false)
+    private Boolean ativo = true;
 
-    @Column(name = "ativo")
-    private Boolean ativo = Boolean.TRUE;
+    @Column(nullable = false)
+    private LocalDateTime cadastro = LocalDateTime.now();
 
-    @Column(name = "cadastro", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime cadastro;
+    @Column(name = "ultimo_login", nullable = false)
+    private LocalDateTime ultimoLogin = LocalDateTime.now();
 
-    @Column(name = "ultimo_login", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime ultimoLogin;
+    @Column(name = "ultima_alteracao", nullable = false)
+    private LocalDateTime ultimaAlteracao = LocalDateTime.now();
 
-    @Column(name = "ultima_alteração", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime ultimaAlteracao;
+    public Cliente() {}
 
-    protected Cliente() {}
-
-    public Cliente(String cpf, String nome, String email, String telefone, String senhaHash, String salt) {
+    public Cliente(String cpf, String nome, String email, String telefone, String senhaHash) {
         this.cpf = cpf;
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
         this.senhaHash = senhaHash;
-        this.salt = salt;
-        this.ativo = true;
-        this.cadastro = LocalDateTime.now();
-        this.ultimoLogin = LocalDateTime.now();
-        this.ultimaAlteracao = LocalDateTime.now();
     }
 
     // Getters e Setters
+    public Long getIdCliente() { return idCliente; }
+    public void setIdCliente(Long idCliente) { this.idCliente = idCliente; }
 
-    public Long getIdCliente() {
-        return idCliente;
-    }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public void setIdCliente(Long idCliente) {
-        this.idCliente = idCliente;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getCpf() {
-        return cpf;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getSenhaHash() { return senhaHash; }
+    public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 
-    public String getEmail() {
-        return email;
-    }
+    public LocalDateTime getCadastro() { return cadastro; }
+    public void setCadastro(LocalDateTime cadastro) { this.cadastro = cadastro; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public LocalDateTime getUltimoLogin() { return ultimoLogin; }
+    public void setUltimoLogin(LocalDateTime ultimoLogin) { this.ultimoLogin = ultimoLogin; }
 
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public String getSenhaHash() {
-        return senhaHash;
-    }
-
-    public void setSenhaHash(String senhaHash) {
-        this.senhaHash = senhaHash;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public Boolean getAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public LocalDateTime getCadastro() {
-        return cadastro;
-    }
-
-    public void setCadastro(LocalDateTime cadastro) {
-        this.cadastro = cadastro;
-    }
-
-    public LocalDateTime getUltimoLogin() {
-        return ultimoLogin;
-    }
-
-    public void setUltimoLogin(LocalDateTime ultimoLogin) {
-        this.ultimoLogin = ultimoLogin;
-    }
-
-    public LocalDateTime getUltimaAlteracao() {
-        return ultimaAlteracao;
-    }
-
-    public void setUltimaAlteracao(LocalDateTime ultimaAlteracao) {
-        this.ultimaAlteracao = ultimaAlteracao;
-    }
+    public LocalDateTime getUltimaAlteracao() { return ultimaAlteracao; }
+    public void setUltimaAlteracao(LocalDateTime ultimaAlteracao) { this.ultimaAlteracao = ultimaAlteracao; }
 }

@@ -34,7 +34,34 @@ export class LoginComponent {
   telefoneValidoCadastro: boolean | null = null;
   isBuscandoCep = false;
 
-  
+  isHoveringLogin = false;
+  isHoveringCadastro = false;
+  zAtivo = false;
+  private fadeInTimer?: ReturnType<typeof setTimeout>;
+  private fadeOutTimer?: ReturnType<typeof setTimeout>;
+
+  get mostrarAlerta(): boolean {
+    const inativo = !this.isHoveringLogin && !this.isHoveringCadastro;
+
+    // Limpamos timers antigos para evitar conflito entre estados
+    clearTimeout(this.fadeInTimer);
+    clearTimeout(this.fadeOutTimer);
+
+    if (inativo) {
+      // Quando hover sai → queremos que o fade-in ocorra suavemente
+      // Esperamos um pequeno delay para deixar o Tailwind começar o fade antes de ajustar o z-index
+      this.fadeInTimer = setTimeout(() => {
+        this.zAtivo = true;
+      }, 1); // levemente atrasado para sincronizar com o início da animação
+    } else {
+      // Quando hover volta → aguardamos o fade-out terminar antes de remover o z-index
+      this.fadeOutTimer = setTimeout(() => {
+        this.zAtivo = false;
+      }, 350); // ligeiramente acima do duration-300 do Tailwind
+    }
+
+    return inativo;
+  }
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     // Login //
@@ -53,10 +80,10 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       cep: ['', Validators.required],
       telefone: ['', Validators.required],
-      logradouro: [{ value: '', disabled: true }],
-      bairro: [{ value: '', disabled: true }],
-      localidade: [{ value: '', disabled: true }],
-      uf: [{ value: '', disabled: true }],
+      logradouro: ['', Validators.required],
+      bairro: ['', Validators.required],
+      localidade: ['', Validators.required],
+      uf: ['', Validators.required],
 
       numero: ['', Validators.required],
       complemento: ['', Validators.required],
@@ -110,7 +137,6 @@ export class LoginComponent {
           this.isBuscandoCep = true;
           let tentativas = 0;
 
-
           return interval(120000).pipe(
             // polling a cada 2 minutos
             startWith(0),
@@ -119,9 +145,7 @@ export class LoginComponent {
               return this.authService.validarCep(numeros);
             }),
 
-
             takeWhile((dados) => !dados && tentativas < 10, true)
-
           );
         })
       )
@@ -220,7 +244,6 @@ export class LoginComponent {
   }
 
   applyNumeroMask() {
-
     let v = this.cadastroForm.value.numero.replace(/\D/g, ''); // remove tudo que não for número
     this.cadastroForm.patchValue({ numero: v }, { emitEvent: false });
   }
