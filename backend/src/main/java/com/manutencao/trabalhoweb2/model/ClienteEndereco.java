@@ -10,13 +10,13 @@ public class ClienteEndereco {
     private ClienteEnderecoId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idCliente")  // referencia a propriedade da chave composta
-    @JoinColumn(name = "id_cliente") // deve coincidir exatamente com a coluna do banco
+    @MapsId("idCliente")
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idEndereco")  // referencia a propriedade da chave composta
-    @JoinColumn(name = "id_endereco") // deve coincidir exatamente com a coluna do banco
+    @MapsId("idEndereco")
+    @JoinColumn(name = "id_endereco")
     private Endereco endereco;
 
     public ClienteEndereco() {}
