@@ -95,7 +95,7 @@ CREATE TABLE solicitacao (
         REFERENCES cliente (id_cliente)
 );
 
-CREATE TABLE Hist_solicitacao (
+CREATE TABLE hist_solicitacao (
     id_historico INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_solicitacao INT UNSIGNED NOT NULL,
