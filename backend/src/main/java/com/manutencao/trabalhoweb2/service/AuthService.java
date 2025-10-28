@@ -14,7 +14,6 @@ import com.manutencao.trabalhoweb2.repository.ClienteEnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.CepRepository;
 import com.manutencao.trabalhoweb2.service.EmailService;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -23,12 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 import java.util.Map;
 
 @Service
 public class AuthService {
 
     @Autowired
+
     private EmailService emailService;
 
     @Autowired
@@ -58,6 +59,7 @@ public class AuthService {
             Optional<Cliente> existentePorEmail = clienteRepository.findByEmail(req.email);
 
             if (existentePorCpf.isPresent() || existentePorEmail.isPresent()) {
+
                 return new BasicResponse(400, "Usuário com esse documento e/ou email já existe");
             }
             
@@ -72,6 +74,7 @@ public class AuthService {
 
             Optional<CepModel> cepOpt = cepRepository.findById(req.cep);
             if (cepOpt.isEmpty()) {
+
                 return new BasicResponse(400, "O CEP informado não está cadastrado no sistema. Erro de ordenação e integridade da operação");
             }
 

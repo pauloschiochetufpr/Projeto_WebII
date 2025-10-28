@@ -54,6 +54,7 @@
     </div>
   </div>
   <div
+
     class="flex justify-center items-center w-[50vw] duration-500 ease-in-out transition-all hover:w-[70vw] h-screen bg-azul-main relative group z-40 border-r-8 border-roxo-terc"
   >
     <div
@@ -195,6 +196,7 @@
               placeholder="000.000.000-00"
               class="w-[145px] placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
               [ngClass]="{
+
                 'text-azul-main font-semibold': !cadastroForm.get('cpf')?.errors && cadastroForm.get('cpf')?.touched,
                 'text-red-500 font-semibold': cadastroForm.get('cpf')?.errors?.['cpfInvalido'] && cadastroForm.get('cpf')?.touched
               }"
@@ -229,6 +231,7 @@
               (input)="applyPhoneMask()"
               maxlength="15"
               placeholder="(00) 00000-0000"
+
               [class.font-semibold]="telefoneValidoCadastro === true || false"
               [class.text-red-500]="telefoneValidoCadastro === false"
               [class.text-azul-main]="telefoneValidoCadastro === true"
@@ -266,6 +269,7 @@
             autocomplete="email"
             placeholder="Digite seu email favorito"
             [class.text-red-500]="emailValidoCadastro === false"
+
             [class.font-semibold]="emailValidoCadastro === true || false"
             [class.text-azul-main]="emailValidoCadastro === true"
             class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
@@ -410,6 +414,7 @@
         </button>
       </form>
       <!-- Área da mensagem  -->
+
     </div>
     <div
       *ngIf="isBuscandoCep && cadastroForm.get('cep')?.touched"

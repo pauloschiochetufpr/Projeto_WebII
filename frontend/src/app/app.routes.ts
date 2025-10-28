@@ -13,6 +13,10 @@ export const routes: Routes = [
   { path: 'home-cliente', component: HomeCliente },
   { path: 'home-funcionario', component: HomeFuncionarioComponent },
   { path: 'solicitacao/criar', component: SolicitarManutencaoComponent },
+<<<<<<< HEAD
+  { path: '', component: LoginComponent },
+=======
   { path: 'login', component: LoginComponent },
+>>>>>>> 83fb1a8c6fc0b7c25f5688c10cb80bc154b8365b
   { path: 'categoriaEquipamento', component: CategoriaEquipamentoComponent },
 ];

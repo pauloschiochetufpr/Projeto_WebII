@@ -46,6 +46,7 @@ export class LoginComponent {
   private fadeInTimer?: ReturnType<typeof setTimeout>;
   private fadeOutTimer?: ReturnType<typeof setTimeout>;
 
+
   mensagemNotificacao: string | null = null;
   codigoNotificacao?: number;
 
