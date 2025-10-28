@@ -24,7 +24,7 @@ export class AuthService {
     );
   }
 
-  // Aqui estou usando API gratuita para verificação de email válido, assim já evita passar emails invalidos para as proximas etapas
+  // Tirei a api, a API caiu :(
   validarEmail(email: string): Observable<any> {
     return this.http.get(`${this.api}/validate-email`, { params: { email } });
   }
