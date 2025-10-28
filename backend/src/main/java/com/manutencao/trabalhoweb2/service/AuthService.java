@@ -12,7 +12,7 @@ import com.manutencao.trabalhoweb2.repository.ClienteRepository;
 import com.manutencao.trabalhoweb2.repository.EnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.ClienteEnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.CepRepository;
-
+import com.manutencao.trabalhoweb2.service.EmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -23,8 +23,14 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import java.util.Map;
+
 @Service
 public class AuthService {
+
+    @Autowired
+
+    private EmailService emailService;
 
     @Autowired
     private ClienteRepository clienteRepository;
@@ -53,7 +59,8 @@ public class AuthService {
             Optional<Cliente> existentePorEmail = clienteRepository.findByEmail(req.email);
 
             if (existentePorCpf.isPresent() || existentePorEmail.isPresent()) {
-                return new BasicResponse(400, "Usuário com esse documento ou email já existe");
+
+                return new BasicResponse(400, "Usuário com esse documento e/ou email já existe");
             }
             
             // Geração de senha aleatória
@@ -67,7 +74,8 @@ public class AuthService {
 
             Optional<CepModel> cepOpt = cepRepository.findById(req.cep);
             if (cepOpt.isEmpty()) {
-                return new BasicResponse(400, "O CEP informado não está cadastrado no sistema.");
+
+                return new BasicResponse(400, "O CEP informado não está cadastrado no sistema. Erro de ordenação e integridade da operação");
             }
 
             
@@ -97,18 +105,23 @@ public class AuthService {
 
             Cliente clienteSalvo = clienteRepository.save(cliente);
 
-            //. Registro da relação cliente-endereço
-            ClienteEndereco clienteEndereco = new ClienteEndereco();
-            clienteEndereco.setCliente(clienteSalvo);
-            clienteEndereco.setEndereco(enderecoSalvo);
-
+            // Registro da relação cliente-endereço
+            ClienteEndereco clienteEndereco = new ClienteEndereco(clienteSalvo, enderecoSalvo);
             clienteEnderecoRepository.save(clienteEndereco);
 
-            //. Envio da senha gerada por e-mail
-            enviarEmailSimples(req.email, "Cadastro realizado com sucesso","Sua senha temporária é: " + senhaGerada);
+
+            // Envio da senha gerada por e-mail
+
+            Map<String, Object> vars = Map.of(
+                "nome", clienteSalvo.getNome(),
+                "senha", senhaGerada,
+                "loginUrl", "https://localhost:4200/login"
+            );
+            emailService.sendHtmlTemplate(req.email, "Bem-vindo a equipe! Aqui está a sua senha :)", "email-registration", vars);
+
 
             // Retorno de sucesso
-            return new BasicResponse(200, "Cadastro concluído com sucesso");
+            return new BasicResponse(200, "Cadastro concluído com sucesso! Verifique a caixa de entrada de seu email para receber sua senha");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,9 +143,9 @@ public class AuthService {
     // Funções auxiliares
     // =====================================================
 
-    /** Gera uma senha aleatória segura */
+    /* Gera uma senha aleatória segura */
     private String gerarSenhaAleatoria(int tamanho) {
-        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+        String caracteres = "0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder senha = new StringBuilder();
 
@@ -141,14 +154,5 @@ public class AuthService {
         }
 
         return senha.toString();
-    }
-
-    /** Placeholder para envio de e-mail (será aprimorado depois) */
-    private void enviarEmailSimples(String destinatario, String assunto, String conteudo) {
-        System.out.println("=== EMAIL SIMULADO ===");
-        System.out.println("Para: " + destinatario);
-        System.out.println("Assunto: " + assunto);
-        System.out.println("Conteúdo: " + conteudo);
-        System.out.println("======================");
     }
 }

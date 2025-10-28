@@ -13,6 +13,7 @@ module.exports = {
       },
       colors: {
         "azul-main": "#2D85FF",
+        "azul-suav": "#A5CAFC",
         "verde-sec": "#19FFA2",
         "verde-esc": "#00B56C",
         "verde-qua": "#54FEBA",

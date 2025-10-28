@@ -5,12 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-
+import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
 import { JsonTestService } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
 import { FuncHeader } from '../../components/func-header/func-header';
-import { VisualizarServicoDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
+import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
 
 interface DisplayUser {
   id?: number | string | null;
@@ -53,7 +53,8 @@ export class Listar implements OnInit {
   currentEmployeeDestinationName: string | null = 'Oficina Centro';
 
   constructor(
-    private jsonService: JsonTestService,
+    private solicitacaoService: SolicitacaoService,
+    private jsonService: JsonTestService, // 👈 agora só usado para parseDate etc
     public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
@@ -62,44 +63,42 @@ export class Listar implements OnInit {
     this.onRefresh();
   }
 
+  // 🔹 Busca no back-end
   onRefresh(): void {
     this.loading = true;
     this.error = null;
     this.summary = 'Carregando...';
     this.users = [];
 
-    this.jsonService.resetMockFromAssets();
+    this.solicitacaoService.listarTodas().pipe(take(1)).subscribe({
+      next: (data: SolicitacaoDto[]) => {
+        const normalized = data.map((s) => ({
+          id: s.idSolicitacao,
+          createdAt: s.createdAt ?? s['dataHora'] ?? new Date().toISOString(),
+          requesterName: s.cliente?.nome ?? `Cliente #${s.idCliente}`,
+          description: s.descricao,
+          state: this.solicitacaoService.mapStatus(s.idStatus),
+          redirectDestinationName: '-',
+          budget: s.valor,
+        }));
 
-    this.jsonService.users$.pipe(take(1)).subscribe({
-      next: (data: any[]) => {
-        const normalized = this.jsonService.normalizeUsers(data || []);
-
-        normalized.sort((a: any, b: any) => {
-          const da =
-            this.jsonService
-              .parseDate(a.createdAt ?? a.date ?? null)
-              ?.getTime() ?? 0;
-          const db =
-            this.jsonService
-              .parseDate(b.createdAt ?? b.date ?? null)
-              ?.getTime() ?? 0;
-          return da - db;
-        });
-
-        this.users = normalized as DisplayUser[];
+        this.users = normalized;
         this.computePeriodFromSelection();
         this.loading = false;
         this.summary = `${this.users.length} registro(s) carregado(s)`;
+
+        console.log('Solicitações recebidas do backend:', data);
       },
-      error: (err: any) => {
-        console.error('Erro ao recarregar dados', err);
-        this.error = 'Erro desconhecido';
+      error: (err) => {
+        console.error('Erro ao buscar solicitações:', err);
+        this.error = 'Erro ao buscar solicitações';
         this.loading = false;
         this.summary = '';
       },
     });
   }
 
+  // 🔹 Funções auxiliares de data (delegando para o JsonTestService)
   private parseDate(value?: string | number | null): Date | null {
     return this.jsonService.parseDate(value);
   }
@@ -128,6 +127,7 @@ export class Listar implements OnInit {
     }
   }
 
+  // 🔹 Normalizações
   private normalizeTextForCompare(s?: string | null): string {
     if (!s) return '';
     return s
@@ -176,6 +176,7 @@ export class Listar implements OnInit {
     }
   }
 
+  // Filtro visual aplicado no HTML
   get listaFiltrada(): DisplayUser[] {
     if (!this.users || this.users.length === 0) return [];
 
@@ -223,16 +224,16 @@ export class Listar implements OnInit {
     });
   }
 
-  // Abre o dialog e aplica os updates locais na solicitacao
- abrirVisualizar(user: DisplayUser) {
-  const ref = this.dialog.open(VisualizarServicoDialog, {
-    width: '700px',
-    data: { 
-      user, 
-      action: 'VISUALIZAR',
-      currentDestination: this.currentEmployeeDestinationName  // 👈 passa pro dialog
-    }
-  });
+  // 🔹 Abre o dialog e aplica os updates locais
+  abrirVisualizar(user: DisplayUser) {
+    const ref = this.dialog.open(VisualizarServicosDialog, {
+      width: '700px',
+      data: {
+        user,
+        action: 'VISUALIZAR',
+        currentDestination: this.currentEmployeeDestinationName,
+      },
+    });
 
     ref.afterClosed().subscribe((result: any) => {
       if (!result) return;
@@ -261,12 +262,11 @@ export class Listar implements OnInit {
           break;
         case 'REDIRECIONAR':
           this.users[idx].state = 'REDIRECIONADA';
-
           this.users[idx].redirectDestinationName =
             result.destino === 'CURRENT'
-          ? this.currentEmployeeDestinationName
-          : result.destino ?? this.users[idx].redirectDestinationName;
-             break;
+              ? this.currentEmployeeDestinationName
+              : result.destino ?? this.users[idx].redirectDestinationName;
+          break;
         case 'PAGAR':
           this.users[idx].state = 'PAGA';
           break;
@@ -274,8 +274,6 @@ export class Listar implements OnInit {
           this.users[idx].state = 'FINALIZADA';
           break;
       }
-
-      // adiciona histórico local
       this.users[idx].history = [
         ...(this.users[idx].history ?? []),
         {
@@ -287,7 +285,7 @@ export class Listar implements OnInit {
     });
   }
 
-  // totais que o html puxa
+  // 🔹 Totais
   get totalSolicitacoes(): number {
     return this.users.length;
   }

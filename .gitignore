@@ -25,6 +25,7 @@ backend/src/main/resources/application.properties
 /backend/src/main/resources/application.properties
 /backend/src/main/resources/keystore.p12
 *.p12
+application-secrets.properties
 
 # ======================================
 # IDEs e editores

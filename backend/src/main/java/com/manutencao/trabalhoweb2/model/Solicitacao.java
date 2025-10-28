@@ -36,9 +36,9 @@ public class Solicitacao {
     @Column(name = "ativo")
     private Boolean ativo = Boolean.TRUE;
 
-    protected Solicitacao() {}
+    public Solicitacao() {}
 
-    protected Solicitacao(String nome, String descricao, Cliente cliente, BigDecimal valor, Integer idStatus, Integer idCategoria) {
+    public Solicitacao(String nome, String descricao, Cliente cliente, BigDecimal valor, Integer idStatus, Integer idCategoria) {
         this.nome = nome;
         this.descricao = descricao;
         this.cliente = cliente;

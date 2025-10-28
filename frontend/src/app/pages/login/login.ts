@@ -17,12 +17,18 @@ import {
 } from 'rxjs/operators';
 import { interval, of } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
+import { NotificationComponent } from '../../components';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.html',
-  imports: [ReactiveFormsModule, CommonModule, LucideAngularModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    LucideAngularModule,
+    NotificationComponent,
+  ],
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -39,6 +45,10 @@ export class LoginComponent {
   zAtivo = false;
   private fadeInTimer?: ReturnType<typeof setTimeout>;
   private fadeOutTimer?: ReturnType<typeof setTimeout>;
+
+
+  mensagemNotificacao: string | null = null;
+  codigoNotificacao?: number;
 
   get mostrarAlerta(): boolean {
     const inativo = !this.isHoveringLogin && !this.isHoveringCadastro;
@@ -204,11 +214,33 @@ export class LoginComponent {
 
       this.authService.cadastro(formValue).subscribe({
         next: (res) => {
-          console.log('Cadastro OK:', res);
+          // Atualiza mensagem e código para o NotificationComponent
+          this.mensagemNotificacao = res.message;
+          this.codigoNotificacao = res.code;
+
+          // Se sucesso (HTTP 200) limpa o form
+          if (res.code === 200) {
+            this.cadastroForm.reset();
+          }
+
+          // Timeout padrão para desaparecer a mensagem
+          setTimeout(() => {
+            this.mensagemNotificacao = null;
+            this.codigoNotificacao = res.code ?? undefined;
+          }, 5000);
+
           this.isSubmittingCadastro = false; // libera botão
         },
         error: (err) => {
-          console.error('Erro cadastro:', err);
+          // Caso erro inesperado, exibe a mensagem e código
+          this.mensagemNotificacao = err?.message;
+          this.codigoNotificacao = err?.status;
+
+          setTimeout(() => {
+            this.mensagemNotificacao = null;
+            this.codigoNotificacao = err.code ?? undefined;
+          }, 5000);
+
           this.isSubmittingCadastro = false; // libera botão
         },
       });
