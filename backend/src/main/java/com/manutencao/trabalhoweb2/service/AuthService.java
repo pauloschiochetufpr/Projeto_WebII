@@ -133,6 +133,7 @@ public class AuthService {
      * Faz login
      * Deve retornar AuthResponse com access/refresh tokens e definir cookies HTTP-only.
      */
+    @Transactional
     public AuthResponse login(LoginRequest req) {
         // buscar cliente ou funcionario por email, validar senha (hash + salt), emitir JWTs
         return new AuthResponse("access-token-placeholder", "refresh-token-placeholder");

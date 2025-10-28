@@ -112,6 +112,15 @@ CREATE TABLE hist_solicitacao (
         REFERENCES funcionario (id_funcionario)
 );
 
+-- Blacklist de token
+
+CREATE TABLE token_blacklist (
+    id_token_blacklist BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(512) NOT NULL UNIQUE,
+    data_expiracao DATETIME NOT NULL,
+    revogado BOOLEAN NOT NULL DEFAULT FALSE
+);
+
 -- Lista oficial da anantel
 
 INSERT INTO ddd_validos (ddd) VALUES
