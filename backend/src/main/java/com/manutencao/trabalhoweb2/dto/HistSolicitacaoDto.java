@@ -1,12 +1,14 @@
 package com.manutencao.trabalhoweb2.dto;
 
+import java.time.LocalDateTime;
+
 public record HistSolicitacaoDto(
-    Long idHistorico,
-    String dataHora,
-    Long idSolicitacao,
+    Long id,
+    Long solicitacaoId,
     Boolean cliente,
     String statusOld,
     String statusNew,
-    Long funcionarioOld,
-    Long funcionarioNew
+    Integer funcionarioOld,
+    Integer funcionarioNew,
+    LocalDateTime dataHora
 ) {}
