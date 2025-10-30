@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { catchError, of, Subscription, take } from 'rxjs';
 import { JsonTestService, User } from '../../services/jsontest';
 
 import { FuncHeader } from '../../components/func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
+import { SolicitacaoService } from '../../services/solicitacao';
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -21,6 +22,7 @@ export interface Solicitation {
   date?: string;
   idStatus?: number;
   state?: string;
+  lastUpdate?: string | null;
   [key: string]: any;
 }
 
@@ -52,20 +54,82 @@ export class HomeFuncionarioComponent implements OnInit, OnDestroy {
   };
 
   constructor(
+    private solicitacaoService: SolicitacaoService,
     private jsonService: JsonTestService,
     public dateSelection: DateSelection
   ) {}
 
   ngOnInit(): void {
+    this.loadAbertoFromBackend();
+  }
+
+  private loadAbertoFromBackend(): void {
     this.loading = true;
+    this.error = null;
+
+    // 1 = ABERTA (conforme map)
+    const sub = this.solicitacaoService
+      .listarTodasComLastUpdate()
+      .pipe(
+        take(1),
+        catchError((err) => {
+          console.warn(
+            'Backend indisponível ou erro ao buscar por status. Usando mock.',
+            err
+          );
+          // fallback: usar o jsonService local (retornamos empty observable aqui;
+          // tratamos fazendo load do mock abaixo)
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (arr) => {
+          if (arr === null) {
+            // fallback para o mock local
+            this.loadFromMock();
+            return;
+          }
+
+          const all = (arr || []).map((d) => this.normalize(d));
+          // já chegam apenas ABERTA (backend), mas filtramos por segurança:
+          this.solicitations = all.filter(
+            (item) => this.getStatus(item) === 'ABERTA'
+          );
+
+          // ordenar crescente por data/hora
+          this.solicitations.sort((a, b) => {
+            const da =
+              this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
+            const db =
+              this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
+            return da - db;
+          });
+
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error(
+            'Erro carregando solicitações (funcionario) — subscribe',
+            err
+          );
+          this.error = 'Erro ao carregar solicitações';
+          this.loading = false;
+        },
+      });
+
+    this.sub.add(sub);
+  }
+
+  private loadFromMock(): void {
+    // subscreve ao BehaviorSubject do mock e filtra ABERTA
     const s = this.jsonService.users$.subscribe({
       next: (arr) => {
         const all = (arr || []).map((d) => this.normalize(d));
-        // filtra apenas ABERTA
         this.solicitations = all.filter(
           (item) => this.getStatus(item) === 'ABERTA'
         );
-        // ordena crescente por data/hora
+
+        // ordenar crescente por data/hora
         this.solicitations.sort((a, b) => {
           const da =
             this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
@@ -73,14 +137,16 @@ export class HomeFuncionarioComponent implements OnInit, OnDestroy {
             this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
           return da - db;
         });
+
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erro carregando solicitações (funcionario)', err);
+        console.error('Erro carregando mock de solicitações', err);
         this.error = 'Erro ao carregar solicitações';
         this.loading = false;
       },
     });
+
     this.sub.add(s);
   }
 

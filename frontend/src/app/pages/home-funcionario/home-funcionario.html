@@ -15,7 +15,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let s of solicitations" class="border-t">
-        <td class="p-2">{{ dateSelection.formatDateDisplay(s.createdAt) }}</td>
+        <td class="p-2">
+          {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
+        </td>
         <td class="p-2">{{ getClientName(s) }}</td>
         <td class="p-2">{{ getDescriptionTruncated(s, 30) }}</td>
         <td class="p-2">

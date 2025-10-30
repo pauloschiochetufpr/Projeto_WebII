@@ -1,6 +1,7 @@
 package com.manutencao.trabalhoweb2.controller;
 
 import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
+import com.manutencao.trabalhoweb2.dto.SolicitacaoLastUpdateDto;
 import com.manutencao.trabalhoweb2.model.Solicitacao;
 import com.manutencao.trabalhoweb2.service.SolicitacaoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,6 +36,13 @@ public class SolicitacaoController {
     public ResponseEntity<List<Solicitacao>> buscarPorStatus(@PathVariable Integer status) {
         return ResponseEntity.ok(solicitacaoService.buscarPorStatus(status));
     }
+
+    @GetMapping("/with-last-update")
+    public ResponseEntity<List<SolicitacaoLastUpdateDto>> listarComLastUpdate() {
+        List<SolicitacaoLastUpdateDto> lista = solicitacaoService.listarTodasComLastUpdate();
+        return ResponseEntity.ok(lista);
+    }
+
 
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody SolicitacaoDto dto) {

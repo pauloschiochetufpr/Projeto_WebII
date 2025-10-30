@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { take } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, take } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
@@ -21,6 +22,7 @@ interface DisplayUser {
   redirectDestinationName?: string | null;
   budget?: number | null;
   history?: { state: string; date: string; by?: string; note?: string }[];
+  lastUpdate?: string | null;
 }
 
 @Component({
@@ -54,7 +56,7 @@ export class Listar implements OnInit {
 
   constructor(
     private solicitacaoService: SolicitacaoService,
-    private jsonService: JsonTestService, // 👈 agora só usado para parseDate etc
+    private jsonService: JsonTestService,
     public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
@@ -70,37 +72,118 @@ export class Listar implements OnInit {
     this.summary = 'Carregando...';
     this.users = [];
 
-    this.solicitacaoService.listarTodas().pipe(take(1)).subscribe({
-      next: (data: SolicitacaoDto[]) => {
-        const normalized = data.map((s) => ({
-          id: s.idSolicitacao,
-          createdAt: s.createdAt ?? s['dataHora'] ?? new Date().toISOString(),
-          requesterName: s.cliente?.nome ?? `Cliente #${s.idCliente}`,
-          description: s.descricao,
-          state: this.solicitacaoService.mapStatus(s.idStatus),
-          redirectDestinationName: '-',
-          budget: s.valor,
-        }));
+    this.solicitacaoService
+      .listarTodasComLastUpdate()
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any[]) => {
+          const normalized = data.map((s) => ({
+            id: s.idSolicitacao,
+            createdAt:
+              s.lastUpdate ??
+              s.createdAt ??
+              s['dataHora'] ??
+              new Date().toISOString(),
+            requesterName: s.cliente?.nome ?? `Cliente #${s.idCliente}`,
+            description: s.descricao,
+            state: this.solicitacaoService.mapStatus(s.idStatus),
+            redirectDestinationName: '-',
+            budget: s.valor,
+            lastUpdate: s.lastUpdate ?? null,
+          }));
 
-        this.users = normalized;
-        this.computePeriodFromSelection();
-        this.loading = false;
-        this.summary = `${this.users.length} registro(s) carregado(s)`;
+          this.users = normalized;
+          this.computePeriodFromSelection();
+          this.loading = false;
+          this.summary = `${this.users.length} registro(s) carregado(s)`;
 
-        console.log('Solicitações recebidas do backend:', data);
-      },
-      error: (err) => {
-        console.error('Erro ao buscar solicitações:', err);
-        this.error = 'Erro ao buscar solicitações';
-        this.loading = false;
-        this.summary = '';
-      },
-    });
+          console.log(
+            'Solicitações recebidas do backend (com lastUpdate):',
+            data
+          );
+        },
+        error: (err) => {
+          console.error('Erro ao buscar solicitações:', err);
+          this.error = 'Erro ao buscar solicitações';
+          this.loading = false;
+          this.summary = '';
+        },
+      });
   }
 
   // 🔹 Funções auxiliares de data (delegando para o JsonTestService)
   private parseDate(value?: string | number | null): Date | null {
     return this.jsonService.parseDate(value);
+  }
+
+  private getLastHistoryDate(history: any[]): string | null {
+    if (!history || history.length === 0) return null;
+
+    const dates = history
+      .map((h) => h.dataHora)
+      .filter(Boolean)
+      .map((d) => new Date(d).getTime())
+      .filter((t) => !isNaN(t));
+
+    if (dates.length === 0) return null;
+
+    return new Date(Math.max(...dates)).toISOString();
+  }
+
+  private fillLastUpdate(): void {
+    if (!this.users || this.users.length === 0) {
+      this.loading = false;
+      return;
+    }
+
+    const calls = this.users.map((u) => {
+      const id = u.id ?? null;
+      if (!id) return of(null); // sem id, pula e retorna null
+
+      // garante que id seja number
+      const idNum = Number(id);
+      if (isNaN(idNum)) return of(null);
+
+      return this.solicitacaoService.getHistorico(idNum).pipe(
+        map((hist) => this.getLastHistoryDate(hist as any)),
+        catchError((err) => {
+          console.warn('Erro ao buscar histórico para id', idNum, err);
+          return of(null);
+        })
+      );
+    });
+
+    forkJoin(calls).subscribe({
+      next: (lastDates) => {
+        this.users = this.users.map((u, i) => ({
+          ...u,
+          // prefere lastDates[i], senão createdAt como fallback
+          lastUpdate:
+            lastDates[i] ??
+            (u.createdAt ? new Date(String(u.createdAt)).toISOString() : null),
+        }));
+
+        // Reordena pela última atualização (crescente)
+        this.users.sort((a, b) => {
+          const ta = a.lastUpdate ? new Date(a.lastUpdate).getTime() : 0;
+          const tb = b.lastUpdate ? new Date(b.lastUpdate).getTime() : 0;
+          return ta - tb;
+        });
+
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erro ao agregar históricos', err);
+        // fallback: apenas transforma createdAt para ISO (se possível)
+        this.users = this.users.map((u) => ({
+          ...u,
+          lastUpdate: u.createdAt
+            ? new Date(String(u.createdAt)).toISOString()
+            : null,
+        }));
+        this.loading = false;
+      },
+    });
   }
 
   private isSameDay(a: Date, b: Date): boolean {

@@ -1,6 +1,7 @@
 package com.manutencao.trabalhoweb2.service;
 
 import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
+import com.manutencao.trabalhoweb2.dto.SolicitacaoLastUpdateDto;
 import com.manutencao.trabalhoweb2.model.Cliente;
 import com.manutencao.trabalhoweb2.model.Solicitacao;
 import com.manutencao.trabalhoweb2.repository.ClienteRepository;
@@ -10,8 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SolicitacaoService {
@@ -79,6 +86,54 @@ public class SolicitacaoService {
     public List<Solicitacao> buscarPorStatus(Integer idStatus) {
         return solicitacaoRepository.findByIdStatus(idStatus);
     }
+
+    // BUSCAR TODAS COM ÚLTIMA ATUALIZAÇÃO
+    public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
+    List<Object[]> rows = solicitacaoRepository.findAllLastUpdate();
+
+    DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE_TIME;
+    ZoneId zone = ZoneId.systemDefault(); // ou ZoneOffset.UTC se quiser UTC
+
+    return rows.stream().map(row -> {
+        Solicitacao s = (Solicitacao) row[0];
+        Object lastObj = row[1]; // pode ser LocalDateTime, Timestamp, Date ou null
+
+        String lastIso = null;
+        if (lastObj != null) {
+            if (lastObj instanceof LocalDateTime ldt) {
+                lastIso = ldt.format(fmt);
+            } else if (lastObj instanceof Timestamp ts) {
+                // Timestamp -> LocalDateTime
+                LocalDateTime ldt = ts.toLocalDateTime();
+                lastIso = ldt.format(fmt);
+            } else if (lastObj instanceof java.util.Date d) {
+                Instant ins = Instant.ofEpochMilli(d.getTime());
+                LocalDateTime ldt = LocalDateTime.ofInstant(ins, zone);
+                lastIso = ldt.format(fmt);
+            } else {
+                // fallback: tentar toString e parse (defensivo)
+                try {
+                    LocalDateTime ldt = LocalDateTime.parse(lastObj.toString());
+                    lastIso = ldt.format(fmt);
+                } catch (Exception e) {
+                    lastIso = lastObj.toString();
+                }
+            }
+        }
+
+        return new SolicitacaoLastUpdateDto(
+            s.getIdSolicitacao(),
+            s.getNome(),
+            s.getDescricao(),
+            s.getCliente() != null ? s.getCliente().getIdCliente() : null,
+            s.getValor(),
+            s.getIdStatus(),
+            s.getIdCategoria(),
+            s.getAtivo(),
+            lastIso
+        );
+    }).collect(Collectors.toList());
+}
 
     // ================================================================
     // 🔧 MÉTODO PRIVADO DE MAPEAMENTO DTO → ENTIDADE

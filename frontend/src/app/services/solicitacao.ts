@@ -67,6 +67,32 @@ export class SolicitacaoService {
     );
   }
 
+  // busca com última atualização
+  listarTodasComLastUpdate(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
+      catchError((err) => {
+        console.error('Erro ao buscar solicitacoes com lastUpdate', err);
+        return throwError(
+          () => new Error('Falha ao buscar solicitacoes com lastUpdate')
+        );
+      })
+    );
+  }
+
+  // buscar solicitações por idStatus (ex: 1 = ABERTA)
+  buscarPorStatus(idStatus: number): Observable<SolicitacaoDto[]> {
+    return this.http
+      .get<SolicitacaoDto[]>(`${this.baseUrl}/status/${idStatus}`)
+      .pipe(
+        catchError((err) => {
+          console.error('Erro ao buscar solicitações por status', err);
+          return throwError(
+            () => new Error('Falha ao buscar solicitações por status')
+          );
+        })
+      );
+  }
+
   // cliente cria solicitação (mexer só no id pra ser o de quem esta criando)
   criarSolicitacao(data: SolicitacaoCreateDto): Observable<SolicitacaoDto> {
     const dto = {

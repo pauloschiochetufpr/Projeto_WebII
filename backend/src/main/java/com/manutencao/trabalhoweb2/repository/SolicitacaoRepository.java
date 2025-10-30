@@ -15,11 +15,8 @@ import com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO;
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
     List<Solicitacao> findByCliente_IdCliente(Long clienteId);
     List<Solicitacao> findByIdStatus(Integer status);
-    //List<Solicitacao> findByFuncionario_IdFuncionario(Long funcionarioId);
-    // List<Solicitacao> findByAtivoTrue();
-    // List<Solicitacao> findByDateToday(LocalDateTime date);
-    // List<Solicitacao> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
-
+    @Query("SELECT s, MAX(h.dataHora) FROM Solicitacao s LEFT JOIN HistSolicitacao h ON h.solicitacao = s GROUP BY s")
+    List<Object[]> findAllLastUpdate();
  /**
   * RF19 nao deu tempo de checar o backend(alterar depois?)
   */  
