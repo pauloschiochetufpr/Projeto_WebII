@@ -10,7 +10,7 @@ import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/cat
 export const routes: Routes = [
   { path: 'solicitacao/listar', component: Listar },
   { path: 'crud-workers', component: CrudWorkersComponent },
-  { path: 'home-cliente', component: HomeCliente },
+  { path: '', component: HomeCliente },
   { path: 'home-funcionario', component: HomeFuncionarioComponent },
   { path: 'solicitacao/criar', component: SolicitarManutencaoComponent },
   { path: 'login', component: LoginComponent },
