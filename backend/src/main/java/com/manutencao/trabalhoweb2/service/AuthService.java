@@ -16,13 +16,16 @@ import com.manutencao.trabalhoweb2.service.EmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import com.manutencao.trabalhoweb2.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -43,6 +46,10 @@ public class AuthService {
 
     @Autowired
     private CepRepository cepRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
     
     public AuthService() {}
 
@@ -134,11 +141,36 @@ public class AuthService {
      * Deve retornar AuthResponse com access/refresh tokens e definir cookies HTTP-only.
      */
     @Transactional
-    public AuthResponse login(LoginRequest req) {
-        // buscar cliente ou funcionario por email, validar senha (hash + salt), emitir JWTs
-        return new AuthResponse("access-token-placeholder", "refresh-token-placeholder");
-    }
+    public Object login(LoginRequest req) {
+        Optional<Cliente> clienteOpt = clienteRepository.findByEmail(req.getEmail());
 
+        if (clienteOpt.isEmpty()) {
+            return new BasicResponse(404, "Usuário não encontrado");
+        }
+
+        Cliente cliente = clienteOpt.get();
+
+        // valida senha com BCrypt
+        boolean senhaValida = BCrypt.checkpw(req.getSenha(), cliente.getSenhaHash());
+        if (!senhaValida) {
+            return new BasicResponse(401, "Credenciais inválidas");
+        }
+
+        // Montar claims
+        Map<String, Object> claims = Map.of(
+            "email", cliente.getEmail(),
+            "tipoUsuario", "cliente",
+            "criadoEm", Instant.now().getEpochSecond(),
+            "expiraEm", Instant.now().plusSeconds(15 * 60).getEpochSecond()
+        );
+
+        // Gerar tokens
+        String accessToken = jwtUtil.generateAccessToken(cliente.getEmail(), claims);
+        String refreshToken = jwtUtil.generateRefreshToken(cliente.getEmail());
+
+        // Retornar resposta AuthResponse
+        return new AuthResponse(accessToken, refreshToken);
+    }
 
     // =====================================================
     // Funções auxiliares

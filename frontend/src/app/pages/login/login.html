@@ -54,14 +54,13 @@
     </div>
   </div>
   <div
-
     class="flex justify-center items-center w-[50vw] duration-500 ease-in-out transition-all hover:w-[70vw] h-screen bg-azul-main relative group z-40 border-r-8 border-roxo-terc"
   >
     <div
       class="h-full w-full absolute bg-black z-50 group-hover:z-10 bg-opacity-30 group-hover:bg-opacity-0 duratio-500 ease-in-out transition-all border-r-8 border-roxo-terc"
     ></div>
     <div
-      class="flex flex-col glass-background p-8 gap-6 w-[20vw] h-[40vh] py-10 z-30"
+      class="flex flex-col glass-background p-8 gap-6 w-[20vw] h-[40vh] py-10 z-30 relative"
     >
       <h2
         class="font-robotoFlex font-semibold text-white text-5xl place-self-center select-none"
@@ -73,7 +72,7 @@
         [formGroup]="loginForm"
         (ngSubmit)="onLoginSubmit()"
       >
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 relative">
           <label class="text-white text-xl font-robotoFlex select-none"
             >EMAIL</label
           >
@@ -86,19 +85,21 @@
             type="email"
             formControlName="email"
             placeholder="usuario@gmail.com"
+            id="emailLogin"
+            name="email"
           />
           <!-- Ícone de certo -->
           <lucide-icon
             *ngIf="emailValidoLogin === true"
             name="check"
-            class="absolute right-3 top-9 text-green-400 w-5 h-5 select-none"
+            class="absolute right-1.5 top-5 text-green-400 w-5 h-5 select-none"
           ></lucide-icon>
 
           <!-- Ícone de errado -->
           <lucide-icon
             *ngIf="emailValidoLogin === false"
             name="x"
-            class="absolute right-3 top-9 text-red-500 w-5 h-5 select-none"
+            class="absolute right-1.5 top-5 text-red-500 w-5 h-5 select-none"
           ></lucide-icon>
         </div>
 
@@ -137,6 +138,15 @@
           ENTRAR
         </button>
       </form>
+      <div
+        class="absolute -bottom-36 left-0 w-full h-[10vh] flex flex-row items-center justify-center"
+      >
+        <app-notification
+          *ngIf="mensagemNotificacaoLogin"
+          [mensagem]="mensagemNotificacaoLogin"
+          [codigo]="codigoNotificacaoLogin"
+        ></app-notification>
+      </div>
     </div>
   </div>
 
@@ -190,7 +200,9 @@
             <input
               type="text"
               formControlName="cpf"
-              autocomplete="cc-number"
+              id="cpfCliente"
+              name="cpf"
+              autocomplete="off"
               (input)="applyCpfMask()"
               maxlength="14"
               placeholder="000.000.000-00"
@@ -227,11 +239,12 @@
             <input
               type="text"
               formControlName="telefone"
+              id="telefoneCliente"
+              name="tel"
               autocomplete="tel"
               (input)="applyPhoneMask()"
               maxlength="15"
               placeholder="(00) 00000-0000"
-
               [class.font-semibold]="telefoneValidoCadastro === true || false"
               [class.text-red-500]="telefoneValidoCadastro === false"
               [class.text-azul-main]="telefoneValidoCadastro === true"
@@ -265,11 +278,12 @@
           </label>
           <input
             type="email"
+            id="emailCadastro"
+            name="email"
             formControlName="email"
             autocomplete="email"
             placeholder="Digite seu email favorito"
             [class.text-red-500]="emailValidoCadastro === false"
-
             [class.font-semibold]="emailValidoCadastro === true || false"
             [class.text-azul-main]="emailValidoCadastro === true"
             class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
@@ -287,6 +301,8 @@
             <input
               type="text"
               formControlName="nome"
+              id="nomeCompleto"
+              name="name"
               autocomplete="name"
               placeholder="Digite seu nome"
               class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
@@ -299,6 +315,8 @@
             <input
               type="text"
               formControlName="cep"
+              id="cepCliente"
+              name="postalCode"
               autocomplete="postal-code"
               (input)="applyCepMask()"
               maxlength="9"
@@ -380,6 +398,9 @@
           >
           <input
             type="text"
+            id="complementoEndereco"
+            name="addressLine2"
+            autocomplete="address-line2"
             formControlName="complemento"
             placeholder="Alguma informação adicional?"
             class="w-full placeholder:select-none placeholder:font-googleSansCode placeholder:font-thin placeholder:text-sm placeholder:text-gray-400 placeholder:text-pretty px-3 py-1.5 rounded-md outline-none focus:shadow-black focus:shadow-inner hover:shadow-inner hover:shadow-black transition-all duration-300 ease-in-out"
@@ -414,7 +435,6 @@
         </button>
       </form>
       <!-- Área da mensagem  -->
-
     </div>
     <div
       *ngIf="isBuscandoCep && cadastroForm.get('cep')?.touched"
@@ -423,9 +443,9 @@
       Buscando CEP, por favor aguarde...
     </div>
     <app-notification
-      *ngIf="mensagemNotificacao"
-      [mensagem]="mensagemNotificacao"
-      [codigo]="codigoNotificacao"
+      *ngIf="mensagemNotificacaoCadastro"
+      [mensagem]="mensagemNotificacaoCadastro"
+      [codigo]="codigoNotificacaoCadastro"
     ></app-notification>
   </div>
 </div>

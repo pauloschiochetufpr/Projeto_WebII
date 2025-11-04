@@ -1,24 +1,16 @@
 package com.manutencao.trabalhoweb2.dto;
 
-public class AuthResponse {
+public class AuthResponse extends BasicResponse {
     public String accessToken;
     public String refreshToken;
-    public String tokenType = "Bearer";
-
-    public AuthResponse() {}
 
     public AuthResponse(String accessToken, String refreshToken) {
+        super(200, "Login realizado com sucesso");
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
 
-    // Getters e Setters
-    public String getAccessToken() { return accessToken; }
-    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
-
-    public String getRefreshToken() { return refreshToken; }
-    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
-
-    public String getTokenType() { return tokenType; }
-    public void setTokenType(String tokenType) { this.tokenType = tokenType; }
+    public AuthResponse(int codigo, String mensagem) {
+        super(codigo, mensagem);
+    }
 }
