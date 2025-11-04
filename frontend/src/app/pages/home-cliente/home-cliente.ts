@@ -5,26 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { JsonTestService } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { VisualizarServicoClienteDialog } from '../../components/visualizar-servico-cliente/visualizar-servico-cliente';
+import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
 
-export interface Solicitation {
-  idSolicitacao?: number;
-  id?: number | string;
-  idCliente?: number;
-  nome?: string;
-  name?: string;
-  descricao?: string;
-  description?: string;
-  dataHora?: string;
-  createdAt?: string;
-  date?: string;
-  idStatus?: number;
-  state?: string;
-  valor?: number;
-  [key: string]: any;
+export interface Solicitation extends SolicitacaoDto {
+  id: number | string;
+  state: string;
 }
+
+
 
 @Component({
   selector: 'app-home',
@@ -40,7 +30,7 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   private sub = new Subscription();
 
-  // ids de status
+  // ids de status mapeamento
   statusMapById: Record<number, string> = {
     1: 'ABERTA',
     2: 'ORÇADA',
@@ -54,23 +44,25 @@ export class HomeCliente implements OnInit, OnDestroy {
   };
 
   constructor(
-    private jsonService: JsonTestService,
+    private solicitacaoService: SolicitacaoService,
     private dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    this.carregarSolicitacoes();
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
+
+  // carrega do back
+  carregarSolicitacoes(): void {
     this.loading = true;
-    const s = this.jsonService.users$.subscribe({
+    const s = this.solicitacaoService.listarTodas().subscribe({
       next: (arr) => {
-        this.solicitations = (arr || []).map((d) => this.normalize(d));
-        this.solicitations.sort((a, b) => {
-          const da =
-            this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-          const db =
-            this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-          return da - db;
-        });
+        this.solicitations = arr.map((d) => this.normalize(d));
         this.loading = false;
       },
       error: (err) => {
@@ -82,42 +74,18 @@ export class HomeCliente implements OnInit, OnDestroy {
     this.sub.add(s);
   }
 
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
   normalize(d: any): Solicitation {
     return {
-      idSolicitacao:
-        d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
-      id: d.id ?? d.idSolicitacao,
-      nome: d.nome ?? d.requesterName ?? d.name,
+      idSolicitacao: d.idSolicitacao,
+      id: d.idSolicitacao ?? d.id,
+      nome: d.nome ?? d.name ?? d.cliente?.nome ?? '—',
       descricao: d.descricao ?? d.description,
-      dataHora: d.dataHora ?? d.createdAt ?? d.date,
+      dataHora: d.dataHora ?? d.createdAt,
       idStatus: d.idStatus,
-      state: d.state ?? d.statusName ?? null,
-      valor: d.valor ?? d.value,
+      state: this.solicitacaoService.mapStatus(d.idStatus),
+      valor: d.valor ?? 0,
       ...d,
     };
-  }
-
-  getDateString(s: Solicitation): string | null {
-    return s.dataHora ?? s.createdAt ?? s.date ?? null;
-  }
-
-  parseDateString(str: string | null): Date | null {
-    if (!str) return null;
-    const d = new Date(str);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  getName(s: Solicitation): string {
-    return (s.nome ?? s.name ?? '—') as string;
-  }
-
-  truncateName(s: Solicitation, max = 30) {
-    const n = this.getName(s);
-    return n.length > max ? n.slice(0, max - 1) + '…' : n;
   }
 
   getStatus(s: Solicitation): string {
@@ -127,9 +95,7 @@ export class HomeCliente implements OnInit, OnDestroy {
     return 'Desconhecido';
   }
 
-  // ----------------- Ações -----------------
-
-  // abrir dialog de visualização (RF008 + demais RFs do cliente)
+  // abre o dialog de visualização do cliente
   view(s: Solicitation) {
     const ref = this.dialog.open(VisualizarServicoClienteDialog, {
       width: '600px',
@@ -138,45 +104,47 @@ export class HomeCliente implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.updateStatusRemote(
-        s,
-        result.newStatusName,
-        result.newStatusId,
-        'CLIENTE'
-      );
+      this.atualizarStatus(s, result.newStatusId, result.newStatusName);
     });
   }
 
-  // atualizar o status localmente e simular chamada ao backend
-  private updateStatusRemote(
+  // atualiza o status de uma solicitação 
+  private atualizarStatus(
     s: Solicitation,
-    newStatusName: string,
-    newStatusId?: number,
-    actor: 'CLIENTE' | 'FUNCIONARIO' | 'SYSTEM' = 'CLIENTE'
+    novoStatusId: number,
+    novoStatusNome: string
   ) {
     const id = s.idSolicitacao ?? s.id;
-    if (id === undefined) {
-      console.error('Solicitação sem ID, não é possível atualizar status', s);
+    if (!id) {
+      console.error('Solicitação sem ID válido:', s);
       return;
     }
 
-    this.jsonService
-      .updateStatus(id, newStatusId, newStatusName, actor)
-      .subscribe({
-        next: (updated) => console.log('Status atualizado (mock):', updated),
-        error: (err) => console.error('Erro ao atualizar status (mock):', err),
-      });
+    this.solicitacaoService.atualizarStatus(Number(id), novoStatusId).subscribe({
+      next: (atualizada) => {
+        console.log('Status atualizado com sucesso:', atualizada);
+
+        // Atualiza localmente para refletir na tela
+        s.idStatus = atualizada.idStatus;
+        s.state = this.solicitacaoService.mapStatus(atualizada.idStatus);
+
+        // Caso o backend devolva o valor atualizado
+        if (atualizada.valor) s.valor = atualizada.valor;
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar status:', err);
+        alert('Erro ao atualizar status da solicitação.');
+      },
+    });
   }
 
-  // função util para formatar a data exibida
-  formatDateDisplay(s: Solicitation): string {
-    const d = this.parseDateString(this.getDateString(s));
-    return d ? d.toLocaleString() : '-';
+  // utilitários
+  truncateName(s: Solicitation, max = 30): string {
+    const n = s.nome ?? '—';
+    return n.length > max ? n.slice(0, max - 1) + '…' : n;
   }
 
-  // getter
   formatDate(value?: string | number | null, withTime: boolean = true): string {
-  return this.dateSelection.formatDateDisplay(value, withTime);
-}
-
+    return this.dateSelection.formatDateDisplay(value, withTime);
+  }
 }
