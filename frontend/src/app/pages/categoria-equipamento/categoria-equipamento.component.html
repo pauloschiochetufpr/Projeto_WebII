@@ -5,7 +5,10 @@
           <h2>Categoria de Equipamento</h2>
         </div>  
       <div class="flex justify-end mb-3">
-          <button class="px-3 py-2 rounded border text-sm">+ Nova Categoria</button>
+          <button class="px-3 py-2 rounded border text-sm" [routerLink]="['/categoriaEquipamento/novaCategoria']" title="Novo">
+              <i class="fa fa-plus"></i>
+              Nova Categoria
+          </button>
         </div>
     </div>
     <div class="bg-white rounded shadow overflow-x-auto">
