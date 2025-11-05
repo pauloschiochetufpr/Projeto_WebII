@@ -6,6 +6,7 @@ import { HomeCliente } from './pages/home-cliente/home-cliente';
 import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario';
 import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/solicitar-manutencao';
 import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component';
+import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 
 export const routes: Routes = [
   { path: 'solicitacao/listar', component: Listar },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'solicitacao/criar', component: SolicitarManutencaoComponent },
   { path: 'login', component: LoginComponent },
   { path: 'categoriaEquipamento', component: CategoriaEquipamentoComponent },
+  { path: 'categoriaEquipamento/novaCategoria', component: Inserir}
 ];
