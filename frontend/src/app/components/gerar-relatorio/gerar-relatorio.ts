@@ -86,28 +86,22 @@ export class ReceitaPorPeriodoComponent implements OnInit {
     item.showDetails = !item.showDetails;
   }
 
-  exportToPDF(): void {
-    const { dataInicio, dataFim } = this.filterForm.value;
-    this.loading = true;
-
-    this.relatorioService
-      .baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: (blob: Blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `relatorio_receitas_${dataInicio || 'inicio'}_${dataFim || 'fim'}.pdf`;
-          link.click();
-          window.URL.revokeObjectURL(url);
-        },
-        error: (err) => {
-          console.error('Erro ao gerar PDF:', err);
-          alert('Erro ao gerar o PDF. Tente novamente.');
-        }
-      });
-  }
+exportToPDF(): void {
+  const { dataInicio, dataFim } = this.filterForm.value;
+  
+  this.relatorioService.baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
+    .subscribe({
+      next: (pdfBlob: Blob) => {
+        const blobUrl = window.URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `relatorio_receitas_${dataInicio || 'inicio'}_${dataFim || 'fim'}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      },
+      error: (err) => console.error('Erro ao baixar PDF:', err)
+    });
+}
 
   formatCurrency(value: number): string {
     return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

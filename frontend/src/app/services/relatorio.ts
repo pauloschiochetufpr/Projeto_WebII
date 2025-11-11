@@ -48,16 +48,17 @@ export class RelatorioService {
   }
 
   // ===== Geração de PDF - NOVO =====
-  baixarPdfReceitasPorPeriodo(dataInicio?: string, dataFim?: string): Observable<Blob> {
-    let params = new HttpParams();
-    if (dataInicio) params = params.set('startDate', dataInicio);
-    if (dataFim) params = params.set('endDate', dataFim);
+baixarPdfReceitasPorPeriodo(dataInicio?: string, dataFim?: string): Observable<Blob> {
+  let params = new HttpParams();
+  if (dataInicio) params = params.set('startDate', dataInicio);
+  if (dataFim) params = params.set('endDate', dataFim);
 
-    return this.http.get(`${this.apiUrl}/reports/revenue-by-period/pdf`, {
-      params,
-      responseType: 'blob'
-    });
-  }
+  return this.http.get(`${this.apiUrl}/reports/revenue-by-period/pdf`, {
+    params,
+    responseType: 'blob'
+  });
+}
+
 
   baixarPdfReceitasPorCategoria(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/reports/revenue-by-category/pdf`, {
