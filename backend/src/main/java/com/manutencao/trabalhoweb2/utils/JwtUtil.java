@@ -28,12 +28,16 @@ public class JwtUtil {
                     this.accessExpMinutes = accessExpMinutes;
                     this.refreshExpDays = refreshExpDays;
                 }
+    
 
+
+    /**
+    * subject = ID do cliente (só avisando)
+    */
     public String generateAccessToken(String subject, Map<String, Object> claims) {
         return Jwts.builder()
                 .setSubject(subject)
                 .addClaims(claims)
-                .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(accessExpMinutes, ChronoUnit.MINUTES)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -42,7 +46,6 @@ public class JwtUtil {
     public String generateRefreshToken(String subject) {
         return Jwts.builder()
                 .setSubject(subject)
-                .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(refreshExpDays, ChronoUnit.DAYS)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();

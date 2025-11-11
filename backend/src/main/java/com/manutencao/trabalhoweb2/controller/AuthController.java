@@ -2,7 +2,9 @@ package com.manutencao.trabalhoweb2.controller;
 
 import org.springframework.web.bind.annotation.*;
 import com.manutencao.trabalhoweb2.dto.*;
+import java.util.Map;
 import com.manutencao.trabalhoweb2.service.AuthService;
+import com.manutencao.trabalhoweb2.service.TokenAdminService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +14,13 @@ import org.springframework.http.ResponseEntity;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenAdminService tokenAdmin;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, TokenAdminService tokenAdmin) {
         this.authService = authService;
+        this.tokenAdmin = tokenAdmin;
     }
+    
 
     @PostMapping("/cadastro")
     public ResponseEntity<BasicResponse> registerCliente(@RequestBody RegisterRequest request) {
@@ -36,10 +41,18 @@ public class AuthController {
         if (result instanceof AuthResponse authResponse) {
             return ResponseEntity.ok(authResponse);
         }
-        
+
         // Se passar para cá, ai é fogo
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new BasicResponse(500, "Erro interno inesperado"));
     }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<BasicResponse> logoutRoute(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        BasicResponse result = tokenAdmin.logout(refreshToken);
+        return ResponseEntity.ok(result);
+    }
+
 
 }

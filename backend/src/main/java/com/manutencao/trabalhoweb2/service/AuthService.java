@@ -12,6 +12,7 @@ import com.manutencao.trabalhoweb2.repository.ClienteRepository;
 import com.manutencao.trabalhoweb2.repository.EnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.ClienteEnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.CepRepository;
+// Falso erro abaixo
 import com.manutencao.trabalhoweb2.service.EmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,6 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -53,10 +52,9 @@ public class AuthService {
     
     public AuthService() {}
 
-    /**
-     * Registra um cliente.
-     * Implementar hashing de senha, persistência e vinculação de endereço.
-     */
+    // Registra um cliente.
+    // Implementar hashing de senha, persistência e vinculação de endereço.
+     
     @Transactional
     public BasicResponse registerCliente(RegisterRequest req) {
         // Validar, checar duplicidade, gerar salt/hash, salvar cliente, salvar endereco e relação
@@ -89,7 +87,7 @@ public class AuthService {
             CepModel cepModel = cepOpt.get();
 
             Endereco endereco = new Endereco();
-            endereco.setCep(cepModel);;
+            endereco.setCep(cepModel);
             endereco.setUf(req.uf);
             endereco.setLocalidade(req.localidade);
             endereco.setLogradouro(req.logradouro);
@@ -158,15 +156,14 @@ public class AuthService {
 
         // Montar claims
         Map<String, Object> claims = Map.of(
-            "email", cliente.getEmail(),
+            "idCliente", cliente.getIdCliente(),
             "tipoUsuario", "cliente",
-            "criadoEm", Instant.now().getEpochSecond(),
             "expiraEm", Instant.now().plusSeconds(15 * 60).getEpochSecond()
         );
 
         // Gerar tokens
-        String accessToken = jwtUtil.generateAccessToken(cliente.getEmail(), claims);
-        String refreshToken = jwtUtil.generateRefreshToken(cliente.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);
+        String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(cliente.getIdCliente()));
 
         // Retornar resposta AuthResponse
         return new AuthResponse(accessToken, refreshToken);
