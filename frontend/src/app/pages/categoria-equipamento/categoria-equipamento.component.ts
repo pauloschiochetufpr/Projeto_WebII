@@ -23,14 +23,7 @@ export class CategoriaEquipamentoComponent {
   }
 
   listarTodos(): CategoriaEquipamento[]{
-    /* return this.categoriaEquipamentoService.listarTodos(); */
-
-    return [
-      new CategoriaEquipamento(1, "cha la la", true),
-      new CategoriaEquipamento(2, "tra la la", true),
-      new CategoriaEquipamento(3, "tu ru ru", false)
-    ]
-
+    return this.categoriaEquipamentoService.listarTodos();
   }
 
     

@@ -20,7 +20,7 @@ export interface Solicitation {
 
 export class CategoriaEquipamento {
   constructor(
-    public id: number = 0,
+    public id: number = 0, 
     public nome: string = '',
     public ativo: boolean = true
   ) {}

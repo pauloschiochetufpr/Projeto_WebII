@@ -1,7 +1,21 @@
-
-<div class="flex justify-center">
-    <div class="bg-red-500">
-        efbedfbdeb
+<body class="bg-gray-100 h-screen grid place-items-center">
+  <form class="bg-white p-4 rounded w-80" #formInserirCategoria="ngForm">
+    <input type="text" id="nome" name="nome" placeholder="Nome"
+           class="w-full mb-3 p-2 border rounded" 
+           [(ngModel)]="categoria.nome" 
+           #nome="ngModel"
+            minlength="2" required>
+    <select name="status" class="w-full mb-3 p-2 border rounded">
+      <option value="ativo">Ativo</option>
+      <option value="nao-ativo">Não-ativo</option>
+    </select>
+    <div class="flex justify-between">
+      <button type="button" class="bg-gray-300 px-4 py-2 rounded" [routerLink]="['/categoriaEquipamento/']">Cancelar</button>
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded"
+        (click)="inserir()" >Salvar
+        </button>
     </div>
-
-</div>
+  </form>
+</body>
+<!-- 
+[disabled]="!formInserirCategoria.form.valid" -->
