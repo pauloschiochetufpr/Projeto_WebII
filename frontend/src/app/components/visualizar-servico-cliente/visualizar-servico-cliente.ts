@@ -24,22 +24,24 @@ export class VisualizarServicoClienteDialog {
   aprovar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
-    this.solicitacaoService.atualizarStatus(this.data.idSolicitacao, 4).subscribe({
-      next: (updated) => {
-        this.loading = false;
-        this.dialogRef.close({
-          action: 'APROVAR',
-          newStatusName: 'APROVADA',
-          newStatusId: 4,
-          user: updated,
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao aprovar:', err);
-        this.loading = false;
-        this.error = 'Falha ao aprovar a solicitação.';
-      },
-    });
+    this.solicitacaoService
+      .atualizarStatus(this.data.idSolicitacao, 3)
+      .subscribe({
+        next: (updated) => {
+          this.loading = false;
+          this.dialogRef.close({
+            action: 'APROVAR',
+            newStatusName: 'APROVADA',
+            newStatusId: 3,
+            user: updated,
+          });
+        },
+        error: (err) => {
+          console.error('Erro ao aprovar:', err);
+          this.loading = false;
+          this.error = 'Falha ao aprovar a solicitação.';
+        },
+      });
   }
 
   rejeitar() {
@@ -48,44 +50,48 @@ export class VisualizarServicoClienteDialog {
     if (!motivo) return;
 
     this.loading = true;
-    this.solicitacaoService.atualizarStatus(this.data.idSolicitacao, 3).subscribe({
-      next: (updated) => {
-        this.loading = false;
-        this.dialogRef.close({
-          action: 'REJEITAR',
-          newStatusName: 'REJEITADA',
-          newStatusId: 3,
-          motivo,
-          user: updated,
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao rejeitar:', err);
-        this.loading = false;
-        this.error = 'Falha ao rejeitar a solicitação.';
-      },
-    });
+    this.solicitacaoService
+      .atualizarStatus(this.data.idSolicitacao, 4)
+      .subscribe({
+        next: (updated) => {
+          this.loading = false;
+          this.dialogRef.close({
+            action: 'REJEITAR',
+            newStatusName: 'REJEITADA',
+            newStatusId: 4,
+            motivo,
+            user: updated,
+          });
+        },
+        error: (err) => {
+          console.error('Erro ao rejeitar:', err);
+          this.loading = false;
+          this.error = 'Falha ao rejeitar a solicitação.';
+        },
+      });
   }
 
   pagar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
-    this.solicitacaoService.atualizarStatus(this.data.idSolicitacao, 7).subscribe({
-      next: (updated) => {
-        this.loading = false;
-        this.dialogRef.close({
-          action: 'PAGAR',
-          newStatusName: 'PAGA',
-          newStatusId: 7,
-          user: updated,
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao pagar:', err);
-        this.loading = false;
-        this.error = 'Falha ao confirmar pagamento.';
-      },
-    });
+    this.solicitacaoService
+      .atualizarStatus(this.data.idSolicitacao, 7)
+      .subscribe({
+        next: (updated) => {
+          this.loading = false;
+          this.dialogRef.close({
+            action: 'PAGAR',
+            newStatusName: 'PAGA',
+            newStatusId: 7,
+            user: updated,
+          });
+        },
+        error: (err) => {
+          console.error('Erro ao pagar:', err);
+          this.loading = false;
+          this.error = 'Falha ao confirmar pagamento.';
+        },
+      });
   }
 
   close() {

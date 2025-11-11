@@ -37,7 +37,7 @@ export interface HistSolicitacao {
   providedIn: 'root',
 })
 export class SolicitacaoService {
-  private baseUrl = `${environment.apiUrl}/api/solicitacoes`;
+  private baseUrl = `${environment.apiUrl}/solicitacoes`;
 
   constructor(private http: HttpClient) {}
 
@@ -68,16 +68,16 @@ export class SolicitacaoService {
   }
 
   // busca com última atualização
- listarTodasComLastUpdate(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
-    catchError((err) => {
-      console.error('Erro ao buscar solicitacoes com lastUpdate', err);
-      return throwError(
-        () => new Error('Falha ao buscar solicitacoes com lastUpdate')
-      );
-    })
-  );
-}
+  listarTodasComLastUpdate(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
+      catchError((err) => {
+        console.error('Erro ao buscar solicitacoes com lastUpdate', err);
+        return throwError(
+          () => new Error('Falha ao buscar solicitacoes com lastUpdate')
+        );
+      })
+    );
+  }
 
   // buscar solicitações por idStatus (ex: 1 = ABERTA)
   buscarPorStatus(idStatus: number): Observable<SolicitacaoDto[]> {
@@ -115,10 +115,15 @@ export class SolicitacaoService {
     return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto);
   }
 
-  atualizarStatus(id: number, novoStatus: number): Observable<SolicitacaoDto> {
+  atualizarStatus(
+    id: number,
+    novoStatus: number,
+    cliente: boolean = false
+  ): Observable<SolicitacaoDto> {
+    const body = { novoStatus, cliente };
     return this.http.patch<SolicitacaoDto>(
-      `${this.baseUrl}/${id}/status?novoStatus=${novoStatus}`,
-      {}
+      `${this.baseUrl}/${id}/status`,
+      body
     );
   }
 
