@@ -3,6 +3,8 @@ package com.manutencao.trabalhoweb2.controller;
 import org.springframework.web.bind.annotation.*;
 import com.manutencao.trabalhoweb2.dto.*;
 import com.manutencao.trabalhoweb2.service.AuthService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
@@ -23,10 +25,21 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        AuthResponse resp = authService.login(request);
-        if (resp == null || resp.accessToken == null) {
-            return ResponseEntity.status(401).body(new BasicResponse(401, "Credenciais inválidas"));
+        Object result = authService.login(request);
+
+        if (result instanceof BasicResponse basicResponse) {
+            return ResponseEntity
+                    .status(HttpStatus.valueOf(basicResponse.getCode()))
+                    .body(basicResponse);
         }
-        return ResponseEntity.ok(resp);
+
+        if (result instanceof AuthResponse authResponse) {
+            return ResponseEntity.ok(authResponse);
+        }
+        
+        // Se passar para cá, ai é fogo
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new BasicResponse(500, "Erro interno inesperado"));
     }
+
 }

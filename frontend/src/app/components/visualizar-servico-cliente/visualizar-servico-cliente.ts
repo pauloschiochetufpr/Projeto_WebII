@@ -21,7 +21,6 @@ export class VisualizarServicoClienteDialog {
     private solicitacaoService: SolicitacaoService
   ) {}
 
-  /** 🟢 Aprovar orçamento */
   aprovar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
@@ -43,7 +42,6 @@ export class VisualizarServicoClienteDialog {
     });
   }
 
-  /** 🔴 Rejeitar orçamento */
   rejeitar() {
     if (!this.data?.idSolicitacao) return;
     const motivo = prompt('Motivo da rejeição:');
@@ -69,7 +67,6 @@ export class VisualizarServicoClienteDialog {
     });
   }
 
-  /** 💰 Efetuar pagamento */
   pagar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
@@ -91,12 +88,10 @@ export class VisualizarServicoClienteDialog {
     });
   }
 
-  /** ❌ Fecha o diálogo */
   close() {
     this.dialogRef.close();
   }
 
-  /** 🕓 Tempo decorrido desde a abertura */
   calcularTempoDecorrido(dataCriacao: string): string {
     const inicio = new Date(dataCriacao).getTime();
     const agora = Date.now();

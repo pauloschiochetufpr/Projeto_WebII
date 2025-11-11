@@ -37,7 +37,7 @@ export interface HistSolicitacao {
   providedIn: 'root',
 })
 export class SolicitacaoService {
-  private baseUrl = `${environment.apiUrl}/solicitacoes`;
+  private baseUrl = `${environment.apiUrl}/api/solicitacoes`;
 
   constructor(private http: HttpClient) {}
 
@@ -68,16 +68,16 @@ export class SolicitacaoService {
   }
 
   // busca com última atualização
-  listarTodasComLastUpdate(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
-      catchError((err) => {
-        console.error('Erro ao buscar solicitacoes com lastUpdate', err);
-        return throwError(
-          () => new Error('Falha ao buscar solicitacoes com lastUpdate')
-        );
-      })
-    );
-  }
+ listarTodasComLastUpdate(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
+    catchError((err) => {
+      console.error('Erro ao buscar solicitacoes com lastUpdate', err);
+      return throwError(
+        () => new Error('Falha ao buscar solicitacoes com lastUpdate')
+      );
+    })
+  );
+}
 
   // buscar solicitações por idStatus (ex: 1 = ABERTA)
   buscarPorStatus(idStatus: number): Observable<SolicitacaoDto[]> {

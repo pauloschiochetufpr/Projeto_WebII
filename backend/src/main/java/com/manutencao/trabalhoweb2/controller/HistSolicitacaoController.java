@@ -19,10 +19,6 @@ public class HistSolicitacaoController {
         this.histService = histService;
     }
 
-    /**
-     * Busca histórico de uma solicitação.
-     * GET /api/solicitacoes/{id}/historico
-     */
     @GetMapping("/{id}/historico")
     public ResponseEntity<List<HistSolicitacaoDto>> getHistoricoBySolicitacao(@PathVariable("id") Long id) {
         List<HistSolicitacao> lista = histService.getHistoricoPorSolicitacaoId(id);
@@ -41,7 +37,8 @@ public class HistSolicitacaoController {
             h.getStatusNew(),
             h.getFuncionarioOld(),
             h.getFuncionarioNew(),
-            h.getDataHora()
+            h.getDataHora(),
+            h.getMotivo()
         ))
         .toList();
 

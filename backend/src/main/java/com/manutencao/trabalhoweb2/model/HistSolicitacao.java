@@ -36,11 +36,18 @@ public class HistSolicitacao {
     @Column(name = "funcionario_new")
     private Integer funcionarioNew;
 
+    @Column(name = "motivo", length = 255)
+    private String motivo;
+
+    
     public HistSolicitacao() {}
 
     // getters / setters
     public Long getIdHistorico() { return idHistorico; }
     public void setIdHistorico(Long idHistorico) { this.idHistorico = idHistorico; }
+
+    public String getMotivo() { return motivo; }
+    public void setMotivo(String motivo) { this.motivo = motivo; }
 
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }

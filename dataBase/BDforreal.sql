@@ -37,7 +37,7 @@ CREATE TABLE ddd_validos (
 );
 
 CREATE TABLE cliente (
-    id_cliente INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_cliente BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     cpf VARCHAR(11) NOT NULL UNIQUE,
     nome VARCHAR(64) NOT NULL,
     email VARCHAR(128) NOT NULL UNIQUE,
@@ -49,12 +49,14 @@ CREATE TABLE cliente (
     ultima_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE cliente_endereco(
-    id_cliente int unsigned,
-    id_endereco int unsigned,
-    FOREIGN key (id_cliente) references cliente(id_cliente),
-    FOREIGN key (id_endereco) references endereco(id_endereco),
-    PRIMARY KEY (id_cliente, id_endereco)
+CREATE TABLE cliente_endereco (
+    id_cliente BIGINT UNSIGNED,
+    id_endereco INT UNSIGNED,
+    FOREIGN KEY (id_cliente)
+        REFERENCES cliente (id_cliente),
+    FOREIGN KEY (id_endereco)
+        REFERENCES endereco (id_endereco),
+    PRIMARY KEY (id_cliente , id_endereco)
 );
 
 CREATE TABLE categoria (
@@ -82,7 +84,7 @@ CREATE TABLE solicitacao (
     id_solicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
-    id_cliente INT UNSIGNED,
+    id_cliente BIGINT UNSIGNED,
     valor DECIMAL(10 , 2 ),
     id_status INT UNSIGNED NOT NULL,
     id_categoria INT UNSIGNED UNSIGNED NOT NULL,

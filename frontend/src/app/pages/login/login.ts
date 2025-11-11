@@ -46,9 +46,11 @@ export class LoginComponent {
   private fadeInTimer?: ReturnType<typeof setTimeout>;
   private fadeOutTimer?: ReturnType<typeof setTimeout>;
 
+  mensagemNotificacaoLogin: string | null = null;
+  codigoNotificacaoLogin?: number;
 
-  mensagemNotificacao: string | null = null;
-  codigoNotificacao?: number;
+  mensagemNotificacaoCadastro: string | null = null;
+  codigoNotificacaoCadastro?: number;
 
   get mostrarAlerta(): boolean {
     const inativo = !this.isHoveringLogin && !this.isHoveringCadastro;
@@ -186,14 +188,45 @@ export class LoginComponent {
     ) {
       this.isSubmittingLogin = true;
       const { email, password } = this.loginForm.value;
+
       this.authService.login(email, password).subscribe({
         next: (res) => {
-          console.log('Login OK:', res);
           this.isSubmittingLogin = false;
+
+          // Verifica AuthResponse
+          if ('accessToken' in res && res.accessToken) {
+            console.log('Tokens recebidos');
+            // Authservice já redireciona e faz tudo necessário
+          }
+
+          // Verifica BasicResponse
+          else if ('code' in res && 'message' in res) {
+            this.mensagemNotificacaoLogin = res.message;
+            this.codigoNotificacaoLogin = res.code;
+            setTimeout(() => {
+              this.mensagemNotificacaoLogin = null;
+              this.codigoNotificacaoLogin = undefined;
+            }, 5000);
+          }
+
+          // Caso inesperado
+          else {
+            this.mensagemNotificacaoLogin = 'Resposta inesperada do servidor.';
+            this.codigoNotificacaoLogin = 500;
+          }
         },
         error: (err) => {
           console.error('Erro login:', err);
           this.isSubmittingLogin = false;
+
+          this.mensagemNotificacaoLogin =
+            err?.error?.message || 'Erro inesperado no login.';
+          this.codigoNotificacaoLogin = err?.status || 500;
+
+          setTimeout(() => {
+            this.mensagemNotificacaoLogin = null;
+            this.codigoNotificacaoLogin = undefined;
+          }, 5000);
         },
       });
     }
@@ -214,34 +247,31 @@ export class LoginComponent {
 
       this.authService.cadastro(formValue).subscribe({
         next: (res) => {
-          // Atualiza mensagem e código para o NotificationComponent
-          this.mensagemNotificacao = res.message;
-          this.codigoNotificacao = res.code;
+          this.mensagemNotificacaoCadastro = res.message;
+          this.codigoNotificacaoCadastro = res.code;
 
-          // Se sucesso (HTTP 200) limpa o form
           if (res.code === 200) {
             this.cadastroForm.reset();
           }
 
-          // Timeout padrão para desaparecer a mensagem
           setTimeout(() => {
-            this.mensagemNotificacao = null;
-            this.codigoNotificacao = res.code ?? undefined;
+            this.mensagemNotificacaoCadastro = null;
+            this.codigoNotificacaoCadastro = undefined;
           }, 5000);
 
-          this.isSubmittingCadastro = false; // libera botão
+          this.isSubmittingCadastro = false;
         },
         error: (err) => {
-          // Caso erro inesperado, exibe a mensagem e código
-          this.mensagemNotificacao = err?.message;
-          this.codigoNotificacao = err?.status;
+          this.mensagemNotificacaoCadastro =
+            err?.error?.message || 'Erro inesperado no cadastro.';
+          this.codigoNotificacaoCadastro = err?.status || 500;
 
           setTimeout(() => {
-            this.mensagemNotificacao = null;
-            this.codigoNotificacao = err.code ?? undefined;
+            this.mensagemNotificacaoCadastro = null;
+            this.codigoNotificacaoCadastro = undefined;
           }, 5000);
 
-          this.isSubmittingCadastro = false; // libera botão
+          this.isSubmittingCadastro = false;
         },
       });
     }

@@ -19,13 +19,15 @@ public class JwtUtil {
     private final long refreshExpDays;
 
     public JwtUtil(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access.expiration-minutes}") long accessExpMinutes,
-            @Value("${jwt.refresh.expiration-days}") long refreshExpDays) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.accessExpMinutes = accessExpMinutes;
-        this.refreshExpDays = refreshExpDays;
-    }
+                    @Value("${jwt.secret}") String secret,
+                    @Value("${jwt.access.expiration-minutes}") long accessExpMinutes,
+                    @Value("${jwt.refresh.expiration-days}") long refreshExpDays
+                ) 
+                {
+                    this.key = Keys.hmacShaKeyFor(secret.getBytes());
+                    this.accessExpMinutes = accessExpMinutes;
+                    this.refreshExpDays = refreshExpDays;
+                }
 
     public String generateAccessToken(String subject, Map<String, Object> claims) {
         return Jwts.builder()
@@ -63,5 +65,10 @@ public class JwtUtil {
     public String getSubject(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Claims getAllClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody();
     }
 }

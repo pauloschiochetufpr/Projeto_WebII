@@ -1,68 +1,45 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<h1>Categoria de Equipamento</h1>
-<table class="table table-striped table-bordered table-hover">
-<tbody>
-<tr>
-<th>Descrição</th>
-<th>Ativo</th>
-  <th class="text-center">
-    <button (click)="abrirModalNova()" class="btn btn-xs btn-success">
-      <i class="fa fa-plus" aria-hidden="true"></i> Novo
-    </button>
-</th>
-</tr>
-<tr *ngFor="let categoriaEquipamento of listaCategorias">
-<td>{{categoriaEquipamento.nome}}</td>
-<td>{{categoriaEquipamento.ativo}}</td>
-<td class="text-center" style="width: 300px">
-<button (click)="abrirModalEditar(categoriaEquipamento)" class="btn btn-xs btn-info">
-  <i class="fa fa-edit" aria-hidden="true"></i> Editar
-</button>
-<button (click)="removerCategoria(categoriaEquipamento)" class="btn btn-xs btn-danger">
-  <i class="fa fa-times" aria-hidden="true"></i> Remover
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-<p *ngIf="listaCategorias.length===0">Nenhuma categoria cadastrada.</p>
-
-<!-- Modal -->
-<div id="categoriaModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form (ngSubmit)="salvarCategoria()" #formCategoria="ngForm">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ editando ? 'Editar Categoria' : 'Nova Categoria' }}</h5>
-          <button type="button" class="close" (click)="fecharModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="nome">Nome:</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="nome" 
-              [(ngModel)]="categoriaSelecionada.nome" 
-              name="nome" 
-              minlength="2" 
-              required>
-          </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" [(ngModel)]="categoriaSelecionada.ativo" name="ativo">
-              Ativo
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" [disabled]="formCategoria.invalid" class="btn btn-primary">
-            <i class="fa fa-save"></i> Salvar
+<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div class="w-full max-w-2xl p-4">
+   <div class="flex justify-around">
+      <div class="">
+          <h2>Categoria de Equipamento</h2>
+        </div>  
+      <div class="flex justify-end mb-3">
+          <button class="px-3 py-2 rounded border text-sm" [routerLink]="['/categoriaEquipamento/novaCategoria']" title="Novo">
+              <i class="fa fa-plus"></i>
+              Nova Categoria
           </button>
-          <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
         </div>
-      </form>
+    </div>
+    <div class="bg-white rounded shadow overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100 text-left">
+          <tr>
+            <th class="px-4 py-2">ID</th>
+            <th class="px-4 py-2">Nome</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2 text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t" *ngFor="let Categoria of categoriasEquipamento">
+            <td class="px-4 py-2">{{Categoria.id}}</td>
+            <td class="px-4 py-2">{{Categoria.nome}}</td>
+            <td class="px-4 py-2">{{Categoria.ativo}}</td>
+            <td class="px-4 py-2 text-center">
+              <button aria-label="Editar" class="inline-flex items-center p-1 mr-2">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button aria-label="Excluir" class="inline-flex items-center p-1">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+          
+        </tbody>
+        
+      </table>
+      <p *ngIf="categoriasEquipamento.length===0">Nenhuma pessoa cadastrada</p>
     </div>
   </div>
-</div>
+</body>

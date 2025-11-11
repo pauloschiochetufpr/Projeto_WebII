@@ -326,6 +326,7 @@ export class Listar implements OnInit {
       );
       if (idx === -1) return;
 
+      //ajeitar
       switch (result.action) {
         case 'ORÇAR':
           this.users[idx].state = 'ORÇADA';

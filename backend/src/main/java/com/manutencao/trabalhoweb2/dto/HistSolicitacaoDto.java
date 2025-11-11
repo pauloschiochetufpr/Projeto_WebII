@@ -10,5 +10,6 @@ public record HistSolicitacaoDto(
     String statusNew,
     Integer funcionarioOld,
     Integer funcionarioNew,
-    LocalDateTime dataHora
+    LocalDateTime dataHora,
+    String motivo
 ) {}
