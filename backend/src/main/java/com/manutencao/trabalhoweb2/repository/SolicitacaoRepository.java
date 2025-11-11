@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.manutencao.trabalhoweb2.model.HistSolicitacao;
 import com.manutencao.trabalhoweb2.model.Solicitacao;
 import com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO;
-import com.manutencao.trabalhoweb2.dto.SolicitacaoLastUpdateDto;
+import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {

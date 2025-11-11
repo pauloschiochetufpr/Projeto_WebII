@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RelatorioService, ReceitaPorDia } from '../../services/relatorio'; 
 import { finalize } from 'rxjs/operators';
+import { RelatorioService, ReceitaPorDia } from '../../services/relatorio';
 
 interface ReceitaPorDiaComUI extends ReceitaPorDia {
   showDetails?: boolean;
@@ -14,26 +14,26 @@ interface ReceitaPorDiaComUI extends ReceitaPorDia {
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './gerar-relatorio.html',
   styles: [`
-    /* tem que usar o padrão que o cena mandou */
+    /* TODO: adaptar para o padrão visual do projeto */
   `]
 })
 export class ReceitaPorPeriodoComponent implements OnInit {
   filterForm: FormGroup;
-  reportData: ReceitaPorDiaComUI[] = []; 
+  reportData: ReceitaPorDiaComUI[] = [];
   loading = false;
   searched = false;
-  
+
   totalRevenue = 0;
   totalServices = 0;
   averageTicket = 0;
 
   constructor(
     private fb: FormBuilder,
-    private relatorioService: RelatorioService 
+    private relatorioService: RelatorioService
   ) {
     this.filterForm = this.fb.group({
-      dataInicio: [''], 
-      dataFim: ['']     
+      dataInicio: [''],
+      dataFim: ['']
     });
   }
 
@@ -41,27 +41,25 @@ export class ReceitaPorPeriodoComponent implements OnInit {
     this.initializeFormWithCurrentMonth();
     this.loadReport();
   }
-  
+
   private initializeFormWithCurrentMonth(): void {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
+
     this.filterForm.patchValue({
       dataInicio: this.formatDateForInput(firstDay),
       dataFim: this.formatDateForInput(lastDay)
     });
   }
-  
+
   loadReport(): void {
     this.loading = true;
     this.searched = false;
     const { dataInicio, dataFim } = this.filterForm.value;
-    
+
     this.relatorioService.obterReceitasPorPeriodo(dataInicio, dataFim)
-      .pipe(
-        finalize(() => this.loading = false)
-      )
+      .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (data: ReceitaPorDia[]) => {
           this.reportData = data.map(item => ({ ...item, showDetails: false }));
@@ -75,11 +73,13 @@ export class ReceitaPorPeriodoComponent implements OnInit {
         }
       });
   }
-  
+
   private calculateSummary(): void {
     this.totalRevenue = this.reportData.reduce((sum, item) => sum + item.receitaTotal, 0);
     this.totalServices = this.reportData.reduce((sum, item) => sum + item.quantidade, 0);
-    this.averageTicket = this.totalServices > 0 ? this.totalRevenue / this.totalServices : 0;
+    this.averageTicket = this.totalServices > 0
+      ? this.totalRevenue / this.totalServices
+      : 0;
   }
 
   toggleDetails(item: ReceitaPorDiaComUI): void {
@@ -88,7 +88,25 @@ export class ReceitaPorPeriodoComponent implements OnInit {
 
   exportToPDF(): void {
     const { dataInicio, dataFim } = this.filterForm.value;
-    this.relatorioService.gerarPdfReceitasPorPeriodo(this.reportData, dataInicio, dataFim);
+    this.loading = true;
+
+    this.relatorioService
+      .baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `relatorio_receitas_${dataInicio || 'inicio'}_${dataFim || 'fim'}.pdf`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Erro ao gerar PDF:', err);
+          alert('Erro ao gerar o PDF. Tente novamente.');
+        }
+      });
   }
 
   formatCurrency(value: number): string {

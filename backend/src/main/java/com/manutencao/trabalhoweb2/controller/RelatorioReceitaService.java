@@ -1,4 +1,4 @@
-package com.manutencao.trabalhoweb2.service;
+package com.manutencao.trabalhoweb2.controller;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
