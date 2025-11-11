@@ -10,22 +10,24 @@ export class CategoriaEquipamentoService {
   
   constructor(){ };
 
-  listarTodos():CategoriaEquipamento[]{
+  listarTodos():CategoriaEquipamento[] {
     const categoriaEquipamento = localStorage[LS_CHAVE]
-    return categoriaEquipamento ? JSON.parse(categoriaEquipamento) : []; 
+    return categoriaEquipamento ? JSON.parse(categoriaEquipamento) : [];
   }
 
   inserir(categoriaEquipamento : CategoriaEquipamento) : void {
-    const listaCategoriaEquipamento = this.listarTodos();
-    categoriaEquipamento.id = new Date().getTime();
+    const listaCategoriaEquipamento = this.listarTodos(); 
+    console.log("Tipo: ", typeof listaCategoriaEquipamento)
+    console.log("Dado: ", listaCategoriaEquipamento)
+    categoriaEquipamento.id = new Date().getTime();  
     listaCategoriaEquipamento.push(categoriaEquipamento);
-    localStorage[LS_CHAVE] = JSON.stringify(categoriaEquipamento);
+    localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
   }
 
   atualizar(categoriaEquipamento : CategoriaEquipamento): void {
     const listaCategoriaEquipamento = this.listarTodos();
     listaCategoriaEquipamento.forEach((obj, index, objs)=>{
-      if (categoriaEquipamento.id === obj.id){
+      if (categoriaEquipamento.id === obj.id){   //ttttttttttttt
         objs[index] = categoriaEquipamento
       }
     });
@@ -36,7 +38,7 @@ export class CategoriaEquipamentoService {
     let listaCategoriaEquipamento = this.listarTodos();
     listaCategoriaEquipamento = 
       listaCategoriaEquipamento.
-        filter(CategoriaEquipamento => CategoriaEquipamento.id !== id);
+        filter(CategoriaEquipamento => CategoriaEquipamento.id !== id); // tttttttt
     localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
   }
 
