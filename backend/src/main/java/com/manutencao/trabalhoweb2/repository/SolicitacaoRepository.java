@@ -15,13 +15,23 @@ import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
-    List<Solicitacao> findByCliente_IdCliente(Long clienteId);
+
     List<Solicitacao> findByIdStatus(Integer status);
 
 @Repository
     public interface HistSolicitacaoRepository extends JpaRepository<HistSolicitacao, Long> {
     List<HistSolicitacao> findBySolicitacaoIdSolicitacao(Long idSolicitacao);
 }
+
+// join com a última data de histórico filtrando pelo cliente
+@Query("""
+    SELECT s, MAX(h.dataHora) AS lastUpdate
+    FROM Solicitacao s
+    LEFT JOIN HistSolicitacao h ON h.solicitacao.idSolicitacao = s.idSolicitacao
+    WHERE s.cliente.idCliente = :clienteId
+    GROUP BY s
+""")
+List<Object[]> findAllLastUpdateByClienteId(@Param("clienteId") Long clienteId);
 
 // join de cliente com o ultimo historico feito
 @Query("""

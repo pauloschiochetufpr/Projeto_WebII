@@ -59,7 +59,7 @@ public List<SolicitacaoLastUpdateDto> listarTodasComUltimoHistorico() {
 }
 
 // ===============================================================
-// LISTAR COM LAST UPDATE SIMPLIFICADO
+// LISTAR COM LAST UPDATE 
 // ===============================================================
 public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
     List<Object[]> rows = solicitacaoRepository.findAllLastUpdate();
@@ -87,6 +87,34 @@ public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
     }).collect(Collectors.toList());
 }
 
+// ===============================================================
+// LISTAR TODAS POR CLIENTE COM LAST UPDATE
+// ===============================================================
+public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long clienteId) {
+    List<Object[]> rows = solicitacaoRepository.findAllLastUpdateByClienteId(clienteId);
+
+    return rows.stream().map(row -> {
+        Solicitacao s = (Solicitacao) row[0];
+        Object lastObj = row[1];
+        String lastIso = (lastObj != null) ? lastObj.toString() : null;
+
+        String nomeCliente = (s.getCliente() != null) ? s.getCliente().getNome() : null;
+
+        return new SolicitacaoLastUpdateDto(
+                s.getIdSolicitacao(),
+                s.getNome(),
+                s.getDescricao(),
+                s.getCliente() != null ? s.getCliente().getIdCliente() : null,
+                s.getValor(),
+                s.getIdStatus(),
+                s.getIdCategoria(),
+                s.getAtivo(),
+                lastIso,
+                nomeCliente,
+                null, null, null, null
+        );
+    }).collect(Collectors.toList());
+}
 
     // ===============================================================
     // CRUD BÁSICO
@@ -110,8 +138,31 @@ public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
     public Solicitacao atualizar(Long id, SolicitacaoDto dto) {
         Solicitacao existente = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada: " + id));
+
+        // captura estado anterior (pode ser null)
+        Integer statusAntigoId = existente.getIdStatus();
+        String statusAntigoStr = statusAntigoId != null ? String.valueOf(statusAntigoId) : null;
+
+        // atualiza campos (mesma lógica que você já tinha)
         atualizarCampos(existente, dto);
-        return solicitacaoRepository.save(existente);
+
+        // salva a solicitação atualizada
+        Solicitacao salva = solicitacaoRepository.save(existente);
+
+        // cria e salva histórico — ajuste 'cliente' se precisar diferenciar quem fez a alteração
+        HistSolicitacao hist = new HistSolicitacao();
+        hist.setSolicitacao(salva);
+        hist.setCliente(false); // aqui: false = ação por funcionário/sistema. Se for cliente, envie essa info no DTO.
+        hist.setStatusOld(statusAntigoStr);
+        hist.setStatusNew(salva.getIdStatus() != null ? String.valueOf(salva.getIdStatus()) : null);
+        hist.setFuncionarioOld(null);
+        hist.setFuncionarioNew(null);
+        hist.setDataHora(LocalDateTime.now());
+        // se sua entidade tem campo 'motivo' e você quiser registrar, adicione hist.setMotivo(dto.getMotivo()) se existir
+
+        histSolicitacaoRepository.save(hist);
+
+        return salva;
     }
 
     @Transactional

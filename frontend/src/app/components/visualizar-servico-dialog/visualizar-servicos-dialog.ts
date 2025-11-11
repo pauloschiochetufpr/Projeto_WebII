@@ -74,19 +74,32 @@ export class VisualizarServicosDialog implements OnInit {
     if (!valor) return;
 
     const novoValor = parseFloat(valor);
-    this.solicitacaoService
-      .atualizarSolicitacao(Number(this.data.user.id), {
-        valor: novoValor,
-        idStatus: 2, // ORÇADA
-      })
-      .subscribe({
-        next: (res) => {
-          this.data.user.budget = res.valor;
-          this.data.user.state = 'ORÇADA';
-          this.dialogRef.close({ action: 'ORÇAR', user: this.data.user });
-        },
-        error: (err) => alert('Erro ao orçar: ' + err.message),
-      });
+    const id = Number(this.data.user.id);
+
+    this.solicitacaoService.buscarPorId(id).subscribe({
+      next: (solicitacao) => {
+        const dto = {
+          idSolicitacao: solicitacao.idSolicitacao ?? id,
+          nome: solicitacao.nome,
+          descricao: solicitacao.descricao,
+          idCliente: solicitacao.idCliente,
+          valor: novoValor,
+          idStatus: 2, // ORÇADA
+          idCategoria: solicitacao.idCategoria,
+          ativo: solicitacao.ativo ?? true,
+        };
+
+        this.solicitacaoService.atualizarSolicitacao(id, dto).subscribe({
+          next: (res) => {
+            this.data.user.budget = res.valor;
+            this.data.user.state = 'ORÇADA';
+            this.dialogRef.close({ action: 'ORÇAR', user: this.data.user });
+          },
+          error: (err) => alert('Erro ao orçar: ' + err.message),
+        });
+      },
+      error: (err) => alert('Erro ao buscar solicitação: ' + err.message),
+    });
   }
 
   // Resgatar serviço rejeitado

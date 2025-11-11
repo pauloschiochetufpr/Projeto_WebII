@@ -6,18 +6,17 @@ import { RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { DateSelection } from '../../services/date-selection';
-import { VisualizarServicoClienteDialog } from '../../components/visualizar-servico-cliente/visualizar-servico-cliente';
+import { VisualizarServicoClienteDialog } from '../visualizar-servico-cliente/visualizar-servico-cliente';
 import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
 
 export interface Solicitation extends SolicitacaoDto {
   id: number | string;
-  state: string;
+  state?: string;
+  lastUpdate?: string | null;
 }
 
-
-
 @Component({
-  selector: 'app-home',
+  selector: 'app-home-cliente',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, MatDialogModule],
   templateUrl: './home-cliente.html',
@@ -34,18 +33,18 @@ export class HomeCliente implements OnInit, OnDestroy {
   statusMapById: Record<number, string> = {
     1: 'ABERTA',
     2: 'ORÇADA',
-    3: 'REJEITADA',
-    4: 'APROVADA',
-    5: 'REDIRECIONADA',
-    6: 'ARRUMADA',
-    7: 'PAGA',
-    8: 'FINALIZADA',
+    3: 'APROVADA',
+    4: 'REJEITADA',
+    5: 'ARRUMADA',
+    6: 'PAGA',
+    7: 'FINALIZADA',
+    8: 'REDIRECIONADA',
     9: 'CANCELADA',
   };
 
   constructor(
     private solicitacaoService: SolicitacaoService,
-    private dateSelection: DateSelection,
+    public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
 
@@ -60,17 +59,29 @@ export class HomeCliente implements OnInit, OnDestroy {
   // carrega do back
   carregarSolicitacoes(): void {
     this.loading = true;
-    const s = this.solicitacaoService.listarTodas().subscribe({
-      next: (arr) => {
-        this.solicitations = arr.map((d) => this.normalize(d));
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar solicitações', err);
-        this.error = 'Erro ao carregar solicitações';
-        this.loading = false;
-      },
-    });
+
+    const clienteId = 1; // substituir pela lógica real para obter o ID do cliente logado do token
+
+    if (!clienteId) {
+      console.error('ID do cliente não encontrado!');
+      this.loading = false;
+      return;
+    }
+
+    const s = this.solicitacaoService
+      .listarPorClienteComLastUpdate(clienteId)
+      .subscribe({
+        next: (arr) => {
+          this.solicitations = arr.map((d) => this.normalize(d));
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erro ao carregar solicitações', err);
+          this.error = 'Erro ao carregar solicitações';
+          this.loading = false;
+        },
+      });
+
     this.sub.add(s);
   }
 
@@ -82,6 +93,7 @@ export class HomeCliente implements OnInit, OnDestroy {
       descricao: d.descricao ?? d.description,
       dataHora: d.dataHora ?? d.createdAt,
       idStatus: d.idStatus,
+      lastUpate: d.lastUpdate,
       state: this.solicitacaoService.mapStatus(d.idStatus),
       valor: d.valor ?? 0,
       ...d,
@@ -105,10 +117,11 @@ export class HomeCliente implements OnInit, OnDestroy {
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
       this.atualizarStatus(s, result.newStatusId, result.newStatusName);
+      this.carregarSolicitacoes();
     });
   }
 
-  // atualiza o status de uma solicitação 
+  // atualiza o status de uma solicitação
   private atualizarStatus(
     s: Solicitation,
     novoStatusId: number,
@@ -120,22 +133,24 @@ export class HomeCliente implements OnInit, OnDestroy {
       return;
     }
 
-    this.solicitacaoService.atualizarStatus(Number(id), novoStatusId).subscribe({
-      next: (atualizada) => {
-        console.log('Status atualizado com sucesso:', atualizada);
+    this.solicitacaoService
+      .atualizarStatus(Number(id), novoStatusId)
+      .subscribe({
+        next: (atualizada) => {
+          console.log('Status atualizado com sucesso:', atualizada);
 
-        // Atualiza localmente para refletir na tela
-        s.idStatus = atualizada.idStatus;
-        s.state = this.solicitacaoService.mapStatus(atualizada.idStatus);
+          // Atualiza localmente para refletir na tela
+          s.idStatus = atualizada.idStatus;
+          s.state = this.solicitacaoService.mapStatus(atualizada.idStatus);
 
-        // Caso o backend devolva o valor atualizado
-        if (atualizada.valor) s.valor = atualizada.valor;
-      },
-      error: (err) => {
-        console.error('Erro ao atualizar status:', err);
-        alert('Erro ao atualizar status da solicitação.');
-      },
-    });
+          // Caso o backend devolva o valor atualizado
+          if (atualizada.valor) s.valor = atualizada.valor;
+        },
+        error: (err) => {
+          console.error('Erro ao atualizar status:', err);
+          alert('Erro ao atualizar status da solicitação.');
+        },
+      });
   }
 
   // utilitários

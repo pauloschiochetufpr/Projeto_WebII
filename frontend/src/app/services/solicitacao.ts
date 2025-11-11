@@ -67,6 +67,26 @@ export class SolicitacaoService {
     );
   }
 
+  // busca solicitações de um cliente com última atualização
+  listarPorClienteComLastUpdate(clienteId: number): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.baseUrl}/cliente/${clienteId}/with-last-update`)
+      .pipe(
+        catchError((err) => {
+          console.error(
+            `Erro ao buscar solicitações do cliente ${clienteId} com lastUpdate`,
+            err
+          );
+          return throwError(
+            () =>
+              new Error(
+                'Falha ao buscar solicitações do cliente com lastUpdate'
+              )
+          );
+        })
+      );
+  }
+
   // busca com última atualização
   listarTodasComLastUpdate(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(

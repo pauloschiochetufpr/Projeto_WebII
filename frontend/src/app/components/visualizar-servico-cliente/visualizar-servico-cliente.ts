@@ -82,7 +82,7 @@ export class VisualizarServicoClienteDialog {
           this.dialogRef.close({
             action: 'PAGAR',
             newStatusName: 'PAGA',
-            newStatusId: 7,
+            newStatusId: 6,
             user: updated,
           });
         },

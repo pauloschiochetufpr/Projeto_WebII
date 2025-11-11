@@ -26,17 +26,21 @@
   <!-- Dados principais -->
   <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg mb-6 text-sm">
     <p><strong>ID:</strong> {{ data.id ?? data.idSolicitacao }}</p>
-    <p><strong>Nome:</strong> {{ data['nome'] ?? data['name'] }}</p>
-    <p><strong>Data/Hora:</strong> {{ data['dataHora'] ?? data['createdAt'] | date:'short' }}
-</p>
+    <p><strong>Nome:</strong> {{ data["nome"] ?? data["name"] }}</p>
+    <p>
+      <strong>Data/Hora:</strong>
+      {{ data["dataHora"] ?? data["createdAt"] | date : "short" }}
+    </p>
 
     <!-- Tempo desde abertura -->
     <p *ngIf="data['createdAt']">
-      <strong>Aberta há:</strong> {{ calcularTempoDecorrido(data['createdAt']) }}
+      <strong>Aberta há:</strong>
+      {{ calcularTempoDecorrido(data["createdAt"]) }}
     </p>
 
     <p class="col-span-2">
-      <strong>Descrição:</strong> {{ data['descricao'] ?? data['description'] ?? '—' }}
+      <strong>Descrição:</strong>
+      {{ data["descricao"] ?? data["description"] ?? "—" }}
     </p>
     <p *ngIf="data.valor" class="col-span-2">
       <strong>Valor:</strong> R$ {{ data.valor }}
@@ -44,26 +48,42 @@
   </div>
 
   <!-- Mensagem dinâmica -->
-  <div class="mb-6 p-3 rounded-lg border text-sm"
-      [ngClass]="{
-  'bg-sky-50 text-sky-700 border-sky-200': data.state === 'ABERTA',
-  'bg-yellow-50 text-yellow-800 border-yellow-200': data.state === 'ORÇADA',
-  'bg-green-50 text-green-800 border-green-200': data.state === 'APROVADA',
-  'bg-red-50 text-red-700 border-red-200': data.state === 'REJEITADA',
-  'bg-blue-50 text-blue-700 border-blue-200': data.state === 'ARRUMADA',
-  'bg-orange-50 text-orange-700 border-orange-200': data.state === 'PAGA',
-  'bg-emerald-50 text-emerald-700 border-emerald-200': data.state === 'FINALIZADA'
-  }"
-
+  <div
+    class="mb-6 p-3 rounded-lg border text-sm"
+    [ngClass]="{
+      'bg-sky-50 text-sky-700 border-sky-200': data.state === 'ABERTA',
+      'bg-yellow-50 text-yellow-800 border-yellow-200': data.state === 'ORÇADA',
+      'bg-green-50 text-green-800 border-green-200': data.state === 'APROVADA',
+      'bg-red-50 text-red-700 border-red-200': data.state === 'REJEITADA',
+      'bg-blue-50 text-blue-700 border-blue-200': data.state === 'ARRUMADA',
+      'bg-orange-50 text-orange-700 border-orange-200': data.state === 'PAGA',
+      'bg-emerald-50 text-emerald-700 border-emerald-200':
+        data.state === 'FINALIZADA'
+    }"
   >
     <ng-container [ngSwitch]="data.state">
-      <p *ngSwitchCase="'ABERTA'">Sua solicitação foi registrada e está aguardando análise do funcionário.</p>
-      <p *ngSwitchCase="'ORÇADA'">Um orçamento está disponível. Você pode aprovar ou rejeitar abaixo.</p>
-      <p *ngSwitchCase="'APROVADA'">O serviço foi aprovado e está em manutenção. Aguarde o término.</p>
-      <p *ngSwitchCase="'REJEITADA'">O orçamento foi rejeitado. Caso tenha mudado de ideia, entre em contato com o suporte.</p>
-      <p *ngSwitchCase="'ARRUMADA'">O serviço foi concluído. Você pode efetuar o pagamento abaixo.</p>
-      <p *ngSwitchCase="'PAGA'">Pagamento confirmado. O serviço será finalizado em breve.</p>
-      <p *ngSwitchCase="'FINALIZADA'">Serviço concluído! Obrigado por confiar em nossa equipe.</p>
+      <p *ngSwitchCase="'ABERTA'">
+        Sua solicitação foi registrada e está aguardando análise do funcionário.
+      </p>
+      <p *ngSwitchCase="'ORÇADA'">
+        Um orçamento está disponível. Você pode aprovar ou rejeitar abaixo.
+      </p>
+      <p *ngSwitchCase="'APROVADA'">
+        O serviço foi aprovado e está em manutenção. Aguarde o término.
+      </p>
+      <p *ngSwitchCase="'REJEITADA'">
+        O orçamento foi rejeitado. Caso tenha mudado de ideia, entre em contato
+        com o suporte.
+      </p>
+      <p *ngSwitchCase="'ARRUMADA'">
+        O serviço foi concluído. Você pode efetuar o pagamento abaixo.
+      </p>
+      <p *ngSwitchCase="'PAGA'">
+        Pagamento confirmado. O serviço será finalizado em breve.
+      </p>
+      <p *ngSwitchCase="'FINALIZADA'">
+        Serviço concluído! Obrigado por confiar em nossa equipe.
+      </p>
       <p *ngSwitchDefault>Verifique o status da sua solicitação acima.</p>
     </ng-container>
   </div>

@@ -366,6 +366,7 @@ export class Listar implements OnInit {
           by: 'FUNCIONÁRIO',
         },
       ];
+      this.onRefresh();
     });
   }
 

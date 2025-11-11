@@ -39,6 +39,44 @@ public class SolicitacaoController {
         return ResponseEntity.ok(solicitacaoService.buscarPorStatus(status));
     }
 
+    @GetMapping("/cliente/{id}/with-last-update")
+public ResponseEntity<List<Map<String, Object>>> listarPorClienteComLastUpdate(@PathVariable("id") Long clienteId) {
+    List<SolicitacaoLastUpdateDto> lista = solicitacaoService.listarPorClienteComLastUpdate(clienteId);
+
+    if (lista.isEmpty()) {
+        return ResponseEntity.noContent().build();
+    }
+
+    List<Map<String, Object>> resposta = lista.stream().map(dto -> {
+        Map<String, Object> m = new HashMap<>();
+        m.put("idSolicitacao", dto.idSolicitacao());
+        m.put("nome", dto.nome());
+        m.put("descricao", dto.descricao());
+        m.put("valor", dto.valor());
+        m.put("idStatus", dto.idStatus());
+        m.put("idCategoria", dto.idCategoria());
+        m.put("ativo", dto.ativo());
+        m.put("lastUpdate", dto.lastUpdate());
+        m.put("idCliente", dto.idCliente());
+
+        Map<String, Object> cliente = new HashMap<>();
+        cliente.put("id", dto.idCliente());
+        cliente.put("nome", dto.nomeCliente());
+        m.put("cliente", cliente);
+
+        Map<String, Object> ultimo = new HashMap<>();
+        ultimo.put("statusOld", dto.statusOld());
+        ultimo.put("statusNew", dto.statusNew());
+        ultimo.put("funcionarioOld", dto.funcionarioOld());
+        ultimo.put("funcionarioNew", dto.funcionarioNew());
+        m.put("ultimoStatus", ultimo);
+
+        return m;
+    }).toList();
+
+    return ResponseEntity.ok(resposta);
+}
+
     @GetMapping("/with-last-update")
 public ResponseEntity<List<Map<String, Object>>> listarComLastUpdate() {
     List<SolicitacaoLastUpdateDto> lista = solicitacaoService.listarTodasComUltimoHistorico();
@@ -96,6 +134,7 @@ public ResponseEntity<List<Map<String, Object>>> listarComLastUpdate() {
         }
     }
 
+    
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> atualizarStatus(
         @PathVariable Long id,

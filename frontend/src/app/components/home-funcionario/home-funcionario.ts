@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { catchError, of, Subscription, take } from 'rxjs';
 import { JsonTestService, User } from '../../services/jsontest';
 
-import { FuncHeader } from '../../components/func-header/func-header';
+import { FuncHeader } from '../func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
 import { SolicitacaoService } from '../../services/solicitacao';
 
@@ -33,7 +33,7 @@ export interface Solicitation {
   templateUrl: './home-funcionario.html',
   styleUrls: ['./home-funcionario.css'],
 })
-export class HomeFuncionarioComponent implements OnInit, OnDestroy {
+export class HomeFuncionario implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
