@@ -3,6 +3,7 @@ package com.manutencao.trabalhoweb2.service;
 import com.manutencao.trabalhoweb2.dto.AtualizarStatusDto;
 import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
 import com.manutencao.trabalhoweb2.dto.SolicitacaoLastUpdateDto;
+import com.manutencao.trabalhoweb2.dto.SolicitacaoResponseDto;
 import com.manutencao.trabalhoweb2.model.*;
 import com.manutencao.trabalhoweb2.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,6 +34,21 @@ public class SolicitacaoService {
     public SolicitacaoService(SolicitacaoRepository solicitacaoRepository) {
         this.solicitacaoRepository = solicitacaoRepository;
     }
+
+    public SolicitacaoResponseDto toDto(Solicitacao s) {
+    return new SolicitacaoResponseDto(
+            s.getIdSolicitacao(),
+            s.getNome(),
+            s.getDescricao(),
+            s.getValor(),
+            s.getIdStatus(),
+            s.getIdCategoria(),
+            s.getAtivo(),
+            s.getCliente() != null ? s.getCliente().getIdCliente() : null,
+            s.getCliente() != null ? s.getCliente().getNome() : null
+    );
+}
+
 
     // ===============================================================
 // LISTAR TODAS COM JOIN (COMPLETO)
