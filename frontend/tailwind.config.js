@@ -1,8 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,ts}", // <- pega todos os templates e components
-  ],
+  content: ["./src/**/*.{html,ts}"],
   theme: {
     extend: {
       fontFamily: {
@@ -18,6 +16,15 @@ module.exports = {
         "verde-esc": "#00B56C",
         "verde-qua": "#54FEBA",
         "roxo-terc": "#6433FF",
+      },
+      keyframes: {
+        dropdown: {
+          "0%": { opacity: 0, transform: "scaleY(0.9)" },
+          "100%": { opacity: 1, transform: "scaleY(1)" },
+        },
+      },
+      animation: {
+        dropdown: "dropdown 0.15s ease-out",
       },
     },
   },

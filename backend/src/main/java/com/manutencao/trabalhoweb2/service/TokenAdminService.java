@@ -141,7 +141,7 @@ public class TokenAdminService {
             Map<String, Object> newClaims = Map.of(
                 "idCliente", idCliente,
                 "tipoUsuario", claims.get("tipoUsuario", String.class),
-                "expiraEm", Instant.now().plusSeconds(15 * 60).getEpochSecond()
+                "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond()
             );
 
             String novoAccess = jwtUtil.generateAccessToken(idClienteStr, newClaims);

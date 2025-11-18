@@ -18,6 +18,7 @@ import {
 import { interval, of } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 import { NotificationComponent } from '../../components';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -75,7 +76,11 @@ export class LoginComponent {
     return inativo;
   }
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     // Login //
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -196,6 +201,7 @@ export class LoginComponent {
           // Verifica AuthResponse
           if ('accessToken' in res && res.accessToken) {
             console.log('Tokens recebidos');
+            this.router.navigate(['/']);
             // Authservice já redireciona e faz tudo necessário
           }
 

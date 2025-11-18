@@ -39,10 +39,6 @@ export class AuthService {
             // Salva tokens em localstorage
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
-
-            // Redirecionar para home
-            this.router.navigate(['/']);
-
             return data as AuthResponse;
           }
 

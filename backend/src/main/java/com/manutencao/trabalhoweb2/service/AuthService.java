@@ -156,10 +156,9 @@ public class AuthService {
 
         // Montar claims
         Map<String, Object> claims = Map.of(
-            "idCliente", cliente.getIdCliente(),
-            "tipoUsuario", "cliente",
-            "expiraEm", Instant.now().plusSeconds(15 * 60).getEpochSecond()
-        );
+                "idCliente", cliente.getIdCliente(),
+                "tipoUsuario", "cliente",
+                "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond());
 
         // Gerar tokens
         String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);

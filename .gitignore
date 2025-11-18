@@ -27,6 +27,8 @@ backend/src/main/resources/application.properties
 *.p12
 application-secrets.properties
 .cache_ggshield
+./.cache_ggshield
+.cache_ggshield.txt
 
 # ======================================
 # IDEs e editores
