@@ -212,4 +212,9 @@ export class VisualizarServicosDialog implements OnInit {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return diffDays;
   }
+
+  trackHistory(index: number, item: any) {
+  return item.id || index;
+}
+
 }

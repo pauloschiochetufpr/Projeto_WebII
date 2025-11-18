@@ -38,33 +38,48 @@
   </div>
 
   <!-- Histórico -->
-  <div class="mb-6">
-    <h3 class="text-lg font-semibold mb-3">Histórico</h3>
-    <ul
-      *ngIf="data?.user?.history?.length; else semHistorico"
-      class="relative border-l border-gray-300 pl-4 space-y-3"
+<div class="mb-6">
+  <h3 class="text-lg font-semibold mb-3">Histórico</h3>
+
+  <ul
+    *ngIf="data?.user?.history?.length; else semHistorico"
+    class="relative border-l border-gray-300 pl-4 space-y-3"
+  >
+    <li
+      *ngFor="let step of data.user.history; trackBy: trackHistory"
+      class="relative flex flex-col text-sm bg-white p-3 rounded shadow-sm"
     >
-      <li
-        *ngFor="let step of data?.user?.history"
-        class="relative flex flex-col text-sm"
-      >
-        <span
-          class="absolute -left-2 top-1 w-3 h-3 rounded-full bg-blue-500"
-        ></span>
-        <span class="text-gray-600 font-medium">
-          {{ step.date | date: 'short' }}
-        </span>
-        <span class="text-blue-700 font-semibold">{{ step.state }}</span>
-        <span class="text-gray-500">({{ step.by }})</span>
-        <span *ngIf="step.note" class="italic text-gray-400">
-          Nota: {{ step.note }}
-        </span>
-      </li>
-    </ul>
-    <ng-template #semHistorico>
-      <p class="text-sm text-gray-500">Nenhum histórico disponível.</p>
-    </ng-template>
-  </div>
+      <span class="absolute -left-2 top-3 w-3 h-3 rounded-full bg-blue-500"></span>
+
+      <span class="text-gray-600 font-medium">
+        {{ step.date | date: 'short' }}
+      </span>
+
+      <span class="text-blue-700 font-semibold">
+        {{ step.state }}
+      </span>
+
+      <span class="text-gray-500">
+        ({{ step.by || 'Sistema' }})
+      </span>
+
+      <span *ngIf="step.note" class="italic text-gray-400">
+        Nota: {{ step.note }}
+      </span>
+
+      <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
+        <span class="w-2 h-2 bg-gray-300 rounded-full"></span>
+        Última atualização registrada
+      </div>
+    </li>
+  </ul>
+
+  <ng-template #semHistorico>
+    <p class="text-sm text-gray-500">Nenhum histórico disponível.</p>
+  </ng-template>
+</div>
+
+<!-- MÉTODO trackBy → adicione no seu TS -->
 
   <!-- Ações -->
   <div class="space-y-6">
