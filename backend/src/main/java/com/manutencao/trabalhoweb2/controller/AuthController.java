@@ -53,6 +53,4 @@ public class AuthController {
         BasicResponse result = tokenAdmin.logout(refreshToken);
         return ResponseEntity.ok(result);
     }
-
-
 }

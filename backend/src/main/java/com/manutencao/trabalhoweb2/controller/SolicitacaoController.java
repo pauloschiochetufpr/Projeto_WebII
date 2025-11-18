@@ -22,7 +22,7 @@ public class SolicitacaoController {
     @Autowired
     private SolicitacaoService solicitacaoService;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<Solicitacao>> listarTodas() {
         return ResponseEntity.ok(solicitacaoService.listarTodas());
     }
