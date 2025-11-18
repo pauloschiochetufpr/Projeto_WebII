@@ -1,13 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HomeCliente } from '../../components/home-cliente/home-cliente';
+import { HomeFuncionario } from '../../components/home-funcionario/home-funcionario';
 
 @Component({
   selector: 'app-home',
-  imports: [HomeCliente],
+  imports: [HomeCliente, HomeFuncionario, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {}
+export class Home implements OnInit {
+  tipoUsuario: string | undefined;
+
+  ngOnInit() {
+    const token = localStorage.getItem('accessToken');
+
+    // Verifique se o token existe antes de chamar a função
+    if (token) {
+      const payload = getTokenPayload(token); // Remova o '!'
+      this.tipoUsuario = payload?.tipoUsuario;
+      console.log('Tipo de usuário (Decodificado):', this.tipoUsuario);
+    } else {
+      // Log para saber que o token está faltando
+      console.warn('⚠️ Token não encontrado. tipoUsuario é undefined.');
+      this.tipoUsuario = undefined;
+    }
+  }
+}
 
 function getTokenPayload(token: string): any | null {
   try {
@@ -19,7 +38,3 @@ function getTokenPayload(token: string): any | null {
     return null;
   }
 }
-const token = localStorage.getItem('token');
-const payload = getTokenPayload(token!);
-const tipoUsuario = payload?.tipoUsuario;
-console.log('Tipo de usuário:', tipoUsuario);

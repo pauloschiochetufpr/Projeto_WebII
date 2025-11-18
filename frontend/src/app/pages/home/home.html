@@ -1,1 +1,7 @@
-<app-home-cliente></app-home-cliente>
+<div *ngIf="tipoUsuario === 'cliente'">
+  <app-home-cliente></app-home-cliente>
+</div>
+
+<div *ngIf="tipoUsuario === 'funcionario'">
+  <app-home-funcionario></app-home-funcionario>
+</div>

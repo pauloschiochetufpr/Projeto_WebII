@@ -86,7 +86,7 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
           // Limpar formulário após 2 segundos e redirecionar
           setTimeout(() => {
             this.resetForm();
-            this.router.navigate(['/home-cliente']);
+            this.router.navigate(['/']);
           }, 2000);
         },
         error: (err) => {
@@ -133,6 +133,6 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
   }
   //voltar p inicio
   goBack(): void {
-    this.router.navigate(['/home-cliente']);
+    this.router.navigate(['/']);
   }
 }

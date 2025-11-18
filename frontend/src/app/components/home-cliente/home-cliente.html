@@ -1,43 +1,75 @@
-<div class="home-container p-4">
-  <div class="home-header mb-4 flex items-center justify-between">
-    <h2>Home — Lista de solicitações</h2>
+<div class="p-6 bg-white shadow-xl rounded-lg mx-auto my-8 max-w-7xl">
+  <div
+    class="mb-6 flex items-center justify-between border-b-2 border-gray-200 pb-4"
+  >
+    <h2 class="text-3xl font-bold text-azul-main font-sansation">
+      Home — Lista de Solicitações
+    </h2>
 
     <a
-      class="btn btn-create"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-lg bg-verde-sec bg-opacity-90 hover:bg-opacity-100 transition duration-300 shadow-md hover:shadow-lg"
       [routerLink]="['/solicitacao/criar']"
       role="button"
       aria-label="Criar solicitação"
     >
-      + Criar solicitação
+      + Criar Solicitação
     </a>
   </div>
-  <table class="table-auto w-full border-collapse">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="p-2 text-left">Data / Hora</th>
-        <th class="p-2 text-left">Nome</th>
-        <th class="p-2 text-left">Estado</th>
-        <th class="p-2 text-left">Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of solicitations" class="border-t">
-        <td class="p-2">
-          {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
-        </td>
-        <td class="p-2">{{ truncateName(s, 30) }}</td>
-        <td class="p-2">{{ getStatus(s) }}</td>
-        <td class="p-2">
-          <!-- RF008: abre dialog -->
-          <button (click)="view(s)" class="btn">Visualizar</button>
-        </td>
-      </tr>
 
-      <tr *ngIf="!loading && solicitations.length === 0">
-        <td colspan="4" class="p-4 text-center">
-          Nenhuma solicitação encontrada.
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="overflow-x-auto">
+    <table class="w-full table-auto border-separate border-spacing-y-2">
+      <thead class="bg-azul-main/90 text-white rounded-md">
+        <tr>
+          <th class="py-3 px-4 text-left rounded-l-lg">Data / Hora</th>
+          <th class="py-3 px-4 text-left">Nome</th>
+          <th class="py-3 px-4 text-left">Estado</th>
+          <th class="py-3 px-4 text-left rounded-r-lg">Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let s of solicitations"
+          class="bg-gray-50 hover:bg-gray-100 transition duration-150 shadow-sm border-b-2 border-transparent"
+        >
+          <td class="py-3 px-4 text-slate-700 rounded-l-lg">
+            {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
+          </td>
+          <td class="py-3 px-4 text-slate-700">{{ truncateName(s, 30) }}</td>
+
+          <td class="py-3 px-4">
+            <span
+              [ngClass]="{
+                'bg-verde-sec/20 text-verde-sec border border-verde-sec':
+                  getStatus(s) === 'Aberto',
+                'bg-gray-400/20 text-gray-700 border border-gray-500':
+                  getStatus(s) === 'Fechado'
+              }"
+              class="inline-block px-3 py-1 text-sm font-semibold rounded-full min-w-[100px] text-center"
+            >
+              {{ getStatus(s) }}
+            </span>
+          </td>
+
+          <td class="py-3 px-4 rounded-r-lg">
+            <button
+              (click)="view(s)"
+              class="font-semibold text-white px-4 py-1.5 rounded-md bg-roxo-terc hover:bg-roxo-terc/90 transition duration-200 text-sm shadow-sm"
+            >
+              Visualizar
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && solicitations.length === 0">
+          <td
+            colspan="4"
+            class="py-8 text-center text-gray-500 font-sansation text-lg bg-gray-50 rounded-lg"
+          >
+            Nenhuma solicitação encontrada.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -1,40 +1,59 @@
-<div class="p-4 max-w-2xl mx-auto">
-
-  <div class="mb-6 flex items-center justify-between">
+<div
+  class="p-6 my-8 max-w-3xl mx-auto shadow-2xl rounded-xl bg-white border border-gray-100"
+>
+  <div
+    class="mb-8 flex items-center justify-between border-b-2 border-gray-200 pb-4"
+  >
     <div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Solicitação de Manutenção</h2>
-      <p class="text-gray-600">Preencha o formulário abaixo para solicitar nossa manutenção</p>
+      <h2 class="text-3xl font-bold text-azul-main font-sansation mb-1">
+        Solicitação de Manutenção
+      </h2>
+      <p class="text-gray-500 font-sansation">
+        Preencha o formulário abaixo para solicitar nossa manutenção.
+      </p>
     </div>
-    <button 
-      (click)="goBack()" 
-      class="btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
-      type="button">
+
+    <button
+      (click)="goBack()"
+      class="font-semibold font-sansation text-white px-6 py-2 rounded-lg bg-roxo-terc hover:bg-roxo-terc/90 transition duration-300 shadow-md"
+      type="button"
+    >
       Voltar
     </button>
   </div>
 
-  <div *ngIf="success" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+  <div
+    *ngIf="success"
+    class="mb-6 p-4 bg-verde-sec/10 border border-verde-sec/50 rounded-lg"
+  >
     <div class="flex items-center">
-      <span class="text-green-600 mr-2">✓</span>
-      <span class="text-green-800 font-medium">{{ success }}</span>
+      <span class="text-verde-sec mr-2 text-xl">✓</span>
+      <span class="text-verde-sec font-medium font-sansation">{{
+        success
+      }}</span>
     </div>
-    <p class="text-green-700 text-sm mt-1">
-      Sua solicitação foi ABERTA.
+    <p class="text-verde-sec/90 text-sm mt-1 font-sansation">
+      Sua solicitação foi **ABERTA**.
     </p>
   </div>
 
-  <div *ngIf="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+  <div
+    *ngIf="error"
+    class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg"
+  >
     <div class="flex items-center">
-      <span class="text-red-600 mr-2">✗</span>
-      <span class="text-red-800 font-medium">{{ error }}</span>
+      <span class="text-red-600 mr-2 text-xl">✗</span>
+      <span class="text-red-800 font-medium font-sansation">{{ error }}</span>
     </div>
   </div>
 
-  <div class="bg-white border rounded-lg p-6 shadow-sm">
+  <div class="bg-gray-50 border rounded-lg p-8 shadow-inner">
     <form (ngSubmit)="onSubmit()" #form="ngForm">
-
       <div class="mb-4">
-        <label for="descricaoEquipamento" class="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          for="descricaoEquipamento"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >
           Descrição do Equipamento *
         </label>
         <input
@@ -45,15 +64,18 @@
           required
           maxlength="100"
           placeholder="Ex: Notebook Dell"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
         />
-        <div class="mt-1 text-xs text-gray-500 text-right">
-          {{ formData.descricaoEquipamento.length || 0 }}/100 caracteres
+        <div class="mt-1 text-xs text-gray-500 text-right font-sansation">
+          {{ formData.descricaoEquipamento?.length || 0 }}/100 caracteres
         </div>
       </div>
 
       <div class="mb-4">
-        <label for="categoriaEquipamento" class="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          for="categoriaEquipamento"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >
           Categoria do Equipamento *
         </label>
         <select
@@ -62,19 +84,29 @@
           [(ngModel)]="formData.categoriaEquipamento"
           required
           [disabled]="loadingCategorias"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
-          
+          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md appearance-none font-sansation text-slate-800 bg-white focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none disabled:bg-gray-200"
+        >
           <option value="">
-            {{ loadingCategorias ? 'Carregando.' : 'Selecione uma categoria' }}
+            {{
+              loadingCategorias
+                ? "Carregando categorias..."
+                : "Selecione uma categoria"
+            }}
           </option>
-          
           <option *ngFor="let categoria of categorias" [value]="categoria.nome">
             {{ categoria.nome }}
           </option>
         </select>
+        <div
+          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+        ></div>
       </div>
+
       <div class="mb-6">
-        <label for="descricaoDefeito" class="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          for="descricaoDefeito"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >
           Descrição do Defeito *
         </label>
         <textarea
@@ -85,10 +117,10 @@
           rows="4"
           maxlength="500"
           placeholder="Qual o problema?"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical">
-        </textarea>
-        <div class="mt-1 text-xs text-gray-500 text-right">
-          {{ formData.descricaoDefeito.length || 0 }}/500 caracteres
+          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 resize-none focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
+        ></textarea>
+        <div class="mt-1 text-xs text-gray-500 text-right font-sansation">
+          {{ formData.descricaoDefeito?.length || 0 }}/500 caracteres
         </div>
       </div>
 
@@ -96,27 +128,41 @@
         <button
           type="submit"
           [disabled]="loading || form.invalid"
-          class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-6 rounded-md transition-colors disabled:cursor-not-allowed flex items-center">
-          
+          class="font-semibold font-sansation py-2 px-8 rounded-lg transition duration-300 shadow-md flex items-center bg-verde-sec hover:bg-verde-sec/90 text-azul-main disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        >
           <span *ngIf="loading" class="mr-2">
-            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              class="animate-spin h-4 w-4 text-azul-main"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
           </span>
-          
-          {{ loading ? 'Enviando...' : 'Solicitar Manutenção' }}
+          {{ loading ? "Enviando..." : "Solicitar Manutenção" }}
         </button>
       </div>
-
     </form>
   </div>
-  <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-    <p class="text-blue-800 text-sm">
-      <strong>E depois dissogit ?:</strong> 
-      Você será notificado por e-mail quando nós fizermos e mandarmos
-      o orçamento, fique no aguardo e atento.
+
+  <div class="mt-6 p-4 bg-azul-main/10 border border-azul-main/30 rounded-lg">
+    <p class="text-azul-main text-sm font-sansation">
+      <strong>Observação:</strong>
+      Você será notificado por e-mail quando nós fizermos e mandarmos o
+      orçamento, fique no aguardo e atento.
     </p>
   </div>
-
 </div>
