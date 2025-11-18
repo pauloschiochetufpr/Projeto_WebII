@@ -115,18 +115,25 @@ export class SolicitacaoService {
 
   // cliente cria solicitação (mexer só no id pra ser o de quem esta criando)
   criarSolicitacao(data: SolicitacaoCreateDto): Observable<SolicitacaoDto> {
-    const dto = {
-      nome: data.descricaoEquipamento,
-      descricao: data.descricaoDefeito,
-      idCliente: 1,
-      idCategoria: this.mapCategoria(data.categoriaEquipamento),
-      valor: 0,
-      idStatus: 1,
-      ativo: true,
-    };
+  const dto = {
+    nome: data.descricaoEquipamento,
+    descricao: data.descricaoDefeito,
+    idCliente: 1, // TODO: pegar do usuário autenticado
+    idCategoria: this.mapCategoria(data.categoriaEquipamento),
+    valor: 0,
+    idStatus: 1,
+    ativo: true,
+  };
 
-    return this.http.post<SolicitacaoDto>(this.baseUrl, dto);
-  }
+  console.log('Enviando solicitação:', dto); // Para debug
+
+  return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
+    catchError((err) => {
+      console.error('Erro detalhado:', err);
+      return throwError(() => err);
+    })
+  );
+}
 
   atualizarSolicitacao(
     id: number,
@@ -166,14 +173,20 @@ export class SolicitacaoService {
 
   // Listar categorias (com mock) fazer a integração
   getCategorias(): Observable<CategoriaEquipamento[]> {
-    return of([
-      { id: 1, nome: 'Notebook', ativo: true },
-      { id: 2, nome: 'Desktop', ativo: true },
-      { id: 3, nome: 'Impressora', ativo: true },
-      { id: 4, nome: 'Mouse', ativo: true },
-      { id: 5, nome: 'Teclado', ativo: true },
-    ]).pipe(delay(300));
-  }
+  return this.http.get<CategoriaEquipamento[]>(`${environment.apiUrl}/categorias`).pipe(
+    catchError((err) => {
+      console.error('Erro ao carregar categorias do backend', err);
+      // Fallback em caso de erro
+      return of([
+        { id: 1, nome: 'Notebook', ativo: true },
+        { id: 2, nome: 'Desktop', ativo: true },
+        { id: 3, nome: 'Impressora', ativo: true },
+        { id: 4, nome: 'Mouse', ativo: true },
+        { id: 5, nome: 'Teclado', ativo: true },
+      ]);
+    })
+  );
+}
 
   mapStatus(idStatus?: number): string {
     switch (idStatus) {
