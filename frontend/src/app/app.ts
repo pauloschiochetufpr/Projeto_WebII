@@ -25,7 +25,7 @@ export class App implements OnInit {
   ngOnInit(): void {
     this.tokenWatcher.start();
     this.router.events.subscribe(() => {
-      this.isLoginPage = this.router.url === '/login';
+    this.isLoginPage = this.router.url === '/login';
     });
   }
 }

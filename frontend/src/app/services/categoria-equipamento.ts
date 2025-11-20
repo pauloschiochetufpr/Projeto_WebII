@@ -31,7 +31,7 @@ export class CategoriaEquipamentoService {
         objs[index] = categoriaEquipamento
       }
     });
-    localStorage[LS_CHAVE] = JSON.stringify(categoriaEquipamento);
+    localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
   }
 
   remover(id:number): void{
@@ -40,6 +40,11 @@ export class CategoriaEquipamentoService {
       listaCategoriaEquipamento.
         filter(CategoriaEquipamento => CategoriaEquipamento.id !== id); // tttttttt
     localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
+  }
+
+  buscarPorId(id: number): CategoriaEquipamento | undefined{
+    const listaCategoriaEquipamento = this.listarTodos();
+    return listaCategoriaEquipamento.find(categoria => categoria.id === id);
   }
 
 

@@ -24,6 +24,7 @@ export class Inserir {
   ){}
 
   inserir():void{
+    //localStorage.clear();
     console.log("Método Inserir() chamado!")
     if(this.formInserirCategoria.form.valid){
       console.log("Formulário Válido!")

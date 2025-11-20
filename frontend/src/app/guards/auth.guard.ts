@@ -9,10 +9,10 @@ interface TokenPayload {
 }
 
 export const authGuard: CanActivateFn = (route, state) => {
-  console.info(
+   console.info(
     '🟦 [AuthGuard] Iniciando verificação de acesso para rota:',
     state.url
-  );
+  ); 
 
   const router = inject(Router);
 

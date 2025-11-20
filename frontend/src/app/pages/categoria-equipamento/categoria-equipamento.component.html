@@ -31,19 +31,28 @@
             <td class="px-4 py-2">{{Categoria.nome}}</td>
             <td class="px-4 py-2">{{Categoria.ativo}}</td>
             <td class="px-4 py-2 text-center">
-              <button aria-label="Editar" class="inline-flex items-center p-1 mr-2">
+             <a href="#" title="Editar" alt="Editar" 
+                [routerLink]="['/categoriaEquipamento/editarCategoria', Categoria.id]">
                 <i class="fas fa-edit"></i>
-              </button>
-              <button aria-label="Excluir" class="inline-flex items-center p-1">
+              </a> 
+             <!--  <button aria-label="Editar" class="inline-flex items-center p-1 mr-2"
+                [routerLink]="['/categoriaEquipamento/editarCategoria', Categoria.id]">
+                <i class="fas fa-edit"></i>
+              </button> -->
+              <!-- <button aria-label="Excluir" class="inline-flex items-center p-1">
                 <i class="fas fa-trash-alt"></i>
-              </button>
+              </button> -->
+              <a href="#" title="Remover" alt="Remover" class="inline-flex items-center p-1"
+                (click)="remover($event, Categoria)">
+                <i class="fas fa-trash-alt"></i>
+              </a>
             </td>
           </tr>
           
         </tbody>
         
       </table>
-      <p *ngIf="categoriasEquipamento.length===0">Nenhuma pessoa cadastrada</p>
+      <p *ngIf="categoriasEquipamento.length===0">Nenhuma categoria cadastrada</p>
     </div>
   </div>
 </body>

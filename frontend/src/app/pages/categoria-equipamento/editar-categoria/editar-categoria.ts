@@ -1,16 +1,3 @@
-/*import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-editar-categoria',
-  imports: [],
-  templateUrl: './editar-categoria.component.html',
-  styleUrl: './editar-categoria.component.css'
-})
-export class EditarCategoriaComponent {
-
-  
-}
-*/
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
 import { CategoriaEquipamento } from '../../../models/solicitacao.model';

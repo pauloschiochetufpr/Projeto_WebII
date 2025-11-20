@@ -6,49 +6,56 @@ import { Home } from './pages/home/home';
 import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/solicitar-manutencao';
 import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component';
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
-import { authGuard } from './guards/auth.guard';
+//import { authGuard } from './guards/auth.guard';
+import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
 
 export const routes: Routes = [
   {
     path: 'solicitacao',
     component: Listar,
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     data: { roles: ['funcionario'] },
   },
   {
     path: 'crud-workers',
     component: CrudWorkersComponent,
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     data: { roles: ['funcionario'] },
   },
   {
     path: '',
     component: Home,
-    canActivate: [authGuard],
+   // canActivate: [authGuard],
     data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: 'solicitacao/criar',
     component: SolicitarManutencaoComponent,
-    canActivate: [authGuard],
+   // canActivate: [authGuard],
     data: { roles: ['cliente'] },
   },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [authGuard],
+   // canActivate: [authGuard],
     data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: 'categoriaEquipamento',
     component: CategoriaEquipamentoComponent,
-    canActivate: [authGuard],
-    data: { roles: ['funcionario'] },
+    //canActivate: [authGuard],
+    //data: { roles: ['funcionario'] },
   },
   {
     path: 'categoriaEquipamento/novaCategoria',
     component: Inserir,
-    canActivate: [authGuard],
-    data: { roles: ['funcionario'] },
+    //canActivate: [authGuard],
+    //data: { roles: ['funcionario'] },
   },
+  {
+    path: 'categoriaEquipamento/editarCategoria/:id',
+    component: EditarCategoria,
+    //canActivate: [authGuard],
+    //data: { roles: ['funcionario'] }, 
+  }
 ];

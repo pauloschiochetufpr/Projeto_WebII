@@ -1,0 +1,31 @@
+<body class="bg-gray-100 h-screen grid place-items-center">
+  <form class="bg-white p-4 rounded w-80" #formInserirCategoria="ngForm">
+    <input type="text" id="nome" name="nome" placeholder="Nome"
+           class="w-full mb-3 p-2 border rounded" 
+           [(ngModel)]="categoria.nome" 
+           #nome="ngModel"
+            minlength="2" required>
+        <div class="bg-red-200 text-red-900 rounded p-2 border-2 border-red-300 mb-4"
+            *ngIf="nome.errors && (nome.dirty || nome.touched)">
+          <div [hidden]="!nome.errors['required']"> 
+            Digite a categoria do equipamento. 
+          </div>
+          <div [hidden]="!nome.errors['minlength']">
+             A categoria do equipamento deve conter ao menos 2 caracteres. 
+          </div>
+        </div>
+    <select name="status" class="w-full mb-3 p-2 border rounded">
+      <option value="ativo">Ativo</option>
+      <option value="nao-ativo">Não-ativo</option>
+    </select>
+    <div class="flex justify-between">
+      <button type="button" class="bg-gray-300 px-4 py-2 rounded" [routerLink]="['/categoriaEquipamento/']">Cancelar</button>
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded"
+        (click)="atualizar()" 
+        [disabled]="!formInserirCategoria.form.valid">Salvar
+        </button>
+    </div>
+  </form>
+</body> 
+<!-- 
+[disabled]="!formInserirCategoria.form.valid" -->

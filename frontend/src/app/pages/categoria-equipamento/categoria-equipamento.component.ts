@@ -18,13 +18,28 @@ export class CategoriaEquipamentoComponent {
 
   constructor(private categoriaEquipamentoService: CategoriaEquipamentoService){}
 
-  ngOnInit(): void{
-    this.categoriasEquipamento = this.listarTodos(); 
-  }
-
   listarTodos(): CategoriaEquipamento[]{
     return this.categoriaEquipamentoService.listarTodos();
   }
+
+    ngOnInit(): void{
+    this.categoriasEquipamento = this.listarTodos(); 
+    console.log('Tipo:', typeof this.categoriasEquipamento);
+    console.log('É array?', Array.isArray(this.categoriasEquipamento));
+    console.log('Conteúdo:', this.categoriasEquipamento);
+  }
+
+  remover($event: any, categoria: CategoriaEquipamento): void {
+    $event.preventDefault();
+    if(confirm(`Deseja realmente remover a categoria ${categoria.nome}?`)){
+      this.categoriaEquipamentoService.remover(categoria.id)
+      this.categoriasEquipamento = this.listarTodos()
+    }
+
+  }
+
+
+
 
     
   }
