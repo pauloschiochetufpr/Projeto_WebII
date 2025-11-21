@@ -37,7 +37,7 @@ export class Cliente {
   ){}
 }
 
-export class Funcionario {
+export class Funcionario_r {
   constructor(
     public idFuncionario : number,
     public nome : string='', 
@@ -46,5 +46,7 @@ export class Funcionario {
     public telefone : string='',
 	  public ativo : boolean=true,
   ){}
+
+  
 }
 

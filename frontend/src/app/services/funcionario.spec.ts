@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CrudFuncionarios } from './crud-funcionarios';
+import { Funcionario } from './funcionario';
 
-describe('CrudFuncionarios', () => {
-  let service: CrudFuncionarios;
+describe('Funcionario', () => {
+  let service: Funcionario;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CrudFuncionarios);
+    service = TestBed.inject(Funcionario);
   });
 
   it('should be created', () => {

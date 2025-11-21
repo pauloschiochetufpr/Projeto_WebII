@@ -1,0 +1,11 @@
+{
+    "funcionarios": [
+        {
+        "id": 1,
+        "nome": "Func",
+        "login": "func",
+        "senha": "func",
+        "perfil": "FUNC"
+        }
+    ]
+}

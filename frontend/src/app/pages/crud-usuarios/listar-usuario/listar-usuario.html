@@ -1,0 +1,43 @@
+<h1>Usuários</h1>
+    <table class="table table-striped table-bordered table-hover">
+        <tbody>
+        <tr>
+            <th>Nome</th>
+            <th>Login</th>
+            <th>Perfil</th>
+            <th class="text-center">
+                <a [routerLink]="['/usuarios/novo']" href="#"
+                title="Novo" alt="Novo"
+                class="btn btn-xs btn-success">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                Novo
+                </a>
+            </th>
+        </tr>
+        <tr *ngFor="let funcionario of funcionarios">
+            <td> {{funcionario.nome }} </td>
+            <td> {{funcionario.email}} </td>
+            <td> {{funcionario.perfil}} </td>
+            <td class="text-center" style="width: 300px">
+                <button type="button" class="btn btn-xs btn-info"
+                (click)="abrirModal(funcionario)">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+                Ver
+                </button>
+                    <a [routerLink]="['/usuarios/editar', funcionario.id_funcionario]"
+                    href="#" title="Editar" alt="Editar"
+                    class="btn btn-xs btn-warning">
+                <i class="fa fa-edit" aria-hidden="true"></i>
+                Editar
+                    </a>
+                    <a href="#" title="Remover" alt="Remover"
+                    class="btn btn-xs btn-danger"
+                    (click)="remover($event, funcionario)">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                Remover
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+<p *ngIf="funcionarios.length==0">Nenhum usuário cadastrado.</p>
