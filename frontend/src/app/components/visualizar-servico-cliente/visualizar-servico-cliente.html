@@ -29,7 +29,7 @@
     <p><strong>Nome:</strong> {{ data["nome"] ?? data["name"] }}</p>
     <p>
       <strong>Data/Hora:</strong>
-      {{ data["dataHora"] ?? data["createdAt"] | date : "short" }}
+      {{ dateSelection.formatDateDisplay(data["lastUpdate"], true) }}
     </p>
 
     <!-- Tempo desde abertura -->

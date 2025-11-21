@@ -8,6 +8,7 @@ import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/cat
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 //import { authGuard } from './guards/auth.guard';
 import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
+import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
 
 export const routes: Routes = [
   {
@@ -25,19 +26,25 @@ export const routes: Routes = [
   {
     path: '',
     component: Home,
-   // canActivate: [authGuard],
+    // canActivate: [authGuard],
+    data: { roles: ['funcionario', 'cliente'] },
+  },
+  {
+    path: 'homefunc',
+    component: HomeFuncionario,
+    // canActivate: [authGuard],
     data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: 'solicitacao/criar',
     component: SolicitarManutencaoComponent,
-   // canActivate: [authGuard],
+    // canActivate: [authGuard],
     data: { roles: ['cliente'] },
   },
   {
     path: 'login',
     component: LoginComponent,
-   // canActivate: [authGuard],
+    // canActivate: [authGuard],
     data: { roles: ['funcionario', 'cliente'] },
   },
   {
@@ -56,6 +63,6 @@ export const routes: Routes = [
     path: 'categoriaEquipamento/editarCategoria/:id',
     component: EditarCategoria,
     //canActivate: [authGuard],
-    //data: { roles: ['funcionario'] }, 
-  }
+    //data: { roles: ['funcionario'] },
+  },
 ];

@@ -8,6 +8,8 @@ import { JsonTestService, User } from '../../services/jsontest';
 import { FuncHeader } from '../func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
 import { SolicitacaoService } from '../../services/solicitacao';
+import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -29,7 +31,13 @@ export interface Solicitation {
 @Component({
   selector: 'app-home-funcionario',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FuncHeader],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    FuncHeader,
+    MatDialogModule,
+  ],
   templateUrl: './home-funcionario.html',
   styleUrls: ['./home-funcionario.css'],
 })
@@ -56,7 +64,8 @@ export class HomeFuncionario implements OnInit, OnDestroy {
   constructor(
     private solicitacaoService: SolicitacaoService,
     private jsonService: JsonTestService,
-    public dateSelection: DateSelection
+    public dateSelection: DateSelection,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {

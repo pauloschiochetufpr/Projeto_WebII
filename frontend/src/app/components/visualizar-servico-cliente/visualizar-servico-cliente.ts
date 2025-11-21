@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Solicitation } from '../../models/solicitacao.model';
 import { SolicitacaoService } from '../../services/solicitacao';
+import { DateSelection } from '../../services/date-selection';
 
 @Component({
   selector: 'app-visualizar-servico-cliente-dialog',
@@ -18,7 +19,8 @@ export class VisualizarServicoClienteDialog {
   constructor(
     public dialogRef: MatDialogRef<VisualizarServicoClienteDialog>,
     @Inject(MAT_DIALOG_DATA) public data: Solicitation,
-    private solicitacaoService: SolicitacaoService
+    private solicitacaoService: SolicitacaoService,
+    public dateSelection: DateSelection
   ) {}
 
   aprovar() {

@@ -144,11 +144,25 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     }
 
     @Transactional
-    public Solicitacao criar(SolicitacaoDto dto) {
-        Solicitacao s = new Solicitacao();
-        atualizarCampos(s, dto);
-        return solicitacaoRepository.save(s);
-    }
+   public Solicitacao criar(SolicitacaoDto dto) {
+    Solicitacao s = new Solicitacao();
+    atualizarCampos(s, dto);
+
+    Solicitacao saved = solicitacaoRepository.save(s);
+
+    HistSolicitacao hist = new HistSolicitacao();
+    hist.setSolicitacao(saved);
+    hist.setCliente(true);
+    hist.setStatusOld(null);
+    hist.setStatusNew("ABERTA");
+    hist.setFuncionarioOld(null);
+    hist.setFuncionarioNew(null);
+    hist.setDataHora(LocalDateTime.now());
+
+    histSolicitacaoRepository.save(hist);
+
+    return saved;
+}
 
     @Transactional
     public Solicitacao atualizar(Long id, SolicitacaoDto dto) {
