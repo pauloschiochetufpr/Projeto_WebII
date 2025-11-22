@@ -75,6 +75,8 @@ CREATE TABLE funcionario (
     ativo BOOLEAN DEFAULT TRUE
 );
 
+insert into funcionario(nome, email, data_nasc, telefone, senha_hash) values ("Inicial",  "func@gmail.com", '2006-03-07', "41999999999", "$2a$10$x9f/RMVsG1v./xLqaMIgRejvr4.O3m8Ns0Ivkqcm76b6Bu/BEIUTu");
+
 CREATE TABLE stat (
     id_status INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     stat VARCHAR(15) NOT NULL
@@ -115,12 +117,9 @@ CREATE TABLE hist_solicitacao (
 );
 
 -- Blacklist de token
-
 CREATE TABLE token_blacklist (
-    id_token_blacklist BIGINT AUTO_INCREMENT PRIMARY KEY,
-    token VARCHAR(512) NOT NULL UNIQUE,
-    data_expiracao DATETIME NOT NULL,
-    revogado BOOLEAN NOT NULL DEFAULT FALSE
+    token VARCHAR(512) PRIMARY KEY,
+    data_expiracao DATETIME NOT NULL
 );
 
 -- Lista oficial da anantel
