@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { CrudWorkersComponent } from './pages/crud-workers/crud-workers.component';
 import { Listar } from './pages/listar/listar';
+import { AreaUsuario } from './pages/area-usuario/area-usuario';
 import { Home } from './pages/home/home';
 import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
 import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/solicitar-manutencao';
@@ -10,6 +11,12 @@ import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+  {
+    path: 'area-usuario',
+    component: AreaUsuario,
+    canActivate: [authGuard],
+    data: { roles: ['funcionario', 'cliente'] },
+  },
   {
     path: 'solicitacao',
     component: Listar,

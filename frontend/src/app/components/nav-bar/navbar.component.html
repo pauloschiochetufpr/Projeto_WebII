@@ -4,7 +4,7 @@
   >
     <a
       routerLink="/"
-      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md rounded-l-none bg-verde-sec bg-opacity-80 hover:bg-opacity-100 flex flex-row relative ml-6"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md rounded-l-none bg-verde-sec hover:bg-opacity-80 bg-opacity-100 flex flex-row relative ml-6 duration-200 ease-in-out transition-colors"
     >
       <div class="absolute -left-9 -top-1 rounded-full border border-verde-sec">
         <picture>
@@ -16,13 +16,15 @@
       HOME</a
     >
     <a
+      *ngIf="cargo === 'funcionario'"
       routerLink="/solicitacao"
-      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec bg-opacity-80 hover:bg-opacity-100"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec hover:bg-opacity-80 bg-opacity-100 duration-200 ease-in-out transition-colors"
       >SOLICITAÇÕES</a
     >
     <a
+      *ngIf="cargo === 'funcionario'"
       routerLink="/categoriaEquipamento"
-      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec bg-opacity-80 hover:bg-opacity-100"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec hover:bg-opacity-90 bg-opacity-100 duration-200 ease-in-out transition-colors"
       >CATEGORIAS</a
     >
 
