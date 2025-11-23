@@ -62,6 +62,7 @@ export class Listar implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.extrairDadosDoToken();
     this.onRefresh();
   }
 
@@ -71,8 +72,6 @@ export class Listar implements OnInit {
     this.error = null;
     this.summary = 'Carregando...';
     this.users = [];
-
-    this.extrairDadosDoToken();
 
     this.solicitacaoService
       .listarPorFuncionarioComLastUpdate(this.id!)

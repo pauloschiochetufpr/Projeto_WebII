@@ -3,12 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SolicitacaoService } from '../../services/solicitacao';
+import { FuncionarioService } from '../../services/funcionarioService';
 
 export interface HistoryStep {
   state: string;
   date: string;
   by: string;
   note?: string;
+}
+
+interface Funcionario {
+  id: number;
+  nome: string;
 }
 
 export interface Solicitation {
@@ -32,12 +38,21 @@ export interface Solicitation {
 export class VisualizarServicosDialog implements OnInit {
   descricaoManutencao: string = '';
   orientacoesCliente: string = '';
+  orcamentoValor: number | null = null;
+  orcamentoEmProcesso = false;
+  orcamentoErro: string | null = null;
+  funcionarios: Funcionario[] = [];
+  selectedFuncionarioId: number | null = null;
+  funcionariosLoading = false;
+  funcionariosError: string | null = null;
+  redirecionando = false;
 
   constructor(
     public dialogRef: MatDialogRef<VisualizarServicosDialog>,
     @Inject(MAT_DIALOG_DATA)
     public data: { user: Solicitation; currentDestination: string },
-    private solicitacaoService: SolicitacaoService // 👈 injeta aqui
+    private solicitacaoService: SolicitacaoService,
+    private funcionarioService: FuncionarioService
   ) {}
 
   ngOnInit(): void {
@@ -70,12 +85,29 @@ export class VisualizarServicosDialog implements OnInit {
 
   // Efetuar Orçamento
   efetuarOrcamento() {
-    const valor = prompt('Digite o valor do orçamento:');
-    if (!valor) return;
+    this.orcamentoErro = null;
 
-    const novoValor = parseFloat(valor);
+    // validação básica
+    if (!this.valorValido()) {
+      this.orcamentoErro = 'Digite um valor válido maior que 0';
+      return;
+    }
+
+    const novoValor = Number(this.orcamentoValor);
+    if (isNaN(novoValor) || novoValor <= 0) {
+      this.orcamentoErro = 'Valor inválido';
+      return;
+    }
+
     const id = Number(this.data.user.id);
+    if (!id) {
+      this.orcamentoErro = 'ID da solicitação inválido';
+      return;
+    }
 
+    this.orcamentoEmProcesso = true;
+
+    // busca a solicitação atual para preencher campos que backend espera
     this.solicitacaoService.buscarPorId(id).subscribe({
       next: (solicitacao) => {
         const dto = {
@@ -91,15 +123,42 @@ export class VisualizarServicosDialog implements OnInit {
 
         this.solicitacaoService.atualizarSolicitacao(id, dto).subscribe({
           next: (res) => {
+            // atualiza UI local e fecha diálogo
             this.data.user.budget = res.valor;
             this.data.user.state = 'ORÇADA';
             this.dialogRef.close({ action: 'ORÇAR', user: this.data.user });
           },
-          error: (err) => alert('Erro ao orçar: ' + err.message),
+          error: (err) => {
+            console.error('Erro ao orçar:', err);
+            this.orcamentoErro = err?.message || 'Erro ao enviar orçamento';
+            this.orcamentoEmProcesso = false;
+          },
+          complete: () => {
+            this.orcamentoEmProcesso = false;
+          },
         });
       },
-      error: (err) => alert('Erro ao buscar solicitação: ' + err.message),
+      error: (err) => {
+        console.error('Erro ao buscar solicitação:', err);
+        this.orcamentoErro = err?.message || 'Erro ao buscar solicitação';
+        this.orcamentoEmProcesso = false;
+      },
     });
+  }
+
+  // utilitária para validação do campo
+  valorValido(): boolean {
+    return (
+      this.orcamentoValor !== null &&
+      this.orcamentoValor !== undefined &&
+      Number(this.orcamentoValor) > 0
+    );
+  }
+
+  // limpa campo e erros
+  limparOrcamento() {
+    this.orcamentoValor = null;
+    this.orcamentoErro = null;
   }
 
   // Resgatar serviço rejeitado
@@ -133,24 +192,72 @@ export class VisualizarServicosDialog implements OnInit {
       });
   }
 
+  carregarFuncionarios() {
+    this.funcionariosLoading = true;
+    this.funcionariosError = null;
+
+    this.funcionarioService.listarTodos().subscribe({
+      next: (list: Funcionario[]) => {
+        this.funcionarios = list.map((f: any) => ({
+          id: f.idFuncionario ?? f.id,
+          nome: f.nome ?? f.nomeCompleto ?? f.name,
+        }));
+        this.funcionariosLoading = false;
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar funcionários', err);
+        this.funcionariosError = 'Erro ao carregar funcionários';
+        this.funcionariosLoading = false;
+      },
+    });
+  }
+
   // Redirecionar Manutenção
   redirecionar() {
-    const destino = prompt('Digite o destino para redirecionamento:');
-    if (!destino) return;
+    if (!this.selectedFuncionarioId) {
+      alert('Selecione um funcionário para redirecionar.');
+      return;
+    }
 
+    const idSolicitacao = Number(this.data.user.id);
+    if (!idSolicitacao) {
+      alert('ID da solicitação inválido.');
+      return;
+    }
+
+    this.redirecionando = true;
+
+    // chama o método do service que aceita funcionarioId (veja a mudança no service abaixo)
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 8)
+      .atualizarStatus(idSolicitacao, 8, false, this.selectedFuncionarioId)
       .subscribe({
-        next: () => {
+        next: (res) => {
+          // atualiza o estado localmente
           this.data.user.state = 'REDIRECIONADA';
-          this.data.user.redirectDestinationName = destino;
+          // pega nome do funcionário selecionado para exibir
+          const destino = this.funcionarios.find(
+            (f) => f.id === this.selectedFuncionarioId
+          );
+          this.data.user.redirectDestinationName = destino
+            ? destino.nome
+            : undefined;
+
           this.dialogRef.close({
             action: 'REDIRECIONAR',
             user: this.data.user,
-            destino,
+            destinoId: this.selectedFuncionarioId,
           });
         },
-        error: (err) => alert('Erro ao redirecionar: ' + err.message),
+        error: (err) => {
+          console.error('Erro ao redirecionar', err);
+          alert(
+            'Erro ao redirecionar: ' + (err?.message || 'Erro desconhecido')
+          );
+          this.redirecionando = false;
+        },
+        complete: () => {
+          this.redirecionando = false;
+        },
       });
   }
 
@@ -214,7 +321,6 @@ export class VisualizarServicosDialog implements OnInit {
   }
 
   trackHistory(index: number, item: any) {
-  return item.id || index;
-}
-
+    return item.id || index;
+  }
 }
