@@ -24,12 +24,9 @@ public class RelatorioReceitaService {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // ==========================================
     // MÉTODOS DE BUSCA DE DADOS (USADOS PELO JSON E PDF)
-    // ==========================================
 
     public List<ReceitaDiariaDTO> buscarDadosPeriodo(LocalDate inicio, LocalDate fim) {
-        // Conversão de LocalDate para LocalDateTime para bater com a query
         LocalDateTime dInicio = (inicio != null) ? inicio.atStartOfDay() : null;
         LocalDateTime dFim = (fim != null) ? fim.atTime(23, 59, 59) : null;
         
@@ -40,13 +37,9 @@ public class RelatorioReceitaService {
         return solicitacaoRepository.findReceitaPorCategoria();
     }
 
-    // ==========================================
-    // RF019 - GERAÇÃO DE PDF RECEITA POR PERÍODO
-    // ==========================================
-    public byte[] gerarRelatorioPeriodoPDF(LocalDate inicio, LocalDate fim) {
-        // Busca os dados usando o método auxiliar acima
-        List<ReceitaDiariaDTO> receitas = buscarDadosPeriodo(inicio, fim);
 
+    public byte[] gerarRelatorioPeriodoPDF(LocalDate inicio, LocalDate fim) {
+        List<ReceitaDiariaDTO> receitas = buscarDadosPeriodo(inicio, fim);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
@@ -55,8 +48,6 @@ public class RelatorioReceitaService {
             document.open();
 
             adicionarTitulo(document, "RELATÓRIO DE RECEITAS POR PERÍODO");
-            
-            // Correção: Usar as variáveis 'inicio' e 'fim' passadas no argumento
             String periodoTexto = formatarPeriodo(inicio, fim);
             Paragraph infoPeriodo = new Paragraph(periodoTexto, FontFactory.getFont(FontFactory.HELVETICA, 11));
             infoPeriodo.setAlignment(Element.ALIGN_CENTER);
@@ -95,9 +86,7 @@ public class RelatorioReceitaService {
         return baos.toByteArray();
     }
 
-    // ==========================================
-    // RF020 - GERAÇÃO DE PDF RECEITA POR CATEGORIA
-    // ==========================================
+
     public byte[] gerarRelatorioCategoriaPDF() {
         // Busca os dados usando o método auxiliar
         List<ReceitaPorCategoriaDTO> receitas = buscarDadosCategoria();
@@ -137,8 +126,6 @@ public class RelatorioReceitaService {
 
             adicionarRodapeTabela(table, String.valueOf(totalServicos), totalGeral);
             document.add(table);
-
-            // Resumo ligeiramente diferente para categorias
             adicionarResumo(document, receitas.size(), totalServicos, totalGeral, "Total de Categorias");
             adicionarRodapePagina(document);
 
@@ -148,10 +135,6 @@ public class RelatorioReceitaService {
         }
         return baos.toByteArray();
     }
-
-    // ==========================================
-    // MÉTODOS AUXILIARES DE ESTILO (REUTILIZADOS)
-    // ==========================================
     
     private void adicionarTitulo(Document doc, String texto) throws DocumentException {
         Paragraph titulo = new Paragraph(texto, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16));

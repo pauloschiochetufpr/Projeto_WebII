@@ -9,8 +9,7 @@ import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/
 import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component';
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
-import { ReceitaPorPeriodoComponent } from './pages/relatorio-periodo/relatorio-periodo';
-import { RelatorioCategoriaComponent } from './pages/relatorio-categoria/relatorio-categoria';
+
 
 export const routes: Routes = [
   {
@@ -68,17 +67,5 @@ export const routes: Routes = [
     component: EditarCategoria,
     canActivate: [authGuard],
     data: { roles: ['funcionario'] },
-  },
-  {
-    path: 'relatorios/periodo', 
-    component: ReceitaPorPeriodoComponent,
-    canActivate: [authGuard],
-    data: { roles: ['funcionario'] }
-  },
-  {
-    path: 'relatorios/categoria', 
-    component: RelatorioCategoriaComponent,
-    canActivate: [authGuard],
-    data: { roles: ['funcionario'] }
   }
 ];

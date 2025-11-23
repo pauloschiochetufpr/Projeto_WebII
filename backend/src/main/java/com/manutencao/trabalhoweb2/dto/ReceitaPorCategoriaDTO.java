@@ -8,14 +8,11 @@ public class ReceitaPorCategoriaDTO {
     private BigDecimal receitaTotal;
     private Long quantidade;
 
-    // Construtor compatível com a JPQL
     public ReceitaPorCategoriaDTO(String categoria, BigDecimal receitaTotal, Long quantidade) {
         this.categoria = categoria;
         this.receitaTotal = receitaTotal != null ? receitaTotal : BigDecimal.ZERO;
         this.quantidade = quantidade != null ? quantidade : 0L;
     }
-
-    // Getters e Setters (Necessários para o gerador de PDF acessar os dados)
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
 

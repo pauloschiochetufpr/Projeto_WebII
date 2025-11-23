@@ -13,16 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
-@CrossOrigin("*") // importante para o Angular conseguir baixar
+@CrossOrigin("*") 
 public class RelatorioReceitaController {
 
     @Autowired
     private RelatorioReceitaService relatorioReceitaService;
-
-    // ====================
-    // DOWNLOADS DE PDF
-    // ====================
-
     // Receita por período (PDF)
     @GetMapping("/revenue-by-period/pdf")
     public ResponseEntity<byte[]> gerarRelatorioPeriodoPDF(
@@ -37,7 +32,6 @@ public class RelatorioReceitaController {
                 .body(pdfBytes);
     }
 
-    // Receita por categoria (PDF)
     @GetMapping("/revenue-by-category/pdf")
     public ResponseEntity<byte[]> gerarRelatorioCategoriaPDF() {
 
@@ -48,12 +42,7 @@ public class RelatorioReceitaController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }
-
-    // ====================
-    // DADOS JSON (PARA TELA)
-    // ====================
-
-    // Endpoint JSON para preencher a tela (RF019)
+    // Endpoint JSON para preencher a tela 
     @GetMapping("/revenue-by-period")
     public ResponseEntity<List<ReceitaDiariaDTO>> getReceitaPeriodoJson(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -62,7 +51,7 @@ public class RelatorioReceitaController {
         return ResponseEntity.ok(relatorioReceitaService.buscarDadosPeriodo(startDate, endDate));
     }
 
-    // Endpoint JSON para preencher a tela (RF020)
+    // Endpoint porém para categoria
     @GetMapping("/revenue-by-category")
     public ResponseEntity<List<ReceitaPorCategoriaDTO>> getReceitaCategoriaJson() {
         return ResponseEntity.ok(relatorioReceitaService.buscarDadosCategoria());
