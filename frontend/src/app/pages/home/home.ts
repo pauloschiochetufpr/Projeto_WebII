@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeCliente } from '../../components/home-cliente/home-cliente';
 import { HomeFuncionario } from '../../components/home-funcionario/home-funcionario';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-home',
@@ -11,30 +12,27 @@ import { HomeFuncionario } from '../../components/home-funcionario/home-funciona
 })
 export class Home implements OnInit {
   tipoUsuario: string | undefined;
+  id: number | undefined;
 
   ngOnInit() {
-    const token = localStorage.getItem('accessToken');
-
-    // Verifique se o token existe antes de chamar a função
-    if (token) {
-      const payload = getTokenPayload(token); // Remova o '!'
-      this.tipoUsuario = payload?.tipoUsuario;
-      console.log('Tipo de usuário (Decodificado):', this.tipoUsuario);
-    } else {
-      // Log para saber que o token está faltando
-      console.warn('⚠️ Token não encontrado. tipoUsuario é undefined.');
-      this.tipoUsuario = undefined;
-    }
+    this.extrairDadosDoToken();
   }
-}
 
-function getTokenPayload(token: string): any | null {
-  try {
-    const payloadPart = token.split('.')[1];
-    const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
-    const decoded = atob(base64);
-    return JSON.parse(decoded);
-  } catch {
-    return null;
+  private extrairDadosDoToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+
+      if (payload?.tipoUsuario) {
+        this.tipoUsuario = payload.tipoUsuario;
+      }
+      if (payload?.id) {
+        this.id = payload.id;
+      }
+    } catch (e) {
+      console.error('Falha ao decodificar token:', e);
+    }
   }
 }

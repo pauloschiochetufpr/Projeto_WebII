@@ -8,6 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DateSelection } from '../../services/date-selection';
 import { VisualizarServicoClienteDialog } from '../visualizar-servico-cliente/visualizar-servico-cliente';
 import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
+import { jwtDecode } from 'jwt-decode';
 
 export interface Solicitation extends SolicitacaoDto {
   id: number | string;
@@ -26,6 +27,7 @@ export class HomeCliente implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
+  id: number | undefined;
 
   private sub = new Subscription();
 
@@ -49,6 +51,7 @@ export class HomeCliente implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.extrairDadosDoToken();
     this.carregarSolicitacoes();
   }
 
@@ -60,7 +63,7 @@ export class HomeCliente implements OnInit, OnDestroy {
   carregarSolicitacoes(): void {
     this.loading = true;
 
-    const clienteId = 1; // substituir pela lógica real para obter o ID do cliente logado do token
+    const clienteId = this.id;
 
     if (!clienteId) {
       console.error('ID do cliente não encontrado!');
@@ -161,5 +164,21 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   formatDate(value?: string | number | null, withTime: boolean = true): string {
     return this.dateSelection.formatDateDisplay(value, withTime);
+  }
+
+
+    private extrairDadosDoToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+
+      if (payload?.id) {
+        this.id = payload.id;
+      }
+    } catch (e) {
+      console.error('Falha ao decodificar token:', e);
+    }
   }
 }

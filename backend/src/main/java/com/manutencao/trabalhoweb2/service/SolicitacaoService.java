@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -176,6 +177,32 @@ public class SolicitacaoService {
                 .map(this::mapToLastUpdateDto)
                 .toList();
     }
+
+    public List<SolicitacaoLastUpdateDto> listarPorFuncionarioComLastUpdate(Long idFuncionario) {
+
+    List<Object[]> rows = solicitacaoRepository.findAllLastUpdateByFuncionario(idFuncionario);
+
+    return rows.stream().map(row ->
+            new SolicitacaoLastUpdateDto(
+                    row[0] != null ? ((Number) row[0]).longValue() : null,
+                    (String) row[1],
+                    (String) row[2],
+                    row[3] != null ? ((Number) row[3]).longValue() : null,
+                    (BigDecimal) row[4],
+                    row[5] != null ? ((Number) row[5]).intValue() : null,
+                    row[6] != null ? ((Number) row[6]).intValue() : null,
+                    (Boolean) row[7],
+                    row[8] != null ? row[8].toString() : null,
+                    row[9] != null ? row[9].toString() : null,
+                    (String) row[10],
+                    row[11] != null ? row[11].toString() : null,
+                    row[12] != null ? row[12].toString() : null,
+                    row[13] != null ? ((Number) row[13]).longValue() : null,
+                    row[14] != null ? ((Number) row[14]).longValue() : null
+            )
+    ).toList();
+}
+
 
     // ======================================================
     // MAPEAMENTO Object[] → DTO

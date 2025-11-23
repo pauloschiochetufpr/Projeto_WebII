@@ -79,4 +79,36 @@ public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> 
         ORDER BY s.created_at ASC
         """, nativeQuery = true)
     List<Object[]> findAllByClienteLastUpdate(@Param("idCliente") Long idCliente);
+
+    @Query("""
+    SELECT 
+        s.idSolicitacao,
+        s.nome,
+        s.descricao,
+        s.cliente.idCliente,
+        s.valor,
+        s.idStatus,
+        s.idCategoria,
+        s.ativo,
+        MAX(h.dataHora),
+        s.createdAt,
+        s.cliente.nome,
+        h.statusOld,
+        h.statusNew,
+        h.funcionarioOld,
+        h.funcionarioNew
+    FROM Solicitacao s
+    LEFT JOIN HistSolicitacao h ON h.solicitacao.idSolicitacao = s.idSolicitacao
+    WHERE s.idStatus = 1
+       OR s.idSolicitacao IN (
+            SELECT hs.solicitacao.idSolicitacao
+            FROM HistSolicitacao hs
+            WHERE hs.funcionarioNew = :idFunc
+       )
+    GROUP BY s.idSolicitacao, s.nome, s.descricao, s.cliente.idCliente,
+             s.valor, s.idStatus, s.idCategoria, s.ativo,
+             s.createdAt, s.cliente.nome
+""")
+List<Object[]> findAllLastUpdateByFuncionario(@Param("idFunc") Long idFunc);
+
 }

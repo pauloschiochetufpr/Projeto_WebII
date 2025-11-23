@@ -87,6 +87,31 @@ export class SolicitacaoService {
       );
   }
 
+  
+ // busca solicitações de um funcionário com última atualização
+  listarPorFuncionarioComLastUpdate(funcionarioId: number): Observable<any[]> {
+    return this.http
+      .get<any[]>(
+        `${this.baseUrl}/funcionario/${funcionarioId}/with-last-update`
+      )
+      .pipe(
+        // Em caso de 204 sem body o HttpClient pode retornar null, normalizamos pra []
+        map((res) => res ?? []),
+        catchError((err) => {
+          console.error(
+            `Erro ao buscar solicitações do funcionário ${funcionarioId} com lastUpdate`,
+            err
+          );
+          return throwError(
+            () =>
+              new Error(
+                'Falha ao buscar solicitações do funcionário com lastUpdate'
+              )
+          );
+        })
+      );
+  }
+
   // busca com última atualização
   listarTodasComLastUpdate(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(

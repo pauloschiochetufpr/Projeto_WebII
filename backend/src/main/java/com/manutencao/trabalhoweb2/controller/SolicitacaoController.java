@@ -89,6 +89,47 @@ public class SolicitacaoController {
 
         return ResponseEntity.ok(convertToFront(lista));
     }
+    
+    @GetMapping("/funcionario/{id}/with-last-update")
+    public ResponseEntity<List<Map<String, Object>>> listarPorFuncionarioComLastUpdate(
+            @PathVariable("id") Long funcionarioId) {
+
+        List<SolicitacaoLastUpdateDto> lista = solicitacaoService.listarPorFuncionarioComLastUpdate(funcionarioId);
+
+        if (lista == null || lista.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        List<Map<String, Object>> resposta = lista.stream().map(dto -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("idSolicitacao", dto.idSolicitacao());
+            m.put("nome", dto.nome());
+            m.put("descricao", dto.descricao());
+            m.put("valor", dto.valor());
+            m.put("idStatus", dto.idStatus());
+            m.put("idCategoria", dto.idCategoria());
+            m.put("ativo", dto.ativo());
+            m.put("lastUpdate", dto.lastUpdate());
+            m.put("idCliente", dto.idCliente());
+
+            Map<String, Object> cliente = new HashMap<>();
+            cliente.put("id", dto.idCliente());
+            cliente.put("nome", dto.nomeCliente());
+            m.put("cliente", cliente);
+
+            Map<String, Object> ultimo = new HashMap<>();
+            ultimo.put("statusOld", dto.statusOld());
+            ultimo.put("statusNew", dto.statusNew());
+            ultimo.put("funcionarioOld", dto.funcionarioOld());
+            ultimo.put("funcionarioNew", dto.funcionarioNew());
+            m.put("ultimoStatus", List.of(ultimo));
+
+
+            return m;
+        }).toList();
+
+        return ResponseEntity.ok(resposta);
+    }
 
     // =======================================================
     // LISTAR TODAS COM LAST UPDATE

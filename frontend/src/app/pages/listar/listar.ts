@@ -12,6 +12,7 @@ import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
 import { FuncHeader } from '../../components/func-header/func-header';
 import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
+import { jwtDecode } from 'jwt-decode';
 
 interface DisplayUser {
   id?: number | string | null;
@@ -47,6 +48,7 @@ export class Listar implements OnInit {
   summary = 'Pressione "Atualizar" para carregar';
   periodStartMs: number | null = null;
   periodEndMs: number | null = null;
+  id: number | undefined;
 
   filtro: 'HOJE' | 'TODAS' | 'PERIODO' = 'HOJE';
   searchClient: string = '';
@@ -73,7 +75,7 @@ export class Listar implements OnInit {
     this.users = [];
 
     this.solicitacaoService
-      .listarTodasComLastUpdate()
+      .listarPorFuncionarioComLastUpdate(this.id!)
       .pipe(take(1))
       .subscribe({
         next: (data: any[]) => {
@@ -395,4 +397,19 @@ export class Listar implements OnInit {
       );
     }).length;
   }
+  
+  private extrairDadosDoToken() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+  
+      try {
+        const payload: any = jwtDecode(token);
+  
+        if (payload?.id) {
+          this.id = payload.id;
+        }
+      } catch (e) {
+        console.error('Falha ao decodificar token:', e);
+      }
+    }
 }
