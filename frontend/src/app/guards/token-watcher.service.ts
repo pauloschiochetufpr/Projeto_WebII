@@ -13,6 +13,7 @@ interface AuthResponse {
 
 interface TokenPayload {
   idCliente?: string | number;
+  nome?: string;
   tipoUsuario?: string;
   exp?: number;
 }
@@ -110,7 +111,7 @@ export class TokenWatcherService implements OnDestroy {
 
       if (counter <= this.EXPIRED_REFRESH_MAX) {
         console.info('[TokenWatcher] Tentando refresh mesmo expirado');
-        const ok = await this.tryRefreshWithGuard(refreshToken);
+        const ok = await this.tryRefreshWithGuard(refreshToken, accessToken);
         if (!ok) await this.performLogout(refreshToken);
       } else {
         console.warn('[TokenWatcher] Limite atingido → logout');
@@ -127,9 +128,15 @@ export class TokenWatcherService implements OnDestroy {
           remaining / 1000
         )}s — refresh`
       );
-      const ok = await this.tryRefreshWithGuard(refreshToken);
+      const ok = await this.tryRefreshWithGuard(refreshToken, accessToken);
       if (!ok) await this.performLogout(refreshToken);
       return;
+    } else {
+      console.warn(
+        `[TokenWatcher] Token valido, ainda possui ${Math.floor(
+          remaining / 1000
+        )}s para expirar`
+      );
     }
   }
 
@@ -151,7 +158,10 @@ export class TokenWatcherService implements OnDestroy {
     localStorage.setItem(this.EXPIRED_COUNTER_KEY, '0');
   }
 
-  private async tryRefreshWithGuard(refreshToken: string): Promise<boolean> {
+  private async tryRefreshWithGuard(
+    refreshToken: string,
+    accessToken: string
+  ): Promise<boolean> {
     if (this.getFlag()) {
       if (this.getFlag()) {
         console.warn('[TokenWatcher] Em andamento — abortando');
@@ -162,20 +172,23 @@ export class TokenWatcherService implements OnDestroy {
     this.setFlag(true);
 
     try {
-      const ok = await this.performRefresh(refreshToken);
+      const ok = await this.performRefresh(refreshToken, accessToken);
       return ok;
     } finally {
       this.setFlag(false);
     }
   }
 
-  private async performRefresh(refreshToken: string): Promise<boolean> {
+  private async performRefresh(
+    refreshToken: string,
+    accessToken: string
+  ): Promise<boolean> {
     try {
       const response = await firstValueFrom(
         this.http
           .post<AuthResponse>(
             this.REFRESH_ENDPOINT,
-            { refreshToken },
+            { refreshToken, accessToken },
             { responseType: 'json' }
           )
           .pipe(timeout(8000))
