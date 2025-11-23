@@ -104,6 +104,40 @@ public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
 }
 
 // ===============================================================
+// LISTAR TODAS POR FUNCIONÁRIO COM LAST UPDATE
+// ===============================================================
+@Transactional(readOnly = true)
+public List<SolicitacaoLastUpdateDto> listarPorFuncionarioComLastUpdate(Long idFuncionario) {
+    // chama a query nova do repository
+    List<Object[]> rows = solicitacaoRepository.findAllLastUpdateByFuncionario(idFuncionario);
+
+    return rows.stream().map(row -> {
+        Solicitacao s = (Solicitacao) row[0];
+        Object lastObj = row[1];
+        String lastIso = (lastObj != null) ? lastObj.toString() : null;
+
+        String nomeCliente = (s.getCliente() != null) ? s.getCliente().getNome() : null;
+
+        return new SolicitacaoLastUpdateDto(
+                s.getIdSolicitacao(),
+                s.getNome(),
+                s.getDescricao(),
+                s.getCliente() != null ? s.getCliente().getIdCliente() : null,
+                s.getValor(),
+                s.getIdStatus(),
+                s.getIdCategoria(),
+                s.getAtivo(),
+                lastIso,
+                nomeCliente,
+                null, // mantenho os mesmos campos nulos que você usava
+                null,
+                null,
+                null
+        );
+    }).collect(Collectors.toList());
+}
+
+// ===============================================================
 // LISTAR TODAS POR CLIENTE COM LAST UPDATE
 // ===============================================================
 public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long clienteId) {
@@ -216,7 +250,7 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     // ALTERAÇÃO DE STATUS + HISTÓRICO
     // ===============================================================
    @Transactional
-public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
+    public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
     Solicitacao solicitacao = solicitacaoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada"));
 

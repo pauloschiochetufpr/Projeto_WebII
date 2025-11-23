@@ -10,8 +10,8 @@ import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
 import { JsonTestService } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
-import { FuncHeader } from '../../components/func-header/func-header';
 import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
+import { jwtDecode } from 'jwt-decode';
 
 interface DisplayUser {
   id?: number | string | null;
@@ -34,7 +34,6 @@ interface DisplayUser {
     HttpClientModule,
     RouterModule,
     RangeDatePicker,
-    FuncHeader,
     MatDialogModule,
   ],
   templateUrl: './listar.html',
@@ -42,6 +41,7 @@ interface DisplayUser {
 })
 export class Listar implements OnInit {
   users: DisplayUser[] = [];
+  id: number | undefined;
   loading = false;
   error: string | null = null;
   summary = 'Pressione "Atualizar" para carregar';
@@ -72,8 +72,10 @@ export class Listar implements OnInit {
     this.summary = 'Carregando...';
     this.users = [];
 
+    this.extrairDadosDoToken();
+
     this.solicitacaoService
-      .listarTodasComLastUpdate()
+      .listarPorFuncionarioComLastUpdate(this.id!)
       .pipe(take(1))
       .subscribe({
         next: (data: any[]) => {
@@ -394,5 +396,20 @@ export class Listar implements OnInit {
         d.getFullYear() === hoje.getFullYear()
       );
     }).length;
+  }
+
+  private extrairDadosDoToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+
+      if (payload?.id) {
+        this.id = payload.id;
+      }
+    } catch (e) {
+      console.error('Falha ao decodificar token:', e);
+    }
   }
 }

@@ -85,6 +85,20 @@ List<Object[]> findAllWithHistory();
 """)
 List<Object[]> findAllLastUpdate();
 
+@Query("""
+    SELECT s, MAX(h.dataHora) AS lastUpdate
+    FROM Solicitacao s
+    LEFT JOIN HistSolicitacao h ON h.solicitacao.idSolicitacao = s.idSolicitacao
+    WHERE s.idStatus = 1
+       OR s.idSolicitacao IN (
+            SELECT hs.solicitacao.idSolicitacao
+            FROM HistSolicitacao hs
+            WHERE hs.funcionarioNew = :idFunc
+       )
+    GROUP BY s.idSolicitacao
+""")
+List<Object[]> findAllLastUpdateByFuncionario(@Param("idFunc") Long idFunc);
+
 }
  /**
   * RF19 nao deu tempo de checar o backend(alterar depois?)
