@@ -15,13 +15,13 @@ export const routes: Routes = [
     path: 'solicitacao',
     component: Listar,
     //canActivate: [authGuard],
-    data: { roles: ['funcionario'] },
+    data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: 'crud-workers',
     component: CrudWorkersComponent,
     //canActivate: [authGuard],
-    data: { roles: ['funcionario'] },
+    data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: '',
@@ -39,7 +39,7 @@ export const routes: Routes = [
     path: 'solicitacao/criar',
     component: SolicitarManutencaoComponent,
     // canActivate: [authGuard],
-    data: { roles: ['cliente'] },
+    data: { roles: ['funcionario', 'cliente'] },
   },
   {
     path: 'login',

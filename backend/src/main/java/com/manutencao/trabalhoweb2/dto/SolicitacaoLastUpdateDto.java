@@ -12,6 +12,7 @@ public record SolicitacaoLastUpdateDto(
         Integer idCategoria,
         Boolean ativo,
         String lastUpdate,
+        String createdAt,
         String nomeCliente,
         String statusOld,
         String statusNew,

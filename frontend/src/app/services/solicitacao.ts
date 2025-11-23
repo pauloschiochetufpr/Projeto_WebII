@@ -160,16 +160,25 @@ export class SolicitacaoService {
   }
 
   // Buscar histórico de uma solicitação
-  getHistorico(idSolicitacao: number): Observable<HistSolicitacao[]> {
-    return this.http
-      .get<HistSolicitacao[]>(`${this.baseUrl}/${idSolicitacao}/historico`)
-      .pipe(
-        catchError((err) => {
-          console.error('Erro ao buscar histórico', err);
-          return throwError(() => new Error('Falha ao buscar histórico'));
-        })
-      );
-  }
+ getHistorico(idSolicitacao: number): Observable<HistSolicitacao[]> {
+  return this.http
+    .get<HistSolicitacao[]>(`${this.baseUrl}/${idSolicitacao}/historico`, {
+      observe: 'response',
+    })
+    .pipe(
+      map((resp) => {
+        if (resp.status === 204 || !resp.body) {
+          return []; 
+        }
+        return resp.body as HistSolicitacao[];
+      }),
+      catchError((err) => {
+        console.error('Erro ao buscar histórico', err);
+        return of([]); 
+      })
+    );
+}
+
 
   // Listar categorias (com mock) fazer a integração
   getCategorias(): Observable<CategoriaEquipamento[]> {

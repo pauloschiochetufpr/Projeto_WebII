@@ -1,6 +1,5 @@
 package com.manutencao.trabalhoweb2.dto;
 
-//dto criado para armazenar temporariamente os dados na hora de atualizar o status que vai pra tabela de historico
 public class AtualizarStatusDto {
     private Integer novoStatus;
     private String motivo;
