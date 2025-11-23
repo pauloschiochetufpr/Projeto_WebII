@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
-@CrossOrigin("*") 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class RelatorioReceitaController {
 
     @Autowired

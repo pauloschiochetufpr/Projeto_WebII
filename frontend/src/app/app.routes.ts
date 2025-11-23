@@ -9,7 +9,7 @@ import { SolicitarManutencaoComponent } from './components/solicitar-manutencao/
 import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/categoria-equipamento.component';
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
-
+import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
 
 export const routes: Routes = [
   {
@@ -21,17 +21,16 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    data: { roles: ['funcionario', 'cliente'] }, 
-  },
-  /*{
-    path: 'area-usuario',
-    component: AreaUsuario,
-    canActivate: [authGuard],
     data: { roles: ['funcionario', 'cliente'] },
   },
-   */
   {
-    path: 'solicitacao', 
+    path: 'homefunc',
+    component: HomeFuncionario,
+    //canActivate: [authGuard],
+    data: { roles: ['funcionario', 'cliente'] },
+  },
+  {
+    path: 'solicitacao',
     component: Listar,
     canActivate: [authGuard],
     data: { roles: ['funcionario'] },
@@ -67,5 +66,5 @@ export const routes: Routes = [
     component: EditarCategoria,
     canActivate: [authGuard],
     data: { roles: ['funcionario'] },
-  }
+  },
 ];
