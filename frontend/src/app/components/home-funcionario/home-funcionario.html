@@ -1,40 +1,157 @@
-<func-header></func-header>
-<div class="func-container p-4">
-  <h2>Página Inicial (Funcionário)</h2>
+<div class="w-full p-4 font-sansation">
+  <div
+    class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-4"
+  >
+    <div
+      class="hidden lg:block -rotate-45 bg-verde-sec w-[300px] h-[600px] absolute right-0 -top-[200px] opacity-80 pointer-events-none -z-10"
+    ></div>
 
-  <p *ngIf="loading">Carregando solicitações...</p>
-  <p *ngIf="error" class="error">{{ error }}</p>
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+      <div>
+        <h2 class="text-2xl font-semibold text-azul-main">
+          Página Inicial (Funcionário)
+        </h2>
+        <span *ngIf="!loading" class="text-sm text-slate-600">
+          Solicitações abertas:
+          <strong class="text-azul-main">{{ solicitations.length }}</strong>
+        </span>
+      </div>
 
-  <table class="table-auto w-full border-collapse">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="p-2 text-left">Data / Hora</th>
-        <th class="p-2 text-left">Cliente</th>
-        <th class="p-2 text-left">Descrição (produto)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of solicitations" class="border-t">
-        <td class="p-2">
-          {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
-        </td>
-        <td class="p-2">{{ getClientName(s) }}</td>
-        <td class="p-2">{{ getDescriptionTruncated(s, 30) }}</td>
-        <td class="p-2">
-          <!-- Link para a tela de orçar (rota ainda não existe) -->
-          <a
-            [routerLink]="['/solicitacao/orcar']"
-            [queryParams]="{ id: s.idSolicitacao ?? s.id }"
+      <button 
+        (click)="openReportModal()"
+        class="bg-azul-main hover:brightness-110 text-white font-medium py-2 px-4 rounded-lg shadow-md flex items-center gap-2 transition-transform hover:scale-105"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Relatórios Financeiros
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <p *ngIf="loading" class="text-sm text-slate-600">
+        Carregando solicitações...
+      </p>
+      <p *ngIf="error" class="text-sm text-red-600 font-semibold">
+        {{ error }}
+      </p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full w-full border-collapse">
+        <thead>
+          <tr class="bg-azul-main">
+            <th class="p-3 text-left text-sm font-semibold text-white">Data / Hora</th>
+            <th class="p-3 text-left text-sm font-semibold text-white">Cliente</th>
+            <th class="p-3 text-left text-sm font-semibold text-white">Descrição (produto)</th>
+            <th class="p-3 text-center text-sm font-semibold text-white">Ações</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y">
+          <tr *ngFor="let s of solicitations" class="hover:bg-gray-50">
+            <td class="p-3 text-sm text-slate-700">
+              {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
+            </td>
+            <td class="p-3 text-sm text-slate-700">
+              {{ getClientName(s) }}
+            </td>
+            <td class="p-3 text-sm text-slate-700">
+              {{ getDescriptionTruncated(s, 30) }}
+            </td>
+            <td class="p-3 text-sm text-center">
+              <a
+                class="cursor-pointer inline-block px-4 py-2 rounded-md bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold transition"
+                title="Ir para Orçar"
+              >
+                Orçar
+              </a>
+            </td>
+          </tr>
+
+          <tr *ngIf="!loading && solicitations.length === 0">
+            <td colspan="4" class="p-6 text-center text-slate-600">
+              Nenhuma solicitação ABERTA no momento.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isModalOpen" class="fixed inset-0 z-50 overflow-y-auto font-sansation" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  
+  <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <div (click)="closeReportModal()" class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+    <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border-2 border-azul-main">
+      
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <h3 class="text-xl leading-6 font-bold text-azul-main mb-4" id="modal-title">
+          Gerar Relatório Financeiro
+        </h3>
+        
+        <div class="flex border-b border-gray-200 mb-6">
+          <button 
+            (click)="switchTab('periodo')"
+            [class]="activeTab === 'periodo' ? 'border-azul-main text-azul-main font-bold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-2 px-4 text-center border-b-2 text-sm focus:outline-none transition-colors"
           >
-          </a>
-        </td>
-      </tr>
+            Por Período
+          </button>
+          <button 
+            (click)="switchTab('categoria')"
+            [class]="activeTab === 'categoria' ? 'border-azul-main text-azul-main font-bold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-2 px-4 text-center border-b-2 text-sm focus:outline-none transition-colors"
+          >
+            Por Categoria
+          </button>
+        </div>
 
-      <tr *ngIf="!loading && solicitations.length === 0">
-        <td colspan="4" class="p-4 text-center">
-          Nenhuma solicitação ABERTA no momento.
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        <div *ngIf="activeTab === 'periodo'">
+          <p class="text-sm text-slate-600 mb-4">Selecione o intervalo de datas para gerar o balanço detalhado.</p>
+          <form [formGroup]="formPeriodo" class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-azul-main mb-1">Data Início</label>
+              <input type="date" formControlName="dataInicio" class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-slate-700 focus:ring-azul-main focus:border-azul-main sm:text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-azul-main mb-1">Data Fim</label>
+              <input type="date" formControlName="dataFim" class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-slate-700 focus:ring-azul-main focus:border-azul-main sm:text-sm">
+            </div>
+          </form>
+        </div>
+
+        <div *ngIf="activeTab === 'categoria'">
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <p class="text-sm text-azul-main font-medium">
+              Este relatório gera o acumulado total histórico de todas as receitas da empresa, agrupadas por categoria de equipamento.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+        <button 
+          (click)="baixarRelatorio()" 
+          [disabled]="loadingReport || (activeTab === 'periodo' && formPeriodo.invalid)"
+          type="button" 
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-verde-sec text-base font-bold text-azul-main hover:brightness-95 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <span *ngIf="!loadingReport">Baixar PDF</span>
+          <span *ngIf="loadingReport">Gerando...</span>
+        </button>
+        <button 
+          (click)="closeReportModal()" 
+          type="button" 
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-gray-100 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

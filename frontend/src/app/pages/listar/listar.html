@@ -1,155 +1,187 @@
-<func-header></func-header>
-<div class="container">
-  <!-- Controles de filtro -->
+<div class="w-full p-4 font-sansation">
   <div
-    class="controls flex flex-wrap items-center gap-4"
-    aria-label="controles de filtro"
+    class="relative bg-white border-2 border-azul-main shadow-md rounded-2xl p-6 max-w-full"
   >
-    <label class="flex items-center gap-1 text-gray-700">
-      <input
-        type="radio"
-        name="filtro"
-        [(ngModel)]="filtro"
-        value="HOJE"
-        checked
-        class="accent-blue-500"
-      />
-      Hoje
-    </label>
-    <label class="flex items-center gap-1 text-gray-700">
-      <input
-        type="radio"
-        name="filtro"
-        [(ngModel)]="filtro"
-        value="TODAS"
-        class="accent-blue-500"
-      />
-      Todas
-    </label>
-    <label class="flex items-center gap-1 text-gray-700">
-      <input
-        type="radio"
-        name="filtro"
-        [(ngModel)]="filtro"
-        value="PERIODO"
-        class="accent-blue-500"
-      />
-      Período
-    </label>
+    <!-- Faixa diagonal decorativa (identidade visual) -->
+    <div
+      class="hidden lg:block -rotate-45 bg-verde-sec w-[350px] h-[700px] absolute right-0 -top-[250px] opacity-80 pointer-events-none -z-10"
+    ></div>
 
-    <ng-container *ngIf="filtro === 'PERIODO'">
-      <rangeDatePicker class="ml-2"></rangeDatePicker>
-    </ng-container>
+    <!-- Título -->
+    <h2 class="text-2xl font-semibold text-azul-main mb-6">
+      Gerenciar Solicitações
+    </h2>
 
-    <button
-      (click)="onRefresh()"
-      class="ml-auto bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition"
-    >
-      Atualizar
-    </button>
+    <!-- CONTROLES DE FILTRO -->
+    <div class="flex flex-wrap items-center gap-6 mb-6">
+      <!-- Hoje -->
+      <label class="flex items-center gap-2 text-slate-700">
+        <input
+          type="radio"
+          name="filtro"
+          [(ngModel)]="filtro"
+          value="HOJE"
+          class="accent-azul-main"
+        />
+        Hoje
+      </label>
+
+      <!-- Todas -->
+      <label class="flex items-center gap-2 text-slate-700">
+        <input
+          type="radio"
+          name="filtro"
+          [(ngModel)]="filtro"
+          value="TODAS"
+          class="accent-azul-main"
+        />
+        Todas
+      </label>
+
+      <!-- Período -->
+      <label class="flex items-center gap-2 text-slate-700">
+        <input
+          type="radio"
+          name="filtro"
+          [(ngModel)]="filtro"
+          value="PERIODO"
+          class="accent-azul-main"
+        />
+        Período
+      </label>
+
+      <!-- Date Picker -->
+      <ng-container *ngIf="filtro === 'PERIODO'">
+        <rangeDatePicker class="ml-2"></rangeDatePicker>
+      </ng-container>
+
+      <!-- Botão Atualizar -->
+      <button
+        (click)="onRefresh()"
+        class="ml-auto bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold px-6 py-2 rounded-md transition"
+      >
+        Atualizar
+      </button>
+    </div>
+
+    <!-- ESTATÍSTICAS RÁPIDAS -->
+    <div class="flex flex-wrap gap-6 mb-6 text-slate-700">
+      <p>
+        Total:
+        <span class="font-semibold text-azul-main">{{
+          totalSolicitacoes
+        }}</span>
+      </p>
+      <p>
+        Pendentes:
+        <span class="font-semibold text-azul-main">{{ totalPendentes }}</span>
+      </p>
+      <p>
+        Concluídas:
+        <span class="font-semibold text-azul-main">{{ totalConcluidas }}</span>
+      </p>
+      <p>
+        Hoje: <span class="font-semibold text-azul-main">{{ totalHoje }}</span>
+      </p>
+    </div>
+
+    <!-- FILTROS EXTRAS -->
+    <div class="flex flex-wrap gap-6 mb-2">
+      <label class="flex flex-col text-slate-700">
+        Buscar por cliente:
+        <input
+          type="text"
+          [(ngModel)]="searchClient"
+          placeholder="Nome do cliente"
+          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-sec"
+        />
+      </label>
+
+      <label class="flex flex-col text-slate-700">
+        Buscar por estado:
+        <input
+          type="text"
+          [(ngModel)]="searchState"
+          placeholder="Estado (ex: ORÇADA)"
+          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-sec"
+        />
+      </label>
+    </div>
+
+    <!-- RESUMO DO CARREGAMENTO -->
+    <p class="text-slate-600 mb-4">
+      <ng-container *ngIf="loading">Carregando...</ng-container>
+      <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
+      <ng-container *ngIf="error" class="text-red-600 font-semibold">{{
+        error
+      }}</ng-container>
+    </p>
+
+    <!-- TABELA -->
+    <div class="overflow-x-auto rounded-lg border border-azul-main shadow-sm">
+      <table class="min-w-full w-full border-collapse">
+        <thead class="bg-azul-main">
+          <tr>
+            <th class="px-4 py-3 text-left text-white font-semibold">
+              Data / Hora
+            </th>
+            <th class="px-4 py-3 text-left text-white font-semibold">ID</th>
+            <th class="px-4 py-3 text-left text-white font-semibold">
+              Cliente
+            </th>
+            <th class="px-4 py-3 text-left text-white font-semibold">
+              Descrição
+            </th>
+            <th class="px-4 py-3 text-left text-white font-semibold">Estado</th>
+            <th class="px-4 py-3 text-left text-white font-semibold">
+              Destino
+            </th>
+            <th class="px-4 py-3 text-center text-white font-semibold">
+              Ações
+            </th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y">
+          <tr *ngFor="let s of listaFiltrada" class="hover:bg-gray-50">
+            <td class="px-4 py-2">
+              {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
+            </td>
+            <td class="px-4 py-2">{{ s.id }}</td>
+            <td class="px-4 py-2">{{ s.requesterName || "-" }}</td>
+            <td class="px-4 py-2">{{ s.description || "-" }}</td>
+
+            <!-- Estado com badge -->
+            <td class="px-4 py-2">
+              <span
+                class="px-2 py-1 rounded text-xs font-semibold"
+                [ngClass]="getStatusClass(s.state)"
+              >
+                {{ s.state }}
+              </span>
+            </td>
+
+            <td class="px-4 py-2">{{ s.redirectDestinationName || "-" }}</td>
+
+            <!-- Botão Visualizar -->
+            <td class="px-4 py-2 text-center">
+              <button
+                (click)="abrirVisualizar(s)"
+                class="bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold px-4 py-1.5 rounded-md text-sm transition"
+              >
+                Visualizar
+              </button>
+            </td>
+          </tr>
+
+          <!-- Lista Vazia -->
+          <tr *ngIf="!loading && listaFiltrada.length === 0">
+            <td colspan="7" class="py-4 text-center text-slate-600">
+              Nenhuma solicitação encontrada.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <!-- Estatísticas rápidas -->
-  <div class="stats flex flex-wrap gap-4 text-gray-700">
-    <p>
-      Total de solicitações:
-      <span class="font-semibold">{{ totalSolicitacoes }}</span>
-    </p>
-    <p>
-      Pendentes: <span class="font-semibold">{{ totalPendentes }}</span>
-    </p>
-    <p>
-      Concluídas: <span class="font-semibold">{{ totalConcluidas }}</span>
-    </p>
-    <p>
-      Solicitações de hoje: <span class="font-semibold">{{ totalHoje }}</span>
-    </p>
-  </div>
-
-  <!-- Filtros extras -->
-  <div class="extra-filters flex flex-wrap gap-4">
-    <label class="flex flex-col text-gray-700">
-      Buscar por cliente:
-      <input
-        type="text"
-        [(ngModel)]="searchClient"
-        placeholder="Nome do cliente"
-        class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-    </label>
-    <label class="flex flex-col text-gray-700">
-      Buscar por estado:
-      <input
-        type="text"
-        [(ngModel)]="searchState"
-        placeholder="Estado (ex: ORÇADA)"
-        class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-    </label>
-  </div>
-</div>
-
-<!-- Resumo do status da leitura -->
-<p class="summary text-gray-600">
-  <ng-container *ngIf="loading">Carregando...</ng-container>
-  <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
-  <ng-container *ngIf="error" class="text-red-500 font-semibold">{{
-    error
-  }}</ng-container>
-</p>
-
-<!-- Tabela de solicitações -->
-<div class="overflow-x-auto">
-  <table class="table-auto w-full border-collapse border border-gray-200">
-    <thead class="bg-gray-100 text-left">
-      <tr>
-        <th class="px-4 py-2 border-b border-gray-200">Data / Hora</th>
-        <th class="px-4 py-2 border-b border-gray-200">ID</th>
-        <th class="px-4 py-2 border-b border-gray-200">Cliente</th>
-        <th class="px-4 py-2 border-b border-gray-200">Descrição</th>
-        <th class="px-4 py-2 border-b border-gray-200">Estado</th>
-        <th class="px-4 py-2 border-b border-gray-200">Destino</th>
-        <th class="px-4 py-2 border-b border-gray-200">Ações</th>
-      </tr>
-    </thead>
-    <tbody class="text-gray-700">
-      <tr *ngFor="let s of listaFiltrada" class="hover:bg-gray-50">
-        <td class="px-4 py-2">
-          {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
-        </td>
-        <td class="px-4 py-2">{{ s.id }}</td>
-        <td class="px-4 py-2">{{ s.requesterName || "-" }}</td>
-        <td class="px-4 py-2">{{ s.description || "-" }}</td>
-
-        <!-- Estado com badge colorida -->
-        <td class="px-4 py-2">
-          <span
-            class="px-2 py-1 rounded text-xs font-medium"
-            [ngClass]="getStatusClass(s.state)"
-          >
-            {{ s.state }}
-          </span>
-        </td>
-
-        <td class="px-4 py-2">{{ s.redirectDestinationName || "-" }}</td>
-
-        <!-- Ações -->
-        <td class="px-4 py-2">
-          <button
-            (click)="abrirVisualizar(s)"
-            class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-sm transition"
-          >
-            Visualizar
-          </button>
-        </td>
-      </tr>
-
-      <!-- Lista vazia -->
-      <tr *ngIf="!loading && listaFiltrada.length === 0">
-        <td colspan="7" class="text-center py-4 text-gray-500">
-          Nenhuma solicitação encontrada.
-        </td>
-      </tr>
-    </tbody>
-  </table>
 </div>

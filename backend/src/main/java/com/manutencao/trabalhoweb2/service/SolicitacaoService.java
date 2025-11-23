@@ -104,6 +104,40 @@ public List<SolicitacaoLastUpdateDto> listarTodasComLastUpdate() {
 }
 
 // ===============================================================
+// LISTAR TODAS POR FUNCIONÁRIO COM LAST UPDATE
+// ===============================================================
+@Transactional(readOnly = true)
+public List<SolicitacaoLastUpdateDto> listarPorFuncionarioComLastUpdate(Long idFuncionario) {
+    // chama a query nova do repository
+    List<Object[]> rows = solicitacaoRepository.findAllLastUpdateByFuncionario(idFuncionario);
+
+    return rows.stream().map(row -> {
+        Solicitacao s = (Solicitacao) row[0];
+        Object lastObj = row[1];
+        String lastIso = (lastObj != null) ? lastObj.toString() : null;
+
+        String nomeCliente = (s.getCliente() != null) ? s.getCliente().getNome() : null;
+
+        return new SolicitacaoLastUpdateDto(
+                s.getIdSolicitacao(),
+                s.getNome(),
+                s.getDescricao(),
+                s.getCliente() != null ? s.getCliente().getIdCliente() : null,
+                s.getValor(),
+                s.getIdStatus(),
+                s.getIdCategoria(),
+                s.getAtivo(),
+                lastIso,
+                nomeCliente,
+                null, // mantenho os mesmos campos nulos que você usava
+                null,
+                null,
+                null
+        );
+    }).collect(Collectors.toList());
+}
+
+// ===============================================================
 // LISTAR TODAS POR CLIENTE COM LAST UPDATE
 // ===============================================================
 public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long clienteId) {
@@ -144,11 +178,25 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     }
 
     @Transactional
-    public Solicitacao criar(SolicitacaoDto dto) {
-        Solicitacao s = new Solicitacao();
-        atualizarCampos(s, dto);
-        return solicitacaoRepository.save(s);
-    }
+   public Solicitacao criar(SolicitacaoDto dto) {
+    Solicitacao s = new Solicitacao();
+    atualizarCampos(s, dto);
+
+    Solicitacao saved = solicitacaoRepository.save(s);
+
+    HistSolicitacao hist = new HistSolicitacao();
+    hist.setSolicitacao(saved);
+    hist.setCliente(true);
+    hist.setStatusOld(null);
+    hist.setStatusNew("ABERTA");
+    hist.setFuncionarioOld(null);
+    hist.setFuncionarioNew(null);
+    hist.setDataHora(LocalDateTime.now());
+
+    histSolicitacaoRepository.save(hist);
+
+    return saved;
+}
 
     @Transactional
     public Solicitacao atualizar(Long id, SolicitacaoDto dto) {
@@ -202,7 +250,7 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     // ALTERAÇÃO DE STATUS + HISTÓRICO
     // ===============================================================
    @Transactional
-public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
+    public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
     Solicitacao solicitacao = solicitacaoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada"));
 
@@ -217,14 +265,35 @@ public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
     // Atualiza o ID de status
     solicitacao.setIdStatus(novoStatusId);
 
+    // pega ultimo historico (se existir) para obter funcionarioNew anterior
+    Optional<HistSolicitacao> ultimoOpt = histSolicitacaoRepository.findTopBySolicitacaoOrderByDataHoraDesc(solicitacao);
+
+    Integer funcionarioOldId = null;
+    if (ultimoOpt.isPresent()) {
+        // supondo que em HistSolicitacao.funcionarioNew o tipo seja Long (id)
+        funcionarioOldId = ultimoOpt.get().getFuncionarioNew(); // Long
+    }
+
+
     // Cria histórico
     HistSolicitacao historico = new HistSolicitacao();
     historico.setSolicitacao(solicitacao);
     historico.setCliente(dto.isCliente());
     historico.setStatusOld(statusAntigo != null ? statusAntigo.toString() : "N/A");
     historico.setStatusNew(novoStatusId.toString());
-    historico.setFuncionarioOld(null);
-    historico.setFuncionarioNew(null);
+    // define funcionarioOld com o id do último funcionarioNew (pode ser null)
+    historico.setFuncionarioOld(funcionarioOldId);
+
+    // funcionarioNew vem do DTO (se o front passou); caso contrário, mantém null
+    if (dto.getFuncionarioId() != null) {
+        historico.setFuncionarioNew(dto.getFuncionarioId());
+    } else {
+        historico.setFuncionarioNew(null);
+    }
+
+    historico.setDataHora(LocalDateTime.now());
+
+    histSolicitacaoRepository.save(historico);
     historico.setDataHora(LocalDateTime.now());
 
     histSolicitacaoRepository.save(historico);

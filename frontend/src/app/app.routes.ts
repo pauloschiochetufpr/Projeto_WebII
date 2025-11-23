@@ -9,6 +9,7 @@ import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/cat
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 import { authGuard } from './guards/auth.guard';
 import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
+import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
 
 export const routes: Routes = [
   {

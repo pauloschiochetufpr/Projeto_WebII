@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import com.manutencao.trabalhoweb2.model.HistSolicitacao;
 import com.manutencao.trabalhoweb2.model.Solicitacao;
+import com.manutencao.trabalhoweb2.dto.ReceitaDiariaDTO;
 import com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO;
-import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
@@ -23,6 +23,19 @@ public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> 
     List<HistSolicitacao> findBySolicitacaoIdSolicitacao(Long idSolicitacao);
 }
 
+@Query("""
+    SELECT s, MAX(h.dataHora) AS lastUpdate
+    FROM Solicitacao s
+    LEFT JOIN HistSolicitacao h ON h.solicitacao.idSolicitacao = s.idSolicitacao
+    WHERE s.idStatus = 1
+       OR s.idSolicitacao IN (
+            SELECT hs.solicitacao.idSolicitacao
+            FROM HistSolicitacao hs
+            WHERE hs.funcionarioNew = :idFunc
+       )
+    GROUP BY s.idSolicitacao
+""")
+List<Object[]> findAllLastUpdateByFuncionario(@Param("idFunc") Long idFunc);
 // join com a última data de histórico filtrando pelo cliente
 @Query("""
     SELECT s, MAX(h.dataHora) AS lastUpdate
@@ -85,24 +98,24 @@ List<Object[]> findAllWithHistory();
 """)
 List<Object[]> findAllLastUpdate();
 
-}
- /**
-  * RF19 nao deu tempo de checar o backend(alterar depois?)
-  */  
-//  @Query("SELECT s FROM Solicitacao s WHERE s.status = 'PAGA' AND " +
-//            "(:startDate IS NULL OR s.dataPagamento >= :startDate) AND " +
-//            "(:endDate IS NULL OR s.dataPagamento <= :endDate)")
-//     List<Solicitacao> findServicosPagosByPeriod(
-//         @Param("startDate") LocalDateTime startDate,
-//         @Param("endDate") LocalDateTime endDate);
 
-    /**
-     * RF020
-     */
-    // @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO(" +
-    //        "s.categoria.nome, SUM(s.valorOrcado), COUNT(s)) " +
-    //        "FROM Solicitacao s " +
-    //        "WHERE s.status = 'PAGA' " +
-    //        "GROUP BY s.categoria.nome " +
-    //        "ORDER BY SUM(s.valorOrcado) DESC")
-    // List<ReceitaPorCategoriaDTO> aggregateRevenueByCategory();
+    @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaDiariaDTO(CAST(h.dataHora AS LocalDate), SUM(s.valor), COUNT(s)) " +
+           "FROM Solicitacao s " +
+           "JOIN HistSolicitacao h ON s.idSolicitacao = h.solicitacao.idSolicitacao " +
+           "WHERE h.statusNew = 'PAGA' " +
+           "AND (:inicio IS NULL OR h.dataHora >= :inicio) " +
+           "AND (:fim IS NULL OR h.dataHora <= :fim) " +
+           "GROUP BY CAST(h.dataHora AS LocalDate) " +
+           "ORDER BY CAST(h.dataHora AS LocalDate) ASC")
+    List<ReceitaDiariaDTO> findReceitaPorPeriodo(@Param("inicio") LocalDateTime inicio, 
+                                                 @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaPorCategoriaDTO(c.nome, SUM(s.valor), COUNT(s)) " +
+           "FROM Solicitacao s, Categoria c, HistSolicitacao h " +
+           "WHERE s.idCategoria = c.idCategoria " +
+           "AND s.idSolicitacao = h.solicitacao.idSolicitacao " +
+           "AND h.statusNew = 'PAGA' " +
+           "GROUP BY c.nome " +
+           "ORDER BY SUM(s.valor) DESC")
+    List<ReceitaPorCategoriaDTO> findReceitaPorCategoria();
+}

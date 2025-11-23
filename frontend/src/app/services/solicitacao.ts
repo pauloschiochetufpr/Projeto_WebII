@@ -87,6 +87,30 @@ export class SolicitacaoService {
       );
   }
 
+  // busca solicitações de um funcionário com última atualização
+  listarPorFuncionarioComLastUpdate(funcionarioId: number): Observable<any[]> {
+    return this.http
+      .get<any[]>(
+        `${this.baseUrl}/funcionario/${funcionarioId}/with-last-update`
+      )
+      .pipe(
+        // Em caso de 204 sem body o HttpClient pode retornar null, normalizamos pra []
+        map((res) => res ?? []),
+        catchError((err) => {
+          console.error(
+            `Erro ao buscar solicitações do funcionário ${funcionarioId} com lastUpdate`,
+            err
+          );
+          return throwError(
+            () =>
+              new Error(
+                'Falha ao buscar solicitações do funcionário com lastUpdate'
+              )
+          );
+        })
+      );
+  }
+
   // busca com última atualização
   listarTodasComLastUpdate(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/with-last-update`).pipe(
@@ -115,25 +139,25 @@ export class SolicitacaoService {
 
   // cliente cria solicitação (mexer só no id pra ser o de quem esta criando)
   criarSolicitacao(data: SolicitacaoCreateDto): Observable<SolicitacaoDto> {
-  const dto = {
-    nome: data.descricaoEquipamento,
-    descricao: data.descricaoDefeito,
-    idCliente: 1, // TODO: pegar do usuário autenticado
-    idCategoria: this.mapCategoria(data.categoriaEquipamento),
-    valor: 0,
-    idStatus: 1,
-    ativo: true,
-  };
+    const dto = {
+      nome: data.descricaoEquipamento,
+      descricao: data.descricaoDefeito,
+      idCliente: 1, // TODO: pegar do usuário autenticado
+      idCategoria: this.mapCategoria(data.categoriaEquipamento),
+      valor: 0,
+      idStatus: 1,
+      ativo: true,
+    };
 
-  console.log('Enviando solicitação:', dto); // Para debug
+    console.log('Enviando solicitação:', dto); // Para debug
 
-  return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
-    catchError((err) => {
-      console.error('Erro detalhado:', err);
-      return throwError(() => err);
-    })
-  );
-}
+    return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
+      catchError((err) => {
+        console.error('Erro detalhado:', err);
+        return throwError(() => err);
+      })
+    );
+  }
 
   atualizarSolicitacao(
     id: number,
@@ -145,12 +169,18 @@ export class SolicitacaoService {
   atualizarStatus(
     id: number,
     novoStatus: number,
-    cliente: boolean = false
-  ): Observable<SolicitacaoDto> {
-    const body = { novoStatus, cliente };
-    return this.http.patch<SolicitacaoDto>(
-      `${this.baseUrl}/${id}/status`,
-      body
+    cliente: boolean = false,
+    funcionarioId?: number
+  ): Observable<any> {
+    const body: any = { novoStatus, cliente };
+    if (funcionarioId !== undefined && funcionarioId !== null) {
+      body.funcionarioId = funcionarioId;
+    }
+    return this.http.patch<any>(`${this.baseUrl}/${id}/status`, body).pipe(
+      catchError((err) => {
+        console.error(`Erro ao atualizar status da solicitação ${id}`, err);
+        return throwError(() => new Error('Falha ao atualizar status'));
+      })
     );
   }
 
@@ -173,20 +203,22 @@ export class SolicitacaoService {
 
   // Listar categorias (com mock) fazer a integração
   getCategorias(): Observable<CategoriaEquipamento[]> {
-  return this.http.get<CategoriaEquipamento[]>(`${environment.apiUrl}/categorias`).pipe(
-    catchError((err) => {
-      console.error('Erro ao carregar categorias do backend', err);
-      // Fallback em caso de erro
-      return of([
-        { id: 1, nome: 'Notebook', ativo: true },
-        { id: 2, nome: 'Desktop', ativo: true },
-        { id: 3, nome: 'Impressora', ativo: true },
-        { id: 4, nome: 'Mouse', ativo: true },
-        { id: 5, nome: 'Teclado', ativo: true },
-      ]);
-    })
-  );
-}
+    return this.http
+      .get<CategoriaEquipamento[]>(`${environment.apiUrl}/categorias`)
+      .pipe(
+        catchError((err) => {
+          console.error('Erro ao carregar categorias do backend', err);
+          // Fallback em caso de erro
+          return of([
+            { id: 1, nome: 'Notebook', ativo: true },
+            { id: 2, nome: 'Desktop', ativo: true },
+            { id: 3, nome: 'Impressora', ativo: true },
+            { id: 4, nome: 'Mouse', ativo: true },
+            { id: 5, nome: 'Teclado', ativo: true },
+          ]);
+        })
+      );
+  }
 
   mapStatus(idStatus?: number): string {
     switch (idStatus) {

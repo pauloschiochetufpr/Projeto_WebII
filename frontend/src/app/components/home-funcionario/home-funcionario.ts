@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; 
 import { RouterModule } from '@angular/router';
-import { catchError, of, Subscription, take } from 'rxjs';
-import { JsonTestService, User } from '../../services/jsontest';
-
+import { catchError, of, Subscription, take, finalize } from 'rxjs';
+import { JsonTestService } from '../../services/jsontest';
 import { FuncHeader } from '../func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
 import { SolicitacaoService } from '../../services/solicitacao';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RelatorioService } from '../../services/relatorio.service'; 
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -29,7 +30,14 @@ export interface Solicitation {
 @Component({
   selector: 'app-home-funcionario',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FuncHeader],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule, 
+    RouterModule,
+    FuncHeader,
+    MatDialogModule,
+  ],
   templateUrl: './home-funcionario.html',
   styleUrls: ['./home-funcionario.css'],
 })
@@ -37,128 +45,146 @@ export class HomeFuncionario implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
+  isModalOpen = false;
+  activeTab: 'periodo' | 'categoria' = 'periodo';
+  formPeriodo: FormGroup;
+  loadingReport = false; 
 
   private sub = new Subscription();
 
-  //ids de status
   statusMapById: Record<number, string> = {
-    1: 'ABERTA',
-    2: 'ORÇADA',
-    3: 'REJEITADA',
-    4: 'APROVADA',
-    5: 'REDIRECIONADA',
-    6: 'ARRUMADA',
-    7: 'PAGA',
-    8: 'FINALIZADA',
-    9: 'CANCELADA',
+    1: 'ABERTA', 2: 'ORÇADA', 3: 'REJEITADA', 4: 'APROVADA',
+    5: 'REDIRECIONADA', 6: 'ARRUMADA', 7: 'PAGA', 8: 'FINALIZADA', 9: 'CANCELADA',
   };
 
   constructor(
     private solicitacaoService: SolicitacaoService,
     private jsonService: JsonTestService,
-    public dateSelection: DateSelection
-  ) {}
+    public dateSelection: DateSelection,
+    private dialog: MatDialog,
+    private relatorioService: RelatorioService,
+    private fb: FormBuilder 
+  ) {
+    this.formPeriodo = this.fb.group({
+      dataInicio: ['', Validators.required],
+      dataFim: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.loadAbertoFromBackend();
+    this.initializeReportDates();
   }
-
   private loadAbertoFromBackend(): void {
     this.loading = true;
     this.error = null;
 
-    // 1 = ABERTA (conforme map)
-    const sub = this.solicitacaoService
-      .listarTodasComLastUpdate()
+    const sub = this.solicitacaoService.listarTodasComLastUpdate()
       .pipe(
         take(1),
         catchError((err) => {
-          console.warn(
-            'Backend indisponível ou erro ao buscar por status. Usando mock.',
-            err
-          );
-          // fallback: usar o jsonService local (retornamos empty observable aqui;
-          // tratamos fazendo load do mock abaixo)
+          console.warn('Backend indisponível. Usando mock.', err);
           return of(null);
         })
       )
       .subscribe({
         next: (arr) => {
           if (arr === null) {
-            // fallback para o mock local
             this.loadFromMock();
             return;
           }
-
           const all = (arr || []).map((d) => this.normalize(d));
-          // já chegam apenas ABERTA (backend), mas filtramos por segurança:
-          this.solicitations = all.filter(
-            (item) => this.getStatus(item) === 'ABERTA'
-          );
-
-          // ordenar crescente por data/hora
-          this.solicitations.sort((a, b) => {
-            const da =
-              this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-            const db =
-              this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-            return da - db;
-          });
-
+          this.solicitations = all.filter((item) => this.getStatus(item) === 'ABERTA');
+          this.sortSolicitations();
           this.loading = false;
         },
         error: (err) => {
-          console.error(
-            'Erro carregando solicitações (funcionario) — subscribe',
-            err
-          );
           this.error = 'Erro ao carregar solicitações';
           this.loading = false;
         },
       });
-
     this.sub.add(sub);
   }
 
   private loadFromMock(): void {
-    // subscreve ao BehaviorSubject do mock e filtra ABERTA
     const s = this.jsonService.users$.subscribe({
       next: (arr) => {
         const all = (arr || []).map((d) => this.normalize(d));
-        this.solicitations = all.filter(
-          (item) => this.getStatus(item) === 'ABERTA'
-        );
-
-        // ordenar crescente por data/hora
-        this.solicitations.sort((a, b) => {
-          const da =
-            this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-          const db =
-            this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-          return da - db;
-        });
-
+        this.solicitations = all.filter((item) => this.getStatus(item) === 'ABERTA');
+        this.sortSolicitations();
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erro carregando mock de solicitações', err);
         this.error = 'Erro ao carregar solicitações';
         this.loading = false;
       },
     });
-
     this.sub.add(s);
+  }
+
+  initializeReportDates(): void {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+    this.formPeriodo.patchValue({
+      dataInicio: firstDay,
+      dataFim: lastDay
+    });
+  }
+
+  openReportModal() { this.isModalOpen = true; }
+  closeReportModal() { this.isModalOpen = false; }
+  switchTab(tab: 'periodo' | 'categoria') { this.activeTab = tab; }
+
+  baixarRelatorio() {
+    this.loadingReport = true;
+
+    if (this.activeTab === 'periodo') {
+      if (this.formPeriodo.invalid) return;
+      const { dataInicio, dataFim } = this.formPeriodo.value;
+      
+      this.relatorioService.baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
+        .pipe(finalize(() => this.loadingReport = false))
+        .subscribe({
+          next: (blob) => this.downloadFile(blob, `relatorio_periodo.pdf`),
+          error: (err) => console.error('Erro ao baixar PDF Período', err)
+        });
+    } else {
+      this.relatorioService.baixarPdfReceitasPorCategoria()
+        .pipe(finalize(() => this.loadingReport = false))
+        .subscribe({
+          next: (blob) => this.downloadFile(blob, `relatorio_categoria.pdf`),
+          error: (err) => console.error('Erro ao baixar PDF Categoria', err)
+        });
+    }
+  }
+
+  private downloadFile(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    this.closeReportModal();
+  }
+
+  private sortSolicitations() {
+    this.solicitations.sort((a, b) => {
+      const da = this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
+      const db = this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
+      return da - db;
+    });
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  // normaliza payload vindo do JSON para o formato usado aqui
   normalize(d: any): Solicitation {
     return {
-      idSolicitacao:
-        d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
+      idSolicitacao: d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
       id: d.id ?? d.idSolicitacao,
       nome: d.nome ?? d.requesterName ?? d.name,
       requesterName: d.requesterName ?? d.nome ?? d.name,
@@ -191,8 +217,7 @@ export class HomeFuncionario implements OnInit, OnDestroy {
 
   getStatus(s: Solicitation): string {
     if (s.state) return s.state;
-    if (s.idStatus && this.statusMapById[s.idStatus])
-      return this.statusMapById[s.idStatus];
+    if (s.idStatus && this.statusMapById[s.idStatus]) return this.statusMapById[s.idStatus];
     return 'Desconhecido';
   }
 }
