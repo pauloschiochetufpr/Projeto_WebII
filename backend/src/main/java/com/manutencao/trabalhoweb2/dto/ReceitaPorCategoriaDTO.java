@@ -1,16 +1,27 @@
 package com.manutencao.trabalhoweb2.dto;
 
+import java.math.BigDecimal;
 
 public class ReceitaPorCategoriaDTO {
     
     private String categoria;
-    private double receitaTotal;
-    private long quantidade;
+    private BigDecimal receitaTotal;
+    private Long quantidade;
 
-    public ReceitaPorCategoriaDTO(String categoria, Double receitaTotal, Long quantidade) {
+    // Construtor compatível com a JPQL
+    public ReceitaPorCategoriaDTO(String categoria, BigDecimal receitaTotal, Long quantidade) {
         this.categoria = categoria;
-        this.receitaTotal = receitaTotal != null ? receitaTotal : 0.0;
+        this.receitaTotal = receitaTotal != null ? receitaTotal : BigDecimal.ZERO;
         this.quantidade = quantidade != null ? quantidade : 0L;
     }
 
+    // Getters e Setters (Necessários para o gerador de PDF acessar os dados)
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+
+    public BigDecimal getReceitaTotal() { return receitaTotal; }
+    public void setReceitaTotal(BigDecimal receitaTotal) { this.receitaTotal = receitaTotal; }
+
+    public Long getQuantidade() { return quantidade; }
+    public void setQuantidade(Long quantidade) { this.quantidade = quantidade; }
 }

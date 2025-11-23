@@ -148,3 +148,21 @@ INSERT INTO ddd_validos (ddd) VALUES
 ('95'),
 ('96'),
 ('98'), ('99');
+
+
+INSERT INTO categoria (nome, ativo) VALUES ('Hardware', 1), ('Software', 1);
+INSERT INTO stat (stat) VALUES ('PAGA'); 
+INSERT INTO cliente (cpf, nome, email, telefone, senha_hash) VALUES ('11111111111', 'Teste User', 'teste@email.com', '41999999999', '123');
+
+
+INSERT INTO solicitacao (nome, descricao, id_cliente, valor, id_status, id_categoria) 
+VALUES ('PC Gamer', 'Limpeza', 1, 150.00, 1, 1);
+
+
+INSERT INTO solicitacao (nome, descricao, id_cliente, valor, id_status, id_categoria) 
+VALUES ('Formatacao', 'Windows 11', 1, 80.00, 1, 2);
+
+INSERT INTO hist_solicitacao (data_hora, id_solicitacao, status_new, status_old, funcionario_new) 
+VALUES 
+('2025-11-01 10:00:00', 1, 'PAGA', 'ARRUMADA', 1), -- Pago dia 01/11
+('2025-11-15 14:00:00', 2, 'PAGA', 'ARRUMADA', 1); -- Pago dia 15/11

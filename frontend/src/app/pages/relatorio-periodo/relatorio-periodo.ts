@@ -2,20 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
+
+// Ajuste o caminho conforme sua estrutura (se services está em src/app/services)
 import { RelatorioService, ReceitaPorDia } from '../../services/relatorio.service';
 
 @Component({
-  selector: 'app-receita-por-periodo',
+  selector: 'app-relatorio-periodo', // Nome do seletor atualizado
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './gerar-relatorio.html',
-  styles: [`
-    /* TODO: adaptar para o padrão visual do projeto */
-  `]
+  templateUrl: './relatorio-periodo.html' // Aponta para o HTML desta mesma pasta
 })
 export class ReceitaPorPeriodoComponent implements OnInit {
   filterForm: FormGroup;
-  reportData: ReceitaPorDia[] = []; 
+  reportData: ReceitaPorDia[] = [];
   loading = false;
   searched = false;
 
@@ -58,7 +57,6 @@ export class ReceitaPorPeriodoComponent implements OnInit {
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (data: ReceitaPorDia[]) => {
-          // o backend já manda os dados agrupados corretamente
           this.reportData = data;
           this.calculateSummary();
           this.searched = true;
@@ -72,6 +70,7 @@ export class ReceitaPorPeriodoComponent implements OnInit {
   }
 
   private calculateSummary(): void {
+    // Usando nomes das propriedades compatíveis com o DTO Java
     this.totalRevenue = this.reportData.reduce((sum, item) => sum + item.valorTotal, 0);
     this.totalServices = this.reportData.reduce((sum, item) => sum + item.quantidadeSolicitacoes, 0);
     
