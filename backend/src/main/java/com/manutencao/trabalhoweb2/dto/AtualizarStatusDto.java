@@ -5,6 +5,7 @@ public class AtualizarStatusDto {
     private Integer novoStatus;
     private String motivo;
     private boolean cliente;
+    private Integer funcionarioId;
 
     public Integer getNovoStatus() { return novoStatus; }
     public void setNovoStatus(Integer novoStatus) { this.novoStatus = novoStatus; }
@@ -14,4 +15,7 @@ public class AtualizarStatusDto {
 
     public boolean isCliente() { return cliente; }
     public void setCliente(boolean cliente) { this.cliente = cliente; }
+
+    public Integer getFuncionarioId() { return funcionarioId; }
+    public void setFuncionarioId(Integer funcionarioId) { this.funcionarioId = funcionarioId; }
 }

@@ -2,7 +2,11 @@ package com.manutencao.trabalhoweb2.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import com.manutencao.trabalhoweb2.model.HistSolicitacao;
+import com.manutencao.trabalhoweb2.model.Solicitacao;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +37,6 @@ public interface HistSolicitacaoRepository extends JpaRepository<HistSolicitacao
         @Param("dataInicial") LocalDate dataInicial,
         @Param("dataFinal") LocalDate dataFinal
     );
+
+    Optional<HistSolicitacao> findTopBySolicitacaoOrderByDataHoraDesc(Solicitacao solicitacao);
 }

@@ -169,12 +169,18 @@ export class SolicitacaoService {
   atualizarStatus(
     id: number,
     novoStatus: number,
-    cliente: boolean = false
-  ): Observable<SolicitacaoDto> {
-    const body = { novoStatus, cliente };
-    return this.http.patch<SolicitacaoDto>(
-      `${this.baseUrl}/${id}/status`,
-      body
+    cliente: boolean = false,
+    funcionarioId?: number
+  ): Observable<any> {
+    const body: any = { novoStatus, cliente };
+    if (funcionarioId !== undefined && funcionarioId !== null) {
+      body.funcionarioId = funcionarioId;
+    }
+    return this.http.patch<any>(`${this.baseUrl}/${id}/status`, body).pipe(
+      catchError((err) => {
+        console.error(`Erro ao atualizar status da solicitação ${id}`, err);
+        return throwError(() => new Error('Falha ao atualizar status'));
+      })
     );
   }
 

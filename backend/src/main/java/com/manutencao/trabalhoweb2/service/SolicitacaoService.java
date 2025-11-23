@@ -265,14 +265,35 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     // Atualiza o ID de status
     solicitacao.setIdStatus(novoStatusId);
 
+    // pega ultimo historico (se existir) para obter funcionarioNew anterior
+    Optional<HistSolicitacao> ultimoOpt = histSolicitacaoRepository.findTopBySolicitacaoOrderByDataHoraDesc(solicitacao);
+
+    Integer funcionarioOldId = null;
+    if (ultimoOpt.isPresent()) {
+        // supondo que em HistSolicitacao.funcionarioNew o tipo seja Long (id)
+        funcionarioOldId = ultimoOpt.get().getFuncionarioNew(); // Long
+    }
+
+
     // Cria histórico
     HistSolicitacao historico = new HistSolicitacao();
     historico.setSolicitacao(solicitacao);
     historico.setCliente(dto.isCliente());
     historico.setStatusOld(statusAntigo != null ? statusAntigo.toString() : "N/A");
     historico.setStatusNew(novoStatusId.toString());
-    historico.setFuncionarioOld(null);
-    historico.setFuncionarioNew(null);
+    // define funcionarioOld com o id do último funcionarioNew (pode ser null)
+    historico.setFuncionarioOld(funcionarioOldId);
+
+    // funcionarioNew vem do DTO (se o front passou); caso contrário, mantém null
+    if (dto.getFuncionarioId() != null) {
+        historico.setFuncionarioNew(dto.getFuncionarioId());
+    } else {
+        historico.setFuncionarioNew(null);
+    }
+
+    historico.setDataHora(LocalDateTime.now());
+
+    histSolicitacaoRepository.save(historico);
     historico.setDataHora(LocalDateTime.now());
 
     histSolicitacaoRepository.save(historico);
