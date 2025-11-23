@@ -3,10 +3,6 @@ package com.manutencao.trabalhoweb2.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * DTO para receitas agrupadas por dia
- * 
- */
 public class ReceitaDiariaDTO {
     
     private LocalDate data;
@@ -18,8 +14,6 @@ public class ReceitaDiariaDTO {
         this.valorTotal = valorTotal;
         this.quantidadeSolicitacoes = quantidadeSolicitacoes;
     }
-    
-    // Getters e Setters
     public LocalDate getData() {
         return data;
     }
