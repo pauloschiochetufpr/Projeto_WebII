@@ -23,6 +23,19 @@ public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> 
     List<HistSolicitacao> findBySolicitacaoIdSolicitacao(Long idSolicitacao);
 }
 
+@Query("""
+    SELECT s, MAX(h.dataHora) AS lastUpdate
+    FROM Solicitacao s
+    LEFT JOIN HistSolicitacao h ON h.solicitacao.idSolicitacao = s.idSolicitacao
+    WHERE s.idStatus = 1
+       OR s.idSolicitacao IN (
+            SELECT hs.solicitacao.idSolicitacao
+            FROM HistSolicitacao hs
+            WHERE hs.funcionarioNew = :idFunc
+       )
+    GROUP BY s.idSolicitacao
+""")
+List<Object[]> findAllLastUpdateByFuncionario(@Param("idFunc") Long idFunc);
 // join com a última data de histórico filtrando pelo cliente
 @Query("""
     SELECT s, MAX(h.dataHora) AS lastUpdate
