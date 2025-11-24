@@ -65,6 +65,24 @@ CREATE TABLE categoria (
     nome VARCHAR(64) NOT NULL
 );
 
+-- Status --
+INSERT INTO stat (stat) VALUES ('ABERTA');
+INSERT INTO stat (stat) VALUES ('ORÇADA');
+INSERT INTO stat (stat) VALUES ('APROVADA');
+INSERT INTO stat (stat) VALUES ('REJEITADA');
+INSERT INTO stat (stat) VALUES ('ARRUMADA');
+INSERT INTO stat (stat) VALUES ('PAGA');
+INSERT INTO stat (stat) VALUES ('FINALIZADA');
+INSERT INTO stat (stat) VALUES ('REDIRECIONADA');
+
+-- Categorias --
+INSERT INTO categoria (nome) VALUES 
+('Notebook'),
+('Desktop'),
+('Impressora'),
+('Mouse'),
+('Teclado');
+
 CREATE TABLE funcionario (
     id_funcionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,

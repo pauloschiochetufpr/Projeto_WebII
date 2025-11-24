@@ -5,17 +5,19 @@
     class="mb-8 flex items-center justify-between border-b-2 border-gray-200 pb-4"
   >
     <div>
-      <h2 class="text-3xl font-bold text-azul-main font-sansation mb-1">
+      <h2
+        class="text-3xl font-bold text-azul-main font-sansation mb-1 select-none"
+      >
         Solicitação de Manutenção
       </h2>
-      <p class="text-gray-500 font-sansation">
+      <p class="text-gray-500 font-sansation select-none">
         Preencha o formulário abaixo para solicitar nossa manutenção.
       </p>
     </div>
 
     <button
       (click)="goBack()"
-      class="font-semibold font-sansation text-white px-6 py-2 rounded-lg bg-roxo-terc hover:bg-roxo-terc/90 transition duration-300 shadow-md"
+      class="font-semibold font-sansation text-white px-6 py-2 rounded-lg bg-roxo-terc hover:shadow-inner hover:shadow-gray-600 transition-shadow ease-in-out duration-300 select-none"
       type="button"
     >
       Voltar
@@ -28,20 +30,20 @@
   >
     <div class="flex items-center">
       <span class="text-verde-sec mr-2 text-xl">✓</span>
-      <span class="text-verde-sec font-medium font-sansation">{{
+      <span class="text-verde-sec font-medium font-sansation select-none">{{
         success
       }}</span>
     </div>
-    <p class="text-verde-sec/90 text-sm mt-1 font-sansation">
+    <p class="text-verde-sec/90 text-sm mt-1 font-sansation select-none">
       Sua solicitação foi **ABERTA**.
     </p>
   </div>
 
   <div
     *ngIf="error"
-    class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg"
+    class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg select-none"
   >
-    <div class="flex items-center">
+    <div class="flex items-center select-none">
       <span class="text-red-600 mr-2 text-xl">✗</span>
       <span class="text-red-800 font-medium font-sansation">{{ error }}</span>
     </div>
@@ -52,7 +54,7 @@
       <div class="mb-4">
         <label
           for="descricaoEquipamento"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
         >
           Descrição do Equipamento *
         </label>
@@ -66,7 +68,9 @@
           placeholder="Ex: Notebook Dell"
           class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
         />
-        <div class="mt-1 text-xs text-gray-500 text-right font-sansation">
+        <div
+          class="mt-1 text-xs text-gray-500 text-right font-sansation select-none"
+        >
           {{ formData.descricaoEquipamento?.length || 0 }}/100 caracteres
         </div>
       </div>
@@ -74,7 +78,7 @@
       <div class="mb-4">
         <label
           for="categoriaEquipamento"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
         >
           Categoria do Equipamento *
         </label>
@@ -84,7 +88,7 @@
           [(ngModel)]="formData.categoriaEquipamento"
           required
           [disabled]="loadingCategorias"
-          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md appearance-none font-sansation text-slate-800 bg-white focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none disabled:bg-gray-200"
+          class="select-none w-full px-4 py-2 border-2 border-azul-main/50 rounded-md appearance-none font-sansation text-slate-800 bg-white focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none disabled:bg-gray-200"
         >
           <option value="">
             {{
@@ -98,14 +102,14 @@
           </option>
         </select>
         <div
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+          class="select-none pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
         ></div>
       </div>
 
       <div class="mb-6">
         <label
           for="descricaoDefeito"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
         >
           Descrição do Defeito *
         </label>
@@ -119,7 +123,9 @@
           placeholder="Qual o problema?"
           class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 resize-none focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
         ></textarea>
-        <div class="mt-1 text-xs text-gray-500 text-right font-sansation">
+        <div
+          class="mt-1 text-xs text-gray-500 text-right font-sansation select-none"
+        >
           {{ formData.descricaoDefeito?.length || 0 }}/500 caracteres
         </div>
       </div>
@@ -128,7 +134,7 @@
         <button
           type="submit"
           [disabled]="loading || form.invalid"
-          class="font-semibold font-sansation py-2 px-8 rounded-lg transition duration-300 shadow-md flex items-center bg-verde-sec hover:bg-verde-sec/90 text-azul-main disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+          class="select-none font-semibold font-sansation py-2 px-8 rounded-lg transition duration-300 shadow-md flex items-center bg-verde-sec hover:bg-verde-sec/90 text-azul-main disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           <span *ngIf="loading" class="mr-2">
             <svg
@@ -159,7 +165,7 @@
   </div>
 
   <div class="mt-6 p-4 bg-azul-main/10 border border-azul-main/30 rounded-lg">
-    <p class="text-azul-main text-sm font-sansation">
+    <p class="text-azul-main text-sm font-sansation select-none">
       <strong>Observação:</strong>
       Você será notificado por e-mail quando nós fizermos e mandarmos o
       orçamento, fique no aguardo e atento.

@@ -2,12 +2,12 @@
   <div
     class="mb-6 flex items-center justify-between border-b-2 border-gray-200 pb-4"
   >
-    <h2 class="text-3xl font-bold text-azul-main font-sansation">
-      Home — Lista de Solicitações
+    <h2 class="text-3xl font-bold text-azul-main font-sansation select-none">
+      Home
     </h2>
 
     <a
-      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-lg bg-verde-sec bg-opacity-90 hover:bg-opacity-100 transition duration-300 shadow-md hover:shadow-lg"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-lg bg-verde-sec bg-opacity-100 hover:shadow-inner hover:shadow-gray-500 transition-shadow duration-300 ease-in-out"
       [routerLink]="['/solicitacao/criar']"
       role="button"
       aria-label="Criar solicitação"
@@ -18,7 +18,9 @@
 
   <div class="overflow-x-auto">
     <table class="w-full table-auto border-separate border-spacing-y-2">
-      <thead class="bg-azul-main/90 text-white rounded-md">
+      <thead
+        class="bg-azul-main/90 shadow-gray-500 shadow-inner text-white rounded-md select-none"
+      >
         <tr>
           <th class="py-3 px-4 text-left rounded-l-lg">Data / Hora</th>
           <th class="py-3 px-4 text-left">Nome</th>
@@ -30,9 +32,9 @@
       <tbody>
         <tr
           *ngFor="let s of solicitations"
-          class="bg-gray-50 hover:bg-gray-100 transition duration-150 shadow-sm border-b-2 border-transparent"
+          class="bg-gray-200 hover:bg-gray-100 transition duration-150 shadow-sm rounded-md"
         >
-          <td class="py-3 px-4 text-slate-700 rounded-l-lg">
+          <td class="py-3 px-4 text-slate-700 rounded-l-lg select-none">
             {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
           </td>
           <td class="py-3 px-4 text-slate-700">{{ truncateName(s, 30) }}</td>
@@ -42,10 +44,10 @@
               [ngClass]="{
                 'bg-verde-sec/20 text-verde-sec border border-verde-sec':
                   getStatus(s) === 'Aberto',
-                'bg-gray-400/20 text-gray-700 border border-gray-500':
+                'bg-gray-400/20 text-gray-700 border border-gray-600':
                   getStatus(s) === 'Fechado'
               }"
-              class="inline-block px-3 py-1 text-sm font-semibold rounded-full min-w-[100px] text-center"
+              class="inline-block px-0 py-1 text-sm font-semibold rounded-full min-w-[100px] text-start select-none"
             >
               {{ getStatus(s) }}
             </span>
@@ -54,7 +56,7 @@
           <td class="py-3 px-4 rounded-r-lg">
             <button
               (click)="view(s)"
-              class="font-semibold text-white px-4 py-1.5 rounded-md bg-roxo-terc hover:bg-roxo-terc/90 transition duration-200 text-sm shadow-sm"
+              class="font-semibold text-white px-4 py-1.5 rounded-md bg-roxo-terc hover:shadow-gray-600 hover:shadow-inner transition duration-300 text-sm select-none"
             >
               Visualizar
             </button>
@@ -73,3 +75,9 @@
     </table>
   </div>
 </div>
+<div class="w-80 h-auto fixed left-1 -bottom-20 z-[9999] select-none">
+  <img src="assets/img/mascote/sup.png" alt="secowl" />
+</div>
+<div
+  class="fixed bg-white -bottom-[300px] -left-[300px] rounded-full h-[600px] w-[600px] z-[9998] select-none"
+></div>

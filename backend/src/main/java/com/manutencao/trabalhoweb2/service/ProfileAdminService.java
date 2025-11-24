@@ -58,8 +58,6 @@ public class ProfileAdminService {
 
         Claims claims = jwtUtil.getAllClaims(token);
         String tipoUsuario = claims.get("tipoUsuario", String.class);
-        //comentar depois:(debug)
-        System.out.println("Claims brutas: " + claims);
 
         Object rawId = claims.get("id");
         Long id = null;
@@ -83,9 +81,6 @@ public class ProfileAdminService {
         } else {
             return new BasicResponse(400, "Tipo de ID no token não suportado.");
         }
-
-        System.out.println("id no token (normalizado) = " + id);
-        System.out.println("tipoUsuario no token = " + tipoUsuario);
         
         Object profile;
 

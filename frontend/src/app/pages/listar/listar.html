@@ -8,14 +8,14 @@
     ></div>
 
     <!-- Título -->
-    <h2 class="text-2xl font-semibold text-azul-main mb-6">
+    <h2 class="text-3xl font-semibold text-azul-main mb-6 select-none">
       Gerenciar Solicitações
     </h2>
 
     <!-- CONTROLES DE FILTRO -->
-    <div class="flex flex-wrap items-center gap-6 mb-6">
+    <div class="flex flex-wrap items-center gap-6 my-16 relative">
       <!-- Hoje -->
-      <label class="flex items-center gap-2 text-slate-700">
+      <label class="flex items-center gap-2 text-slate-700 select-none">
         <input
           type="radio"
           name="filtro"
@@ -27,7 +27,7 @@
       </label>
 
       <!-- Todas -->
-      <label class="flex items-center gap-2 text-slate-700">
+      <label class="flex items-center gap-2 text-slate-700 select-none">
         <input
           type="radio"
           name="filtro"
@@ -39,7 +39,7 @@
       </label>
 
       <!-- Período -->
-      <label class="flex items-center gap-2 text-slate-700">
+      <label class="flex items-center gap-2 text-slate-700 select-none">
         <input
           type="radio"
           name="filtro"
@@ -52,20 +52,22 @@
 
       <!-- Date Picker -->
       <ng-container *ngIf="filtro === 'PERIODO'">
-        <rangeDatePicker class="ml-2"></rangeDatePicker>
+        <rangeDatePicker
+          class="ml-2 absolute -top-3 left-[20%]"
+        ></rangeDatePicker>
       </ng-container>
 
       <!-- Botão Atualizar -->
       <button
         (click)="onRefresh()"
-        class="ml-auto bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold px-6 py-2 rounded-md transition"
+        class="absolute -top-20 right-7 ml-auto transition-shadow duration-300 ease-in-out bg-verde-sec hover:shadow-gray-600 hover:shadow-inner bg-opacity-100 text-azul-main font-semibold px-6 py-2 rounded-md select-none"
       >
         Atualizar
       </button>
     </div>
 
     <!-- ESTATÍSTICAS RÁPIDAS -->
-    <div class="flex flex-wrap gap-6 mb-6 text-slate-700">
+    <div class="flex flex-wrap gap-6 mb-6 text-slate-700 select-none">
       <p>
         Total:
         <span class="font-semibold text-azul-main">{{
@@ -86,14 +88,14 @@
     </div>
 
     <!-- FILTROS EXTRAS -->
-    <div class="flex flex-wrap gap-6 mb-2">
+    <div class="flex flex-wrap gap-6 mb-2 select-none">
       <label class="flex flex-col text-slate-700">
         Buscar por cliente:
         <input
           type="text"
           [(ngModel)]="searchClient"
           placeholder="Nome do cliente"
-          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-sec"
+          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-esc outline-none"
         />
       </label>
 
@@ -103,13 +105,13 @@
           type="text"
           [(ngModel)]="searchState"
           placeholder="Estado (ex: ORÇADA)"
-          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-sec"
+          class="mt-1 p-2 border border-azul-main rounded-md focus:ring-2 focus:ring-verde-esc outline-none"
         />
       </label>
     </div>
 
     <!-- RESUMO DO CARREGAMENTO -->
-    <p class="text-slate-600 mb-4">
+    <p class="text-slate-600 mb-4 select-none">
       <ng-container *ngIf="loading">Carregando...</ng-container>
       <ng-container *ngIf="!loading && !error">{{ summary }}</ng-container>
       <ng-container *ngIf="error" class="text-red-600 font-semibold">{{
@@ -120,7 +122,7 @@
     <!-- TABELA -->
     <div class="overflow-x-auto rounded-lg border border-azul-main shadow-sm">
       <table class="min-w-full w-full border-collapse">
-        <thead class="bg-azul-main">
+        <thead class="bg-azul-main select-none">
           <tr>
             <th class="px-4 py-3 text-left text-white font-semibold">
               Data / Hora
@@ -144,7 +146,7 @@
 
         <tbody class="bg-white divide-y">
           <tr *ngFor="let s of listaFiltrada" class="hover:bg-gray-50">
-            <td class="px-4 py-2">
+            <td class="px-4 py-2 select-none">
               {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
             </td>
             <td class="px-4 py-2">{{ s.id }}</td>
@@ -154,20 +156,22 @@
             <!-- Estado com badge -->
             <td class="px-4 py-2">
               <span
-                class="px-2 py-1 rounded text-xs font-semibold"
+                class="px-2 py-1 rounded text-xs font-semibold select-none"
                 [ngClass]="getStatusClass(s.state)"
               >
                 {{ s.state }}
               </span>
             </td>
 
-            <td class="px-4 py-2">{{ s.redirectDestinationName || "-" }}</td>
+            <td class="px-4 py-2 select-none">
+              {{ s.redirectDestinationName || "-" }}
+            </td>
 
             <!-- Botão Visualizar -->
-            <td class="px-4 py-2 text-center">
+            <td class="px-4 py-2 text-center select-none">
               <button
                 (click)="abrirVisualizar(s)"
-                class="bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold px-4 py-1.5 rounded-md text-sm transition"
+                class="bg-verde-sec hover:shadow-gray-600 hover:shadow-inner bg-opacity-100 text-azul-main font-semibold px-4 py-1.5 rounded-md text-sm transition"
               >
                 Visualizar
               </button>

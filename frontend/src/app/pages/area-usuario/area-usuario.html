@@ -43,40 +43,50 @@
     >
       <div *ngIf="paginaAtual === 'Perfil'" class="h-fit w-full px-16 py-10">
         <div class="w-full h-fit flex flex-col gap-4 py-6">
-          <h1 class="text-azul-main text-3xl font-sansation font-bold">
-            Olá, {{ nomeUsuario }}
-          </h1>
+          <div class="shadow-md shadow-gray-500 px-8 py-4 bg-white rounded-md">
+            <h1
+              class="text-azul-main text-3xl font-sansation font-bold select-none"
+            >
+              Olá, {{ nomeUsuario }}
+            </h1>
+          </div>
         </div>
       </div>
       <div *ngIf="paginaAtual === 'Segurança'" class="h-fit w-full px-16 py-10">
-        <div class="w-full h-fit flex flex-col gap-4 py-6">
+        <div class="w-full h-fit flex flex-col gap-10 py-6">
           <!-- Inicio forms segurança -->
-          <h2 class="text-azul-main font-bold font-sansation text-4xl">
-            Alterar dados de login
-          </h2>
+          <div class="shadow-md shadow-gray-500 px-8 py-4 bg-white rounded-md">
+            <h2
+              class="text-azul-main font-bold font-sansation text-4xl select-none"
+            >
+              Alterar dados de login
+            </h2>
+          </div>
 
           <!-- Formulário em sí -->
           <form
             [formGroup]="credenciaisForm"
             (ngSubmit)="enviarFormulario()"
-            class="flex flex-col gap-4"
+            class="flex flex-col gap-4 bg-white rounded-md px-16 py-16 shadow-gray-500 shadow-md relative min-h-[500px]"
           >
             <!-- EMAIL -->
             <div class="flex flex-col gap-2">
-              <label class="text-white font-semibold font-robotoFlex text-xl"
+              <label
+                class="text-gray-600 font-semibold font-robotoFlex text-xl select-none"
                 >Novo e-mail</label
               >
               <input
                 type="email"
                 formControlName="email"
                 placeholder="exemplo@dominio.com"
-                class="w-1/4 px-3 py-2 rounded-md bg-white text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-300 ease-in"
+                class="placeholder:select-none w-1/4 px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-200 ease-in"
               />
             </div>
 
             <!-- SENHA -->
             <div class="flex flex-col gap-2">
-              <label class="text-white font-semibold font-robotoFlex text-xl"
+              <label
+                class="text-gray-600 font-semibold font-robotoFlex text-xl select-none"
                 >Nova senha</label
               >
               <input
@@ -84,18 +94,21 @@
                 formControlName="senha"
                 maxlength="4"
                 placeholder="****"
-                class="w-1/4 px-3 py-2 rounded-md bg-white text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-300 ease-in"
+                class="placeholder:select-none w-1/4 px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-200 ease-in"
               />
             </div>
 
             <!-- BOTÃO -->
             <button
               type="submit"
-              class="w-1/4 bg-verde-sec text-azul-main bg-opacity-65 hover:bg-opacity-100 font-bold rounded-md hover:bg-verde text-xl py-3 duration-300 ease-in-out transition-colors"
+              class="w-1/4 bg-azul-main text-white hover:shadow-gray-600 font-bold rounded-md hover:shadow-inner text-xl py-3 duration-200 ease-in-out transition-all select-none"
               [disabled]="credenciaisForm.invalid"
             >
               Salvar alterações
             </button>
+            <div class="w-80 h-auto absolute right-10 top-7">
+              <img src="assets/img/mascote/security.svg" alt="secowl" />
+            </div>
           </form>
         </div>
       </div>
