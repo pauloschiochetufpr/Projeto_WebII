@@ -48,10 +48,10 @@ export class LoginComponent {
   private fadeOutTimer?: ReturnType<typeof setTimeout>;
 
   mensagemNotificacaoLogin: string | null = null;
-  codigoNotificacaoLogin?: number;
+  codigoNotificacaoLogin: number | null = null;
 
   mensagemNotificacaoCadastro: string | null = null;
-  codigoNotificacaoCadastro?: number;
+  codigoNotificacaoCadastro: number | null = null;
 
   get mostrarAlerta(): boolean {
     const inativo = !this.isHoveringLogin && !this.isHoveringCadastro;
@@ -211,7 +211,7 @@ export class LoginComponent {
             this.codigoNotificacaoLogin = res.code;
             setTimeout(() => {
               this.mensagemNotificacaoLogin = null;
-              this.codigoNotificacaoLogin = undefined;
+              this.codigoNotificacaoLogin = null;
             }, 5000);
           }
 
@@ -231,7 +231,7 @@ export class LoginComponent {
 
           setTimeout(() => {
             this.mensagemNotificacaoLogin = null;
-            this.codigoNotificacaoLogin = undefined;
+            this.codigoNotificacaoLogin = null;
           }, 5000);
         },
       });
@@ -262,7 +262,7 @@ export class LoginComponent {
 
           setTimeout(() => {
             this.mensagemNotificacaoCadastro = null;
-            this.codigoNotificacaoCadastro = undefined;
+            this.codigoNotificacaoCadastro = null;
           }, 5000);
 
           this.isSubmittingCadastro = false;
@@ -274,7 +274,7 @@ export class LoginComponent {
 
           setTimeout(() => {
             this.mensagemNotificacaoCadastro = null;
-            this.codigoNotificacaoCadastro = undefined;
+            this.codigoNotificacaoCadastro = null;
           }, 5000);
 
           this.isSubmittingCadastro = false;
