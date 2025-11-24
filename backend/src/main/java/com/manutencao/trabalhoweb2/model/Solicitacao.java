@@ -2,10 +2,16 @@ package com.manutencao.trabalhoweb2.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "solicitacao")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Solicitacao {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,12 +24,10 @@ public class Solicitacao {
     @Column(name = "descricao", nullable = false, length = 255)
     private String descricao;
 
-    // relacionamento com cliente (idCliente). Nullable conforme DDL.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", referencedColumnName = "id_cliente", nullable = true)
     private Cliente cliente;
 
-    // valor com precisão DECIMAL(10,2)
     @Column(name = "valor", precision = 10, scale = 2)
     private BigDecimal valor;
 
@@ -35,6 +39,22 @@ public class Solicitacao {
 
     @Column(name = "ativo")
     private Boolean ativo = Boolean.TRUE;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "descricao_manutencao", nullable = true)
+    private String descricaoManutencao;
+
+    @Column(name = "orientacoes_cliente", nullable = true)
+    private String orientacoesCliente;
+
+    @Column(name = "funcionario_responsavel")
+    private Integer funcionarioResponsavel;
+
+    @Column(name = "funcionario_redirecionado_para")
+    private Integer funcionarioRedirecionadoPara;
 
     public Solicitacao() {}
 
@@ -72,4 +92,7 @@ public class Solicitacao {
 
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

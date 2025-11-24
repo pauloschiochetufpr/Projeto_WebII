@@ -20,6 +20,14 @@ export interface Solicitation {
   redirectDestinationName?: string;
   budget?: number;
   history?: HistoryStep[];
+  // campos extra vindos do backend
+  idSolicitacao?: number;
+  idCliente?: number;
+  idCategoria?: number;
+  idStatus?: number;
+  valor?: number;
+  ativo?: boolean;
+  cliente?: { nome?: string };
 }
 
 @Component({
@@ -37,7 +45,7 @@ export class VisualizarServicosDialog implements OnInit {
     public dialogRef: MatDialogRef<VisualizarServicosDialog>,
     @Inject(MAT_DIALOG_DATA)
     public data: { user: Solicitation; currentDestination: string },
-    private solicitacaoService: SolicitacaoService // 👈 injeta aqui
+    private solicitacaoService: SolicitacaoService
   ) {}
 
   ngOnInit(): void {
@@ -48,9 +56,15 @@ export class VisualizarServicosDialog implements OnInit {
   carregarHistorico(): void {
     if (!this.data.user.id) return;
 
-    this.solicitacaoService.getHistorico(Number(this.data.user.id)).subscribe({
-      next: (hist) => {
-        this.data.user.history = hist.map((h) => ({
+    const idNum = Number(this.data.user.id);
+    if (isNaN(idNum)) {
+      this.data.user.history = [];
+      return;
+    }
+
+    this.solicitacaoService.getHistorico(idNum).subscribe({
+      next: (hist: any[]) => {
+        this.data.user.history = (hist || []).map((h: any) => ({
           date: h.dataHora,
           state: h.statusNew || '',
           by: h.funcionarioNew
@@ -61,28 +75,37 @@ export class VisualizarServicosDialog implements OnInit {
           note: h.statusOld ? `De ${h.statusOld}` : undefined,
         }));
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar histórico:', err);
         this.data.user.history = [];
       },
     });
   }
 
-  // Efetuar Orçamento
+  // Efetuar Orçamento — usa PUT (atualizarSolicitacao) para enviar valor + mudar status para ORÇADA
   efetuarOrcamento() {
     const valor = prompt('Digite o valor do orçamento:');
     if (!valor) return;
 
-    const novoValor = parseFloat(valor);
+    const novoValor = parseFloat(valor.replace(',', '.'));
+    if (isNaN(novoValor)) {
+      alert('Valor inválido');
+      return;
+    }
+
     const id = Number(this.data.user.id);
+    if (isNaN(id)) {
+      alert('ID da solicitação inválido');
+      return;
+    }
 
     this.solicitacaoService.buscarPorId(id).subscribe({
-      next: (solicitacao) => {
-        const dto = {
+      next: (solicitacao: any) => {
+        const dto: any = {
           idSolicitacao: solicitacao.idSolicitacao ?? id,
           nome: solicitacao.nome,
           descricao: solicitacao.descricao,
-          idCliente: solicitacao.idCliente,
+          idCliente: solicitacao.idCliente ?? solicitacao.cliente?.idCliente ?? null,
           valor: novoValor,
           idStatus: 2, // ORÇADA
           idCategoria: solicitacao.idCategoria,
@@ -90,35 +113,43 @@ export class VisualizarServicosDialog implements OnInit {
         };
 
         this.solicitacaoService.atualizarSolicitacao(id, dto).subscribe({
-          next: (res) => {
-            this.data.user.budget = res.valor;
+          next: (res: any) => {
+            // atualiza view local
+            this.data.user.budget = res?.valor ?? novoValor;
             this.data.user.state = 'ORÇADA';
-            this.dialogRef.close({ action: 'ORÇAR', user: this.data.user });
+            // fecha dialog retornando ação para o caller
+            this.dialogRef.close({ action: 'ORÇAR', user: this.data.user, budget: this.data.user.budget });
           },
-          error: (err) => alert('Erro ao orçar: ' + err.message),
+          error: (err: any) => {
+            console.error('Erro ao orçar:', err);
+            alert('Erro ao orçar: ' + (err?.message ?? 'Erro no servidor'));
+          },
         });
       },
-      error: (err) => alert('Erro ao buscar solicitação: ' + err.message),
+      error: (err: any) => {
+        console.error('Erro ao buscar solicitação antes de orçar:', err);
+        alert('Erro ao buscar solicitação: ' + (err?.message ?? 'Erro no servidor'));
+      },
     });
   }
 
   // Resgatar serviço rejeitado
   resgatar() {
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 3)
+      .atualizarStatus(Number(this.data.user.id), 3, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'APROVADA';
           this.dialogRef.close({ action: 'RESGATAR', user: this.data.user });
         },
-        error: (err) => alert('Erro ao resgatar: ' + err.message),
+        error: (err: any) => alert('Erro ao resgatar: ' + (err?.message ?? err)),
       });
   }
 
   // Efetuar Manutenção
   registrarManutencao() {
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 5)
+      .atualizarStatus(Number(this.data.user.id), 5, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'ARRUMADA';
@@ -129,7 +160,7 @@ export class VisualizarServicosDialog implements OnInit {
             orientacoes: this.orientacoesCliente,
           });
         },
-        error: (err) => alert('Erro ao registrar manutenção: ' + err.message),
+        error: (err: any) => alert('Erro ao registrar manutenção: ' + (err?.message ?? err)),
       });
   }
 
@@ -138,8 +169,9 @@ export class VisualizarServicosDialog implements OnInit {
     const destino = prompt('Digite o destino para redirecionamento:');
     if (!destino) return;
 
+    // aqui você pode enviar funcionarioId se tiver (adaptar backend)
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 8)
+      .atualizarStatus(Number(this.data.user.id), 8, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'REDIRECIONADA';
@@ -150,44 +182,45 @@ export class VisualizarServicosDialog implements OnInit {
             destino,
           });
         },
-        error: (err) => alert('Erro ao redirecionar: ' + err.message),
+        error: (err: any) => alert('Erro ao redirecionar: ' + (err?.message ?? err)),
       });
   }
 
   // Pagar Serviço
   pagar() {
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 6)
+      .atualizarStatus(Number(this.data.user.id), 6, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'PAGA';
           this.dialogRef.close({ action: 'PAGAR', user: this.data.user });
         },
-        error: (err) => alert('Erro ao pagar: ' + err.message),
+        error: (err: any) => alert('Erro ao pagar: ' + (err?.message ?? err)),
       });
   }
 
   // Finalizar Solicitação
   finalizar() {
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 7)
+      .atualizarStatus(Number(this.data.user.id), 7, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'FINALIZADA';
           this.dialogRef.close({ action: 'FINALIZAR', user: this.data.user });
         },
-        error: (err) => alert('Erro ao finalizar: ' + err.message),
+        error: (err: any) => alert('Erro ao finalizar: ' + (err?.message ?? err)),
       });
   }
 
   close() {
     this.dialogRef.close();
   }
+
   // Redirecionar para si mesmo
   redirecionarParaMim() {
     const destino = this.data.currentDestination;
     this.solicitacaoService
-      .atualizarStatus(Number(this.data.user.id), 8)
+      .atualizarStatus(Number(this.data.user.id), 8, false)
       .subscribe({
         next: () => {
           this.data.user.state = 'REDIRECIONADA';
@@ -198,8 +231,8 @@ export class VisualizarServicosDialog implements OnInit {
             destino,
           });
         },
-        error: (err) =>
-          alert('Erro ao redirecionar para si mesmo: ' + err.message),
+        error: (err: any) =>
+          alert('Erro ao redirecionar para si mesmo: ' + (err?.message ?? err)),
       });
   }
 
@@ -214,7 +247,6 @@ export class VisualizarServicosDialog implements OnInit {
   }
 
   trackHistory(index: number, item: any) {
-  return item.id || index;
-}
-
+    return item?.id ?? index;
+  }
 }

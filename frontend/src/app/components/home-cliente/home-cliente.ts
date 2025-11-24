@@ -75,9 +75,11 @@ export class HomeCliente implements OnInit, OnDestroy {
       .listarPorClienteComLastUpdate(clienteId)
       .subscribe({
         next: (arr) => {
-          this.solicitations = arr.map((d) => this.normalize(d));
-          this.loading = false;
-        },
+        const lista = Array.isArray(arr) ? arr : [];
+        this.solicitations = lista.map((d) => this.normalize(d));
+        this.loading = false;
+      }
+,
         error: (err) => {
           console.error('Erro ao carregar solicitações', err);
           this.error = 'Erro ao carregar solicitações';
@@ -89,19 +91,23 @@ export class HomeCliente implements OnInit, OnDestroy {
   }
 
   private extrairDadosDoToken() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+  const token = localStorage.getItem('accessToken');
+  if (!token) return;
 
-    try {
-      const payload: any = jwtDecode(token);
+  try {
+    const payload: any = jwtDecode(token);
 
-      if (payload?.id) {
-        this.id = payload.id;
-      }
-    } catch (e) {
-      console.error('Falha ao decodificar token:', e);
+    // Cliente usa SUB
+    if (payload?.sub) {
+      this.id = payload.sub;
     }
+
+  } catch (e) {
+    console.error('Falha ao decodificar token:', e);
   }
+}
+
+
 
   normalize(d: any): Solicitation {
     return {

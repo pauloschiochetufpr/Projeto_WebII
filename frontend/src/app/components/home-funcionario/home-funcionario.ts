@@ -3,29 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { catchError, of, Subscription, take } from 'rxjs';
-import { JsonTestService, User } from '../../services/jsontest';
-
+import { ModalOrcamentoDialog } from '../modal-orcamento-dialog/modal-orcamento-dialog';
 import { FuncHeader } from '../func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
 import { SolicitacaoService } from '../../services/solicitacao';
-import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { jwtDecode } from 'jwt-decode';
 
 export interface Solicitation {
   idSolicitacao?: number;
   id?: number | string;
   idCliente?: number;
-  nome?: string;
   requesterName?: string;
   descricao?: string;
   description?: string;
   dataHora?: string;
   createdAt?: string;
-  date?: string;
+  lastUpdate?: string | null;
   idStatus?: number;
   state?: string;
-  lastUpdate?: string | null;
   [key: string]: any;
+  
 }
 
 @Component({
@@ -40,15 +38,19 @@ export interface Solicitation {
   ],
   templateUrl: './home-funcionario.html',
   styleUrls: ['./home-funcionario.css'],
+  
 })
 export class HomeFuncionario implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
+  tipoUsuario?: string;
+  idFuncionario?: number;
+
 
   private sub = new Subscription();
 
-  //ids de status
+  /** Mapa fixo dos estados */
   statusMapById: Record<number, string> = {
     1: 'ABERTA',
     2: 'ORÇADA',
@@ -63,145 +65,145 @@ export class HomeFuncionario implements OnInit, OnDestroy {
 
   constructor(
     private solicitacaoService: SolicitacaoService,
-    private jsonService: JsonTestService,
     public dateSelection: DateSelection,
     private dialog: MatDialog
   ) {}
 
+  private extrairDadosDoToken() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return;
+
+  try {
+    const payload: any = jwtDecode(token);
+
+    if (payload?.id) {
+      this.idFuncionario = payload.id;   // <-- AQUI pega o id do funcionário logado
+    }
+    if (payload?.tipoUsuario) {
+      this.tipoUsuario = payload.tipoUsuario;
+    }
+  } catch (e) {
+    console.error('Falha ao decodificar token:', e);
+  }
+}
+
+  // =====================
+  // 🔹 Inicialização
+  // =====================
   ngOnInit(): void {
-    this.loadAbertoFromBackend();
-  }
-
-  private loadAbertoFromBackend(): void {
-    this.loading = true;
-    this.error = null;
-
-    // 1 = ABERTA (conforme map)
-    const sub = this.solicitacaoService
-      .listarTodasComLastUpdate()
-      .pipe(
-        take(1),
-        catchError((err) => {
-          console.warn(
-            'Backend indisponível ou erro ao buscar por status. Usando mock.',
-            err
-          );
-          // fallback: usar o jsonService local (retornamos empty observable aqui;
-          // tratamos fazendo load do mock abaixo)
-          return of(null);
-        })
-      )
-      .subscribe({
-        next: (arr) => {
-          if (arr === null) {
-            // fallback para o mock local
-            this.loadFromMock();
-            return;
-          }
-
-          const all = (arr || []).map((d) => this.normalize(d));
-          // já chegam apenas ABERTA (backend), mas filtramos por segurança:
-          this.solicitations = all.filter(
-            (item) => this.getStatus(item) === 'ABERTA'
-          );
-
-          // ordenar crescente por data/hora
-          this.solicitations.sort((a, b) => {
-            const da =
-              this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-            const db =
-              this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-            return da - db;
-          });
-
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error(
-            'Erro carregando solicitações (funcionario) — subscribe',
-            err
-          );
-          this.error = 'Erro ao carregar solicitações';
-          this.loading = false;
-        },
-      });
-
-    this.sub.add(sub);
-  }
-
-  private loadFromMock(): void {
-    // subscreve ao BehaviorSubject do mock e filtra ABERTA
-    const s = this.jsonService.users$.subscribe({
-      next: (arr) => {
-        const all = (arr || []).map((d) => this.normalize(d));
-        this.solicitations = all.filter(
-          (item) => this.getStatus(item) === 'ABERTA'
-        );
-
-        // ordenar crescente por data/hora
-        this.solicitations.sort((a, b) => {
-          const da =
-            this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-          const db =
-            this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-          return da - db;
-        });
-
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Erro carregando mock de solicitações', err);
-        this.error = 'Erro ao carregar solicitações';
-        this.loading = false;
-      },
-    });
-
-    this.sub.add(s);
+    this.extrairDadosDoToken();   
+    this.loadAbertas();
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  // normaliza payload vindo do JSON para o formato usado aqui
-  normalize(d: any): Solicitation {
+  // =====================
+  // 🔹 Busca apenas ABERTAS
+  // =====================
+  private loadAbertas(): void {
+    this.loading = true;
+    this.error = null;
+
+    const s = this.solicitacaoService
+      .listarAbertasParaFuncionario()
+      .pipe(
+        take(1),
+        catchError((err) => {
+          console.error('Erro ao buscar ABERTAS:', err);
+          this.loading = false;
+          this.error = 'Erro ao carregar solicitações abertas.';
+          return of([]);
+        })
+      )
+      .subscribe((arr) => {
+        const list = (arr || []).map((s) => this.normalize(s));
+
+        // ordena por data cescente
+        list.sort((a, b) => {
+          const da = this.parseDate(this.getDate(a))?.getTime() ?? 0;
+          const db = this.parseDate(this.getDate(b))?.getTime() ?? 0;
+          return da - db;
+        });
+
+        this.solicitations = list;
+        this.loading = false;
+
+        console.log('HOME-FUNCIONARIO → recebidas:', list);
+      });
+
+    this.sub.add(s);
+  }
+
+irParaOrcamento(s: Solicitation) {
+  const ref = this.dialog.open(ModalOrcamentoDialog, {
+    width: '400px',
+    data: { solicitacao: s }
+  });
+
+  ref.afterClosed().subscribe(valor => {
+    if (valor === null || valor === undefined) return; // cancelado
+
+    // Chamada ao backend: mudar status para ORÇADA (2) + salvar valor
+    this.solicitacaoService
+      .atualizarStatus(s.id as number, 2, false, this.idFuncionario!)
+      .subscribe({
+        next: () => {
+          console.log('Orçamento enviado:', valor);
+
+          // TO-DO: atualizar o valor do orçamento via backend se necessário
+          // ou criar endpoint apropriado
+
+          this.loadAbertas(); // recarrega lista
+        },
+        error: (err) => {
+          console.error('Erro ao enviar orçamento:', err);
+        }
+      });
+  });
+}
+
+
+  // =====================
+  // 🔹 Normalização
+  // =====================
+  private normalize(d: any): Solicitation {
     return {
-      idSolicitacao:
-        d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
+      idSolicitacao: d.idSolicitacao ?? d.id,
       id: d.id ?? d.idSolicitacao,
-      nome: d.nome ?? d.requesterName ?? d.name,
-      requesterName: d.requesterName ?? d.nome ?? d.name,
+      idCliente: d.idCliente,
+      requesterName: d.cliente?.nome ?? d.requesterName ?? d.nome ?? '—',
       descricao: d.descricao ?? d.description,
+      description: d.description ?? d.descricao,
       dataHora: d.dataHora ?? d.createdAt ?? d.date,
+      createdAt: d.createdAt ?? d.dataHora ?? null,
       idStatus: d.idStatus,
-      state: d.state ?? d.statusName ?? null,
+      state: this.statusMapById[d.idStatus] ?? d.state ?? '—',
+      lastUpdate: d.lastUpdate ?? d.dataHora ?? d.createdAt ?? null,
       ...d,
     };
   }
 
-  getDateString(s: Solicitation): string | null {
-    return s.dataHora ?? s.createdAt ?? s.date ?? null;
+  // =====================
+  // 🔹 Helpers
+  // =====================
+  private getDate(s: Solicitation): string | null {
+    return s.lastUpdate ?? s.dataHora ?? s.createdAt ?? null;
   }
 
-  parseDateString(str: string | null): Date | null {
+  private parseDate(str: string | null): Date | null {
     if (!str) return null;
     const d = new Date(str);
     return isNaN(d.getTime()) ? null : d;
   }
 
   getClientName(s: Solicitation): string {
-    return (s.nome ?? s.requesterName ?? '—') as string;
+    return s.requesterName || '—';
   }
 
-  getDescriptionTruncated(s: Solicitation, max = 30): string {
-    const desc = (s.descricao ?? s.description ?? '—') as string;
-    return desc.length > max ? desc.slice(0, max - 1) + '…' : desc;
-  }
-
-  getStatus(s: Solicitation): string {
-    if (s.state) return s.state;
-    if (s.idStatus && this.statusMapById[s.idStatus])
-      return this.statusMapById[s.idStatus];
-    return 'Desconhecido';
+  getDescriptionTruncated(s: Solicitation, max: number): string {
+    const text = s.descricao ?? s.description ?? '—';
+    return text.length > max ? text.slice(0, max - 1) + '…' : text;
   }
 }

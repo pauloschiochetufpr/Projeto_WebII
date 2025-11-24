@@ -24,7 +24,7 @@ public class HistSolicitacaoController {
         List<HistSolicitacao> lista = histService.getHistoricoPorSolicitacaoId(id);
 
         if (lista.isEmpty()) {
-            return ResponseEntity.noContent().build(); 
+            return ResponseEntity.ok(List.of());
         }
 
         // Converte para DTO

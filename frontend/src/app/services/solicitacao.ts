@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { map, delay, catchError } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import {
   SolicitacaoCreateDto,
   CategoriaEquipamento,
@@ -123,6 +123,39 @@ export class SolicitacaoService {
     );
   }
 
+  // funcionário vê somente ABERTAS na HOME
+  listarAbertasParaFuncionario(): Observable<SolicitacaoDto[]> {
+    return this.http.get<SolicitacaoDto[]>(`${this.baseUrl}/funcionario/abertas`).pipe(
+      catchError(err => {
+        console.error("Erro ao buscar ABERTAS para funcionário", err);
+        return throwError(() => new Error("Falha ao buscar abertas"));
+      })
+    );
+  }
+
+  // solicitações do funcionário — todas que ele já mexeu
+  listarSomenteDoFuncionario(funcionarioId: number): Observable<SolicitacaoDto[]> {
+    return this.http.get<SolicitacaoDto[]>(`${this.baseUrl}/funcionario/${funcionarioId}/minhas`).pipe(
+      catchError(err => {
+        console.error(`Erro ao buscar solicitações manipuladas por ${funcionarioId}`, err);
+        return throwError(() => new Error("Falha ao buscar solicitações manipuladas"));
+      })
+    );
+  }
+
+  /**
+   * Atualização completa da solicitação (PUT), usado pelo dialog para
+   * alterar valor/idStatus/nome/descrição etc.
+   */
+  atualizarSolicitacao(id: number, dto: Partial<SolicitacaoDto>): Observable<SolicitacaoDto> {
+    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto).pipe(
+      catchError(err => {
+        console.error('Erro ao atualizar solicitação', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
   // buscar solicitações por idStatus (ex: 1 = ABERTA)
   buscarPorStatus(idStatus: number): Observable<SolicitacaoDto[]> {
     return this.http
@@ -159,22 +192,25 @@ export class SolicitacaoService {
     );
   }
 
-  atualizarSolicitacao(
-    id: number,
-    dto: Partial<SolicitacaoDto>
-  ): Observable<SolicitacaoDto> {
-    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto);
-  }
-
+  /**
+   * Atualiza somente o status (PATCH para /{id}/status).
+   * Opcionalmente envia funcionarioId (para redirecionamento/orçamento) e cliente flag.
+   */
   atualizarStatus(
     id: number,
     novoStatus: number,
-    cliente: boolean = false
-  ): Observable<SolicitacaoDto> {
-    const body = { novoStatus, cliente };
-    return this.http.patch<SolicitacaoDto>(
-      `${this.baseUrl}/${id}/status`,
-      body
+    cliente: boolean = false,
+    funcionarioId?: number,
+    motivo?: string
+  ): Observable<any> {
+    const body: any = { novoStatus, cliente };
+    if (funcionarioId != null) body.funcionarioId = funcionarioId;
+    if (motivo != null) body.motivo = motivo;
+    return this.http.patch<any>(`${this.baseUrl}/${id}/status`, body).pipe(
+      catchError((err) => {
+        console.error('Erro ao atualizar status', err);
+        return throwError(() => err);
+      })
     );
   }
 
