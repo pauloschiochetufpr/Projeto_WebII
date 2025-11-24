@@ -147,7 +147,7 @@ public class TokenAdminService {
 
             // Gera novo access token e refresh token
             Map<String, Object> newClaims = Map.of(
-                "idCliente", id,
+                "id", id,
                 "nome", claims.get("nome", String.class),
                 "tipoUsuario", claims.get("tipoUsuario", String.class),
                 "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond()

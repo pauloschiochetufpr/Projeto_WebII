@@ -1,16 +1,16 @@
 <div class="h-fit w-screen overflow-x-hidden bg-azul-main flex flex-row">
   <!-- Área esquerda -->
   <div
-    class="h-fit min-h-[93vh] w-2/12 overflow-y-auto overflow-x-hidden flex flex-col items-center justify-start pt-16 gap-2"
+    class="h-fit min-h-[93vh] w-2/12 overflow-y-auto overflow-x-hidden flex flex-col items-center justify-start pt-16 gap-2 relative"
   >
     <div class="w-full h-fit flex flex-col gap-2 justify-start items-start">
       <!-- Botão 1 -->
       <button
         (click)="selecionar('Perfil')"
-        class="select-none px-4 py-2.5 w-64 h-fit ml-5 rounded-md text-left font-sansation font-semibold text-lg hover:bg-verde-sec hover:text-azul-main duration-200 ease-in-out transition-colors"
+        class="select-none px-4 py-2.5 w-64 h-fit ml-5 rounded-md text-left font-sansation font-semibold text-lg hover:bg-verde-sec hover:text-azul-main duration-300 ease-in-out transition-colors"
         [class.bg-verde-sec]="paginaAtual === 'Perfil'"
         [class.text-azul-main]="paginaAtual === 'Perfil'"
-        [class.text-verde-sec]="paginaAtual !== 'Perfil'"
+        [class.text-white]="paginaAtual !== 'Perfil'"
         [class.bg-azul-main]="paginaAtual !== 'Perfil'"
       >
         Perfil
@@ -19,27 +19,85 @@
       <!-- Botão 2 -->
       <button
         (click)="selecionar('Segurança')"
-        class="select-none px-4 py-2.5 w-64 h-fit ml-5 rounded-md text-left font-sansation font-semibold text-lg hover:bg-verde-sec hover:text-azul-main duration-200 ease-in-out transition-colors"
+        class="select-none px-4 py-2.5 w-64 h-fit ml-5 rounded-md text-left font-sansation font-semibold text-lg hover:bg-verde-sec hover:text-azul-main duration-300 ease-in-out transition-colors"
         [class.bg-verde-sec]="paginaAtual === 'Segurança'"
         [class.text-azul-main]="paginaAtual === 'Segurança'"
-        [class.text-verde-sec]="paginaAtual !== 'Segurança'"
+        [class.text-white]="paginaAtual !== 'Segurança'"
         [class.bg-azul-main]="paginaAtual !== 'Segurança'"
       >
         Segurança
       </button>
     </div>
     <div class="bg-verde-sec h-[2px] rounded-md w-11/12 my-2"></div>
+    <div class="bottom-5 absolute w-fit h-fit text-nowrap">
+      <app-notification
+        [codigo]="codigoResposta"
+        [mensagem]="mensagemResposta"
+      ></app-notification>
+    </div>
   </div>
   <!-- Área direita -->
   <div class="flex-1 h-fit flex flex-col justify-center items-center">
     <div
-      class="bg-azul-suav rounded-lg h-fit w-10/12 mt-16 shadow-inner shadow-azul-main"
+      class="bg-azul-suav rounded-lg h-fit w-10/12 mt-16 shadow-inner shadow-gray-700"
     >
-      <div *ngIf="paginaAtual === 'Perfil'" class="h-fit w-full">
-        <div class="w-96 h-96">Pefil</div>
+      <div *ngIf="paginaAtual === 'Perfil'" class="h-fit w-full px-16 py-10">
+        <div class="w-full h-fit flex flex-col gap-4 py-6">
+          <h1 class="text-azul-main text-3xl font-sansation font-bold">
+            Olá, {{ nomeUsuario }}
+          </h1>
+        </div>
       </div>
-      <div *ngIf="paginaAtual === 'Segurança'" class="h-fit w-full">
-        <div class="w-96 h-96">Ta seguro</div>
+      <div *ngIf="paginaAtual === 'Segurança'" class="h-fit w-full px-16 py-10">
+        <div class="w-full h-fit flex flex-col gap-4 py-6">
+          <!-- Inicio forms segurança -->
+          <h2 class="text-azul-main font-bold font-sansation text-4xl">
+            Alterar dados de login
+          </h2>
+
+          <!-- Formulário em sí -->
+          <form
+            [formGroup]="credenciaisForm"
+            (ngSubmit)="enviarFormulario()"
+            class="flex flex-col gap-4"
+          >
+            <!-- EMAIL -->
+            <div class="flex flex-col gap-2">
+              <label class="text-white font-semibold font-robotoFlex text-xl"
+                >Novo e-mail</label
+              >
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="exemplo@dominio.com"
+                class="w-1/4 px-3 py-2 rounded-md bg-white text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-300 ease-in"
+              />
+            </div>
+
+            <!-- SENHA -->
+            <div class="flex flex-col gap-2">
+              <label class="text-white font-semibold font-robotoFlex text-xl"
+                >Nova senha</label
+              >
+              <input
+                type="password"
+                formControlName="senha"
+                maxlength="4"
+                placeholder="****"
+                class="w-1/4 px-3 py-2 rounded-md bg-white text-gray-700 hover:shadow-md hover:shadow-gray-500 outline-none focus:shadow-md focus:shadow-gray-500 pl-4 transition-shadow duration-300 ease-in"
+              />
+            </div>
+
+            <!-- BOTÃO -->
+            <button
+              type="submit"
+              class="w-1/4 bg-verde-sec text-azul-main bg-opacity-65 hover:bg-opacity-100 font-bold rounded-md hover:bg-verde text-xl py-3 duration-300 ease-in-out transition-colors"
+              [disabled]="credenciaisForm.invalid"
+            >
+              Salvar alterações
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>

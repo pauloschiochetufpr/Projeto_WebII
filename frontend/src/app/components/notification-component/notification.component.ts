@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
   templateUrl: './notification.component.html',
 })
 export class NotificationComponent {
-  @Input() codigo?: number; // HTTP code
-  @Input() mensagem!: string; // mensagem do backend
+  @Input() codigo: number | null = null;
+  @Input() mensagem: string | null = null;
 
   get corFundo(): string {
     if (this.codigo && this.codigo >= 200 && this.codigo < 300)
