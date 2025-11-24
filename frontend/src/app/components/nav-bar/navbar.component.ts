@@ -15,7 +15,6 @@ export class NavbarComponent {
   private readonly api = environment.apiUrl;
   isOpen = false;
 
-  // Pegar do Token
   userName = 'Usuário';
   cargo: string | null = null;
 
