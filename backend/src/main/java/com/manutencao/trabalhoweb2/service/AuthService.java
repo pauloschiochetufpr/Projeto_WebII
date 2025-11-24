@@ -8,12 +8,10 @@ import com.manutencao.trabalhoweb2.model.CepModel;
 import com.manutencao.trabalhoweb2.model.Cliente;
 import com.manutencao.trabalhoweb2.model.Endereco;
 import com.manutencao.trabalhoweb2.model.ClienteEndereco;
-import com.manutencao.trabalhoweb2.model.Funcionario;
 import com.manutencao.trabalhoweb2.repository.ClienteRepository;
 import com.manutencao.trabalhoweb2.repository.EnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.ClienteEnderecoRepository;
 import com.manutencao.trabalhoweb2.repository.CepRepository;
-import com.manutencao.trabalhoweb2.repository.FuncionarioRepository;
 // Falso erro abaixo
 import com.manutencao.trabalhoweb2.service.EmailService;
 
@@ -40,9 +38,6 @@ public class AuthService {
     private ClienteRepository clienteRepository;
 
     @Autowired
-    private FuncionarioRepository funcionarioRepository;
-
-    @Autowired
     private EnderecoRepository enderecoRepository;
 
     @Autowired
@@ -67,10 +62,8 @@ public class AuthService {
             // Verificação de existência por CPF e e-mail
             Optional<Cliente> existentePorCpf = clienteRepository.findByCpf(req.cpf);
             Optional<Cliente> existentePorEmail = clienteRepository.findByEmail(req.email);
-            Optional<Funcionario> existeFunPorEmail = funcionarioRepository.findByEmail(req.email);
-            
-            // Verificação de email de funcionario criada
-            if (existentePorCpf.isPresent() || existentePorEmail.isPresent() || existeFunPorEmail.isPresent()) {
+
+            if (existentePorCpf.isPresent() || existentePorEmail.isPresent()) {
 
                 return new BasicResponse(400, "Usuário com esse documento e/ou email já existe");
             }
@@ -148,63 +141,31 @@ public class AuthService {
     @Transactional
     public Object login(LoginRequest req) {
         Optional<Cliente> clienteOpt = clienteRepository.findByEmail(req.getEmail());
-        Optional<Funcionario> funOptional = funcionarioRepository.findByEmail(req.getEmail());
 
-        if (clienteOpt.isEmpty() && funOptional.isEmpty()) {
+        if (clienteOpt.isEmpty()) {
             return new BasicResponse(404, "Usuário não encontrado");
         }
-        if (!clienteOpt.isEmpty()) {
 
-            Cliente cliente = clienteOpt.get();
+        Cliente cliente = clienteOpt.get();
 
-            // valida senha com BCrypt
-            boolean senhaValida = BCrypt.checkpw(req.getSenha(), cliente.getSenhaHash());
-            if (!senhaValida) {
-                return new BasicResponse(401, "Credenciais inválidas");
-            }
+        // valida senha com BCrypt
+        boolean senhaValida = BCrypt.checkpw(req.getSenha(), cliente.getSenhaHash());
+        if (!senhaValida) {
+            return new BasicResponse(401, "Credenciais inválidas");
+        }
 
-            // Montar claims
-            Map<String, Object> claims = Map.of(
-                "id", cliente.getIdCliente(),
-                "nome", cliente.getNome(),
+        // Montar claims
+        Map<String, Object> claims = Map.of(
+                "idCliente", cliente.getIdCliente(),
                 "tipoUsuario", "cliente",
-                "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond()
-            );
-                
-                
-            // Gerar tokens
-            String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);
-            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(cliente.getIdCliente()));
+                "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond());
 
+        // Gerar tokens
+        String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);
+        String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(cliente.getIdCliente()));
 
-            // Retornar resposta AuthResponse
-            return new AuthResponse(accessToken, refreshToken);
-        }
-        if (!funOptional.isEmpty()) {
-
-            Funcionario func = funOptional.get();
-
-            boolean senhaValida = BCrypt.checkpw(req.getSenha(), func.getSenhaHash());
-            if (!senhaValida) {
-                return new BasicResponse(401, "credenciais inválidas");
-            }
-
-            // Montar claims
-            Map<String, Object> claims = Map.of(
-                    "id", func.getIdFuncionario(),
-                    "nome", func.getNome(),
-                    "tipoUsuario", "funcionario",
-                    "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond());
-
-            // Gerar tokens
-            String accessToken = jwtUtil.generateAccessToken(String.valueOf(func.getIdFuncionario()), claims);
-            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(func.getIdFuncionario()));
-
-            // Retornar resposta AuthResponse
-            return new AuthResponse(accessToken, refreshToken);
-        }
-         return new BasicResponse(500, "Servidor com erro inesperado");
-
+        // Retornar resposta AuthResponse
+        return new AuthResponse(accessToken, refreshToken);
     }
 
     // =====================================================

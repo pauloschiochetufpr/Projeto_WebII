@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, delay, catchError } from 'rxjs/operators';
 import {
   SolicitacaoCreateDto,
   CategoriaEquipamento,
@@ -87,7 +87,8 @@ export class SolicitacaoService {
       );
   }
 
-  // busca solicitações de um funcionário com última atualização
+  
+ // busca solicitações de um funcionário com última atualização
   listarPorFuncionarioComLastUpdate(funcionarioId: number): Observable<any[]> {
     return this.http
       .get<any[]>(
@@ -123,39 +124,6 @@ export class SolicitacaoService {
     );
   }
 
-  // funcionário vê somente ABERTAS na HOME
-  listarAbertasParaFuncionario(): Observable<SolicitacaoDto[]> {
-    return this.http.get<SolicitacaoDto[]>(`${this.baseUrl}/funcionario/abertas`).pipe(
-      catchError(err => {
-        console.error("Erro ao buscar ABERTAS para funcionário", err);
-        return throwError(() => new Error("Falha ao buscar abertas"));
-      })
-    );
-  }
-
-  // solicitações do funcionário — todas que ele já mexeu
-  listarSomenteDoFuncionario(funcionarioId: number): Observable<SolicitacaoDto[]> {
-    return this.http.get<SolicitacaoDto[]>(`${this.baseUrl}/funcionario/${funcionarioId}/minhas`).pipe(
-      catchError(err => {
-        console.error(`Erro ao buscar solicitações manipuladas por ${funcionarioId}`, err);
-        return throwError(() => new Error("Falha ao buscar solicitações manipuladas"));
-      })
-    );
-  }
-
-  /**
-   * Atualização completa da solicitação (PUT), usado pelo dialog para
-   * alterar valor/idStatus/nome/descrição etc.
-   */
-  atualizarSolicitacao(id: number, dto: Partial<SolicitacaoDto>): Observable<SolicitacaoDto> {
-    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto).pipe(
-      catchError(err => {
-        console.error('Erro ao atualizar solicitação', err);
-        return throwError(() => err);
-      })
-    );
-  }
-
   // buscar solicitações por idStatus (ex: 1 = ABERTA)
   buscarPorStatus(idStatus: number): Observable<SolicitacaoDto[]> {
     return this.http
@@ -172,45 +140,42 @@ export class SolicitacaoService {
 
   // cliente cria solicitação (mexer só no id pra ser o de quem esta criando)
   criarSolicitacao(data: SolicitacaoCreateDto): Observable<SolicitacaoDto> {
-    const dto = {
-      nome: data.descricaoEquipamento,
-      descricao: data.descricaoDefeito,
-      idCliente: 1, // TODO: pegar do usuário autenticado
-      idCategoria: this.mapCategoria(data.categoriaEquipamento),
-      valor: 0,
-      idStatus: 1,
-      ativo: true,
-    };
+  const dto = {
+    nome: data.descricaoEquipamento,
+    descricao: data.descricaoDefeito,
+    idCliente: 1, // TODO: pegar do usuário autenticado
+    idCategoria: this.mapCategoria(data.categoriaEquipamento),
+    valor: 0,
+    idStatus: 1,
+    ativo: true,
+  };
 
-    console.log('Enviando solicitação:', dto); // Para debug
+  console.log('Enviando solicitação:', dto); // Para debug
 
-    return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
-      catchError((err) => {
-        console.error('Erro detalhado:', err);
-        return throwError(() => err);
-      })
-    );
+  return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
+    catchError((err) => {
+      console.error('Erro detalhado:', err);
+      return throwError(() => err);
+    })
+  );
+}
+
+  atualizarSolicitacao(
+    id: number,
+    dto: Partial<SolicitacaoDto>
+  ): Observable<SolicitacaoDto> {
+    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto);
   }
 
-  /**
-   * Atualiza somente o status (PATCH para /{id}/status).
-   * Opcionalmente envia funcionarioId (para redirecionamento/orçamento) e cliente flag.
-   */
   atualizarStatus(
     id: number,
     novoStatus: number,
-    cliente: boolean = false,
-    funcionarioId?: number,
-    motivo?: string
-  ): Observable<any> {
-    const body: any = { novoStatus, cliente };
-    if (funcionarioId != null) body.funcionarioId = funcionarioId;
-    if (motivo != null) body.motivo = motivo;
-    return this.http.patch<any>(`${this.baseUrl}/${id}/status`, body).pipe(
-      catchError((err) => {
-        console.error('Erro ao atualizar status', err);
-        return throwError(() => err);
-      })
+    cliente: boolean = false
+  ): Observable<SolicitacaoDto> {
+    const body = { novoStatus, cliente };
+    return this.http.patch<SolicitacaoDto>(
+      `${this.baseUrl}/${id}/status`,
+      body
     );
   }
 
@@ -220,35 +185,42 @@ export class SolicitacaoService {
   }
 
   // Buscar histórico de uma solicitação
-  getHistorico(idSolicitacao: number): Observable<HistSolicitacao[]> {
-    return this.http
-      .get<HistSolicitacao[]>(`${this.baseUrl}/${idSolicitacao}/historico`)
-      .pipe(
-        catchError((err) => {
-          console.error('Erro ao buscar histórico', err);
-          return throwError(() => new Error('Falha ao buscar histórico'));
-        })
-      );
-  }
+ getHistorico(idSolicitacao: number): Observable<HistSolicitacao[]> {
+  return this.http
+    .get<HistSolicitacao[]>(`${this.baseUrl}/${idSolicitacao}/historico`, {
+      observe: 'response',
+    })
+    .pipe(
+      map((resp) => {
+        if (resp.status === 204 || !resp.body) {
+          return []; 
+        }
+        return resp.body as HistSolicitacao[];
+      }),
+      catchError((err) => {
+        console.error('Erro ao buscar histórico', err);
+        return of([]); 
+      })
+    );
+}
+
 
   // Listar categorias (com mock) fazer a integração
   getCategorias(): Observable<CategoriaEquipamento[]> {
-    return this.http
-      .get<CategoriaEquipamento[]>(`${environment.apiUrl}/categorias`)
-      .pipe(
-        catchError((err) => {
-          console.error('Erro ao carregar categorias do backend', err);
-          // Fallback em caso de erro
-          return of([
-            { id: 1, nome: 'Notebook', ativo: true },
-            { id: 2, nome: 'Desktop', ativo: true },
-            { id: 3, nome: 'Impressora', ativo: true },
-            { id: 4, nome: 'Mouse', ativo: true },
-            { id: 5, nome: 'Teclado', ativo: true },
-          ]);
-        })
-      );
-  }
+  return this.http.get<CategoriaEquipamento[]>(`${environment.apiUrl}/categorias`).pipe(
+    catchError((err) => {
+      console.error('Erro ao carregar categorias do backend', err);
+      // Fallback em caso de erro
+      return of([
+        { id: 1, nome: 'Notebook', ativo: true },
+        { id: 2, nome: 'Desktop', ativo: true },
+        { id: 3, nome: 'Impressora', ativo: true },
+        { id: 4, nome: 'Mouse', ativo: true },
+        { id: 5, nome: 'Teclado', ativo: true },
+      ]);
+    })
+  );
+}
 
   mapStatus(idStatus?: number): string {
     switch (idStatus) {

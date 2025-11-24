@@ -44,18 +44,6 @@ public class Solicitacao {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "descricao_manutencao", nullable = true)
-    private String descricaoManutencao;
-
-    @Column(name = "orientacoes_cliente", nullable = true)
-    private String orientacoesCliente;
-
-    @Column(name = "funcionario_responsavel")
-    private Integer funcionarioResponsavel;
-
-    @Column(name = "funcionario_redirecionado_para")
-    private Integer funcionarioRedirecionadoPara;
-
     public Solicitacao() {}
 
     public Solicitacao(String nome, String descricao, Cliente cliente, BigDecimal valor, Integer idStatus, Integer idCategoria) {

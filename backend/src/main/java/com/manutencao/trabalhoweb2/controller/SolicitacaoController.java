@@ -68,25 +68,6 @@ public class SolicitacaoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/funcionario/abertas")
-    public ResponseEntity<List<SolicitacaoLastUpdateDto>> listarAbertasParaFuncionario() {
-    List<SolicitacaoLastUpdateDto> list = solicitacaoService.listarAbertasParaFuncionario();
-    return ResponseEntity.ok(list);
-}
-
-
-    @GetMapping("/funcionario/{id}/minhas")
-    public ResponseEntity<List<Solicitacao>> listarSomenteFuncionario(@PathVariable Long id) {
-
-    List<Solicitacao> lista = solicitacaoService.listarSomenteDoFuncionario(id);
-
-    if (lista.isEmpty()) return ResponseEntity.noContent().build();
-
-    return ResponseEntity.ok(lista);
-}
-
-
-
     // =======================================================
     // BUSCAR POR STATUS
     // =======================================================
@@ -222,16 +203,30 @@ public class SolicitacaoController {
     // =======================================================
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody SolicitacaoDto dto) {
-    try {
-        Solicitacao nova = solicitacaoService.criar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nova);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
-}
+    public ResponseEntity<?> criar(@RequestBody SolicitacaoCreateDto body) {
+        try {
+            Long idCliente = 1L; // futuro: pegar do JWT
 
+            SolicitacaoDto dto = new SolicitacaoDto(
+                    null,
+                    body.getDescricaoEquipamento(),
+                    body.getDescricaoDefeito(),
+                    idCliente,
+                    java.math.BigDecimal.ZERO,
+                    1,
+                    mapCategoria(body.getCategoriaEquipamento()),
+                    true
+            );
+
+            Solicitacao s = solicitacaoService.criar(dto);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(solicitacaoService.toDto(s));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 
     private Integer mapCategoria(String nome) {
         if (nome == null) return 0;
@@ -265,20 +260,18 @@ public class SolicitacaoController {
     // ATUALIZAR STATUS / HISTÓRICO
     // =======================================================
 
-      @PatchMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<?> atualizarStatus(
             @PathVariable Long id,
-            @RequestBody AtualizarStatusDto dto) {
+            @RequestBody AtualizarStatusDto dto
+    ) {
         try {
             Solicitacao s = solicitacaoService.atualizarStatus(id, dto);
             return ResponseEntity.ok(solicitacaoService.toDto(s));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 

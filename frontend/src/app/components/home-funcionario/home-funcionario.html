@@ -1,37 +1,50 @@
 <div class="w-full p-4 font-sansation">
-  <div class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-6">
-
-    <!-- Faixa diagonal decorativa (identidade visual) -->
+  <div
+    class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-4"
+  >
+    <!-- faixa diagonal decorativa (aparece em telas maiores) -->
     <div
-      class="hidden lg:block -rotate-45 bg-verde-sec w-[300px] h-[600px] absolute right-0 -top-[200px] opacity-80 pointer-events-none -z-10">
-    </div>
+      class="hidden lg:block -rotate-45 bg-verde-sec w-[300px] h-[600px] absolute right-0 -top-[200px] opacity-80 pointer-events-none -z-10"
+    ></div>
 
     <!-- Cabeçalho -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-azul-main">Página Inicial (Funcionário)</h2>
-
-      <span *ngIf="!loading" class="text-sm text-slate-600">
-        Solicitações abertas:
-        <strong class="text-azul-main">{{ solicitations.length }}</strong>
-      </span>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-semibold text-azul-main">
+        Página Inicial (Funcionário)
+      </h2>
+      <span *ngIf="!loading" class="text-sm text-slate-600"
+        >Solicitações abertas:
+        <strong class="text-azul-main">{{ solicitations.length }}</strong></span
+      >
     </div>
 
     <!-- Estado de carregamento / erro -->
     <div class="mb-4">
-      <p *ngIf="loading" class="text-sm text-slate-600">Carregando solicitações...</p>
-      <p *ngIf="error" class="text-sm text-red-600 font-semibold">{{ error }}</p>
+      <p *ngIf="loading" class="text-sm text-slate-600">
+        Carregando solicitações...
+      </p>
+      <p *ngIf="error" class="text-sm text-red-600 font-semibold">
+        {{ error }}
+      </p>
     </div>
 
     <!-- Tabela -->
-    <div class="overflow-x-auto border border-azul-main rounded-lg shadow-sm">
-      <table class="min-w-full border-collapse">
-
-        <thead class="bg-azul-main">
-          <tr>
-            <th class="p-3 text-left text-sm font-semibold text-white">Data / Hora</th>
-            <th class="p-3 text-left text-sm font-semibold text-white">Cliente</th>
-            <th class="p-3 text-left text-sm font-semibold text-white">Descrição</th>
-            <th class="p-3 text-center text-sm font-semibold text-white">Ações</th>
+    <div class="overflow-x-auto">
+      <table class="min-w-full w-full border-collapse">
+        <thead>
+          <tr class="bg-azul-main">
+            <th class="p-3 text-left text-sm font-semibold text-white">
+              Data / Hora
+            </th>
+            <th class="p-3 text-left text-sm font-semibold text-white">
+              Cliente
+            </th>
+            <th class="p-3 text-left text-sm font-semibold text-white">
+              Descrição (produto)
+            </th>
+            <th class="p-3 text-center text-sm font-semibold text-white">
+              Ações
+            </th>
           </tr>
         </thead>
 
@@ -40,34 +53,27 @@
             <td class="p-3 text-sm text-slate-700">
               {{ dateSelection.formatDateDisplay(s.lastUpdate, true) }}
             </td>
-
             <td class="p-3 text-sm text-slate-700">
               {{ getClientName(s) }}
             </td>
-
             <td class="p-3 text-sm text-slate-700">
               {{ getDescriptionTruncated(s, 30) }}
             </td>
-
-            <td class="p-3 text-center">
+            <td class="p-3 text-sm text-center">
               <a
-              (click)="irParaOrcamento(s)"
-              class="inline-block px-4 py-2 rounded-md bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold transition cursor-pointer"
-              title="Ir para Orçar"
-            >
-              Orçar
-            </a>
+                class="inline-block px-4 py-2 rounded-md bg-verde-sec bg-opacity-80 hover:bg-opacity-100 text-azul-main font-semibold transition"
+                title="Ir para Orçar"
+                >Orçar</a
+              >
             </td>
           </tr>
 
-          <!-- Lista vazia -->
           <tr *ngIf="!loading && solicitations.length === 0">
             <td colspan="4" class="p-6 text-center text-slate-600">
               Nenhuma solicitação ABERTA no momento.
             </td>
           </tr>
         </tbody>
-
       </table>
     </div>
   </div>

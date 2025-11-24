@@ -10,6 +10,7 @@ import { SolicitacaoService, SolicitacaoDto } from '../../services/solicitacao';
 import { JsonTestService } from '../../services/jsontest';
 import { DateSelection } from '../../services/date-selection';
 import { RangeDatePicker } from '../../components/range-date-picker/range-date-picker';
+import { FuncHeader } from '../../components/func-header/func-header';
 import { VisualizarServicosDialog } from '../../components/visualizar-servico-dialog/visualizar-servicos-dialog';
 import { jwtDecode } from 'jwt-decode';
 
@@ -34,6 +35,7 @@ interface DisplayUser {
     HttpClientModule,
     RouterModule,
     RangeDatePicker,
+    FuncHeader,
     MatDialogModule,
   ],
   templateUrl: './listar.html',
@@ -41,19 +43,18 @@ interface DisplayUser {
 })
 export class Listar implements OnInit {
   users: DisplayUser[] = [];
-  id: number | undefined;
   loading = false;
   error: string | null = null;
   summary = 'Pressione "Atualizar" para carregar';
   periodStartMs: number | null = null;
   periodEndMs: number | null = null;
+  id: number | undefined;
 
   filtro: 'HOJE' | 'TODAS' | 'PERIODO' = 'HOJE';
   searchClient: string = '';
   searchState: string = '';
 
   currentEmployeeDestinationName: string | null = 'Oficina Centro';
-  tipoUsuario: any;
 
   constructor(
     private solicitacaoService: SolicitacaoService,
@@ -66,82 +67,51 @@ export class Listar implements OnInit {
     this.onRefresh();
   }
 
-  
-  private extrairDadosDoToken() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return;
-
-  try {
-    const payload: any = jwtDecode(token);
-
-    // tipoUsuario sempre existe
-    this.tipoUsuario = payload?.tipoUsuario ?? null;
-
-    // ID pode estar em três lugares
-    this.id =
-      payload?.id ??
-      payload?.idCliente ??
-      Number(payload?.sub) ??
-      null;
-
-  } catch (e) {
-    console.error('Falha ao decodificar token:', e);
-  }
-}
-
   // 🔹 Busca no back-end
   onRefresh(): void {
-  this.loading = true;
-  this.error = null;
-  this.summary = 'Carregando...';
-  this.users = [];
+    this.loading = true;
+    this.error = null;
+    this.summary = 'Carregando...';
+    this.users = [];
 
-  this.extrairDadosDoToken();
+    this.solicitacaoService
+      .listarPorFuncionarioComLastUpdate(this.id!)
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any[]) => {
+          const normalized = data.map((s) => ({
+            id: s.idSolicitacao,
+            createdAt:
+              s.lastUpdate ??
+              s.createdAt ??
+              s['dataHora'] ??
+              new Date().toISOString(),
+            requesterName: s.cliente?.nome ?? `Cliente #${s.idCliente}`,
+            description: s.descricao,
+            state: this.solicitacaoService.mapStatus(s.idStatus),
+            redirectDestinationName: '-',
+            budget: s.valor,
+            lastUpdate: s.lastUpdate ?? null,
+          }));
 
-  if (!this.id) {
-    console.error('ID do funcionário não encontrado no token.');
-    this.loading = false;
-    return;
+          this.users = normalized;
+          this.computePeriodFromSelection();
+          this.loading = false;
+          this.summary = `${this.users.length} registro(s) carregado(s)`;
+
+          console.log(
+            'Solicitações recebidas do backend (com lastUpdate):',
+            data
+          );
+        },
+        error: (err) => {
+          console.error('Erro ao buscar solicitações:', err);
+          this.error = 'Erro ao buscar solicitações';
+          this.loading = false;
+          this.summary = '';
+        },
+      });
   }
-
-  this.solicitacaoService
-    .listarSomenteDoFuncionario(this.id!)
-    .pipe(take(1))
-    .subscribe({
-      next: (data: any[]) => {
-        const normalized = data.map((s) => ({
-          id: s.idSolicitacao,
-          createdAt:
-            s.lastUpdate ??
-            s.createdAt ??
-            s['dataHora'] ??
-            new Date().toISOString(),
-          requesterName: s.cliente?.nome ?? `Cliente #${s.idCliente}`,
-          description: s.descricao,
-          state: this.solicitacaoService.mapStatus(s.idStatus),
-          redirectDestinationName: '-',
-          budget: s.valor,
-          lastUpdate: s.lastUpdate ?? null,
-        }));
-
-        this.users = normalized;
-        this.computePeriodFromSelection();
-        this.loading = false;
-        this.summary = `${this.users.length} registro(s) carregado(s)`;
-
-        console.log(
-          'Solicitações recebidas do backend (somente do funcionário):',
-          data
-        );
-      },
-      error: (err) => {
-        console.error('Erro ao buscar solicitações:', err);
-        this.error = 'Erro ao buscar solicitações';
-        this.loading = false;
-        this.summary = '';
-      },
-    });
-}
 
   // 🔹 Funções auxiliares de data (delegando para o JsonTestService)
   private parseDate(value?: string | number | null): Date | null {
@@ -427,7 +397,19 @@ export class Listar implements OnInit {
       );
     }).length;
   }
-
-
-
+  
+  private extrairDadosDoToken() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+  
+      try {
+        const payload: any = jwtDecode(token);
+  
+        if (payload?.id) {
+          this.id = payload.id;
+        }
+      } catch (e) {
+        console.error('Falha ao decodificar token:', e);
+      }
+    }
 }

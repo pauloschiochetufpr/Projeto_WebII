@@ -75,11 +75,9 @@ export class HomeCliente implements OnInit, OnDestroy {
       .listarPorClienteComLastUpdate(clienteId)
       .subscribe({
         next: (arr) => {
-        const lista = Array.isArray(arr) ? arr : [];
-        this.solicitations = lista.map((d) => this.normalize(d));
-        this.loading = false;
-      }
-,
+          this.solicitations = arr.map((d) => this.normalize(d));
+          this.loading = false;
+        },
         error: (err) => {
           console.error('Erro ao carregar solicitações', err);
           this.error = 'Erro ao carregar solicitações';
@@ -89,25 +87,6 @@ export class HomeCliente implements OnInit, OnDestroy {
 
     this.sub.add(s);
   }
-
-  private extrairDadosDoToken() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return;
-
-  try {
-    const payload: any = jwtDecode(token);
-
-    // Cliente usa SUB
-    if (payload?.sub) {
-      this.id = payload.sub;
-    }
-
-  } catch (e) {
-    console.error('Falha ao decodificar token:', e);
-  }
-}
-
-
 
   normalize(d: any): Solicitation {
     return {
@@ -185,5 +164,21 @@ export class HomeCliente implements OnInit, OnDestroy {
 
   formatDate(value?: string | number | null, withTime: boolean = true): string {
     return this.dateSelection.formatDateDisplay(value, withTime);
+  }
+
+
+    private extrairDadosDoToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+
+      if (payload?.id) {
+        this.id = payload.id;
+      }
+    } catch (e) {
+      console.error('Falha ao decodificar token:', e);
+    }
   }
 }

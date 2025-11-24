@@ -101,16 +101,13 @@ public class TokenAdminService {
 
     // Solicitar novo access token
     @Transactional
-    public AuthResponse tokenRotation(String refreshToken, String accessToken) {
+    public AuthResponse tokenRotation(String refreshToken) {
         try {
             // Token ausente
             if (refreshToken == null || refreshToken.isBlank()) {
-            return new AuthResponse(400, "Token de atualização ausente");
+                return new AuthResponse(400, "Token de atualização ausente");
             }
-            if (accessToken == null || accessToken.isBlank()) {
-                return new AuthResponse(400, "Access token ausente");
-            }
-            
+
             // Token já foi usado
             if (blacklistRepository.existsByToken(refreshToken)) {
                 return new AuthResponse(401, "Token inválido ou já utilizado");
@@ -122,22 +119,17 @@ public class TokenAdminService {
             }
 
             // Decodifica claims
-            Claims claims;
-            try {
-                claims = jwtUtil.getAllClaims(accessToken); 
-            } catch (Exception e) {
-                return new AuthResponse(401, "Access token inválido");
+            Claims claims = jwtUtil.getAllClaims(refreshToken);
+
+            // Obtem o subject (id do cliente)
+            String idClienteStr = claims.getSubject();
+            if (idClienteStr == null || idClienteStr.isBlank()) {
+                return new AuthResponse(400, "Token de atualização corrompido");
             }
 
-            // Obtem o subject
-            String idStr = claims.getSubject();
-            if (idStr == null || idStr.isBlank()) {
-                return new AuthResponse(400, "Access token corrompido");
-            }
-
-            Long id;
+            Long idCliente;
             try {
-                id = Long.parseLong(idStr);
+                idCliente = Long.parseLong(idClienteStr);
             } catch (NumberFormatException nfe) {
                 return new AuthResponse(400, "Formato de ID inválido no token");
             }
@@ -147,14 +139,13 @@ public class TokenAdminService {
 
             // Gera novo access token e refresh token
             Map<String, Object> newClaims = Map.of(
-                "idCliente", id,
-                "nome", claims.get("nome", String.class),
+                "idCliente", idCliente,
                 "tipoUsuario", claims.get("tipoUsuario", String.class),
                 "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond()
             );
 
-            String novoAccess = jwtUtil.generateAccessToken(idStr, newClaims);
-            String novoRefresh = jwtUtil.generateRefreshToken(idStr);
+            String novoAccess = jwtUtil.generateAccessToken(idClienteStr, newClaims);
+            String novoRefresh = jwtUtil.generateRefreshToken(idClienteStr);
 
             return new AuthResponse(novoAccess, novoRefresh);
 
@@ -163,31 +154,9 @@ public class TokenAdminService {
             e.printStackTrace();
             return new AuthResponse(401, "Token de atualização inválido");
         } catch (Exception e) {
-                // 🔍 DEBUG COMPLETO PARA ERROS INESPERADOS
-                System.out.println("\n=======================[DEBUG TOKEN ROTATION - ERRO INESPERADO]=======================");
-                System.out.println("Timestamp: " + Instant.now());
-                System.out.println("Tipo de exceção: " + e.getClass().getName());
-                System.out.println("Mensagem da exceção: " + e.getMessage());
-                System.out.println("Causa (getCause): " + (e.getCause() != null ? e.getCause().toString() : "null"));
-
-                System.out.println("\n--- Stacktrace completo ---");
-                e.printStackTrace(System.out);
-
-                System.out.println("\n--- Variáveis importantes no momento do erro ---");
-                System.out.println("Refresh Token recebido: " + refreshToken);
-                try {
-                    System.out.println("Validade do refresh (jwtUtil.isTokenValid): " + jwtUtil.isTokenValid(refreshToken));
-                } catch (Exception ex2) {
-                    System.out.println("Falha ao validar refresh token dentro do bloco de debug: " + ex2.getMessage());
-                }
-
-                System.out.println("\n--- Informações adicionais ---");
-                System.out.println("blacklistRepository.existsByToken(refreshToken): " +
-                    blacklistRepository.existsByToken(refreshToken));
-
-                System.out.println("=======================================================================================\n");
-
-                return new AuthResponse(500, "Erro interno ao renovar token");
+            // Erros inesperados
+            e.printStackTrace();
+            return new AuthResponse(500, "Erro interno ao renovar token");
         }
     }
 
@@ -201,10 +170,12 @@ public class TokenAdminService {
             Date exp = jwtUtil.getExpiration(token);
             LocalDateTime dataExp = LocalDateTime.ofInstant(exp.toInstant(), ZoneId.systemDefault());
             TokenBlacklist entry = new TokenBlacklist(token, dataExp);
+            entry.setRevogado(true);
             blacklistRepository.save(entry);
         } catch (JwtException e) {
             // Mesmo tokens inválidos podem ser adicionados (por segurança)
             TokenBlacklist entry = new TokenBlacklist(token, LocalDateTime.now().plusDays(7));
+            entry.setRevogado(true);
             blacklistRepository.save(entry);
         }
     }
