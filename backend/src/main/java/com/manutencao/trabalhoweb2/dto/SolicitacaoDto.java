@@ -10,5 +10,6 @@ public record SolicitacaoDto(
     BigDecimal valor,
     Integer idStatus,
     Integer idCategoria,
-    Boolean ativo
+    Boolean ativo,
+    Integer funcionarioId
 ) {}

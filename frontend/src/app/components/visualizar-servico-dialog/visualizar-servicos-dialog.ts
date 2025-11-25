@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SolicitacaoService } from '../../services/solicitacao';
 import { FuncionarioService } from '../../services/funcionarioService';
+import { jwtDecode } from 'jwt-decode';
 
 export interface HistoryStep {
   state: string;
@@ -46,6 +47,7 @@ export class VisualizarServicosDialog implements OnInit {
   funcionariosLoading = false;
   funcionariosError: string | null = null;
   redirecionando = false;
+  idfunc: number | undefined;
 
   constructor(
     public dialogRef: MatDialogRef<VisualizarServicosDialog>,
@@ -87,6 +89,7 @@ export class VisualizarServicosDialog implements OnInit {
   efetuarOrcamento() {
     this.orcamentoErro = null;
 
+    this.extrairDadosDoToken();
     // validação básica
     if (!this.valorValido()) {
       this.orcamentoErro = 'Digite um valor válido maior que 0';
@@ -119,11 +122,12 @@ export class VisualizarServicosDialog implements OnInit {
           idStatus: 2, // ORÇADA
           idCategoria: solicitacao.idCategoria,
           ativo: solicitacao.ativo ?? true,
+          funcionarioId: this.idfunc,
         };
 
         this.solicitacaoService.atualizarSolicitacao(id, dto).subscribe({
           next: (res) => {
-            // atualiza UI local e fecha diálogo
+            // opcional: se quiser também gravar via PATCH, veja opção abaixo
             this.data.user.budget = res.valor;
             this.data.user.state = 'ORÇADA';
             this.dialogRef.close({ action: 'ORÇAR', user: this.data.user });
@@ -322,5 +326,20 @@ export class VisualizarServicosDialog implements OnInit {
 
   trackHistory(index: number, item: any) {
     return item.id || index;
+  }
+
+  private extrairDadosDoToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+
+      if (payload?.id) {
+        this.idfunc = payload.id;
+      }
+    } catch (e) {
+      console.error('Falha ao decodificar token:', e);
+    }
   }
 }

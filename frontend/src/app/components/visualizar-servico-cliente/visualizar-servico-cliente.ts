@@ -2,9 +2,10 @@ import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Solicitation } from '../../models/solicitacao.model';
+
 import { SolicitacaoService } from '../../services/solicitacao';
 import { DateSelection } from '../../services/date-selection';
+import { Solicitation } from '../../models/solicitacao.model';
 
 @Component({
   selector: 'app-visualizar-servico-cliente-dialog',
@@ -23,11 +24,15 @@ export class VisualizarServicoClienteDialog {
     public dateSelection: DateSelection
   ) {}
 
+  // ============================================================
+  // 🔵 APROVAR SERVIÇO (ORÇADA → APROVADA)
+  // ============================================================
   aprovar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
+
     this.solicitacaoService
-      .atualizarStatus(this.data.idSolicitacao, 3)
+      .atualizarStatus(Number(this.data.idSolicitacao), 3)
       .subscribe({
         next: (updated) => {
           this.loading = false;
@@ -46,14 +51,18 @@ export class VisualizarServicoClienteDialog {
       });
   }
 
+  // ============================================================
+  // 🔵 REJEITAR SERVIÇO (ORÇADA → REJEITADA)
+  // ============================================================
   rejeitar() {
     if (!this.data?.idSolicitacao) return;
     const motivo = prompt('Motivo da rejeição:');
     if (!motivo) return;
 
     this.loading = true;
+
     this.solicitacaoService
-      .atualizarStatus(this.data.idSolicitacao, 4)
+      .atualizarStatus(Number(this.data.idSolicitacao), 4)
       .subscribe({
         next: (updated) => {
           this.loading = false;
@@ -73,11 +82,15 @@ export class VisualizarServicoClienteDialog {
       });
   }
 
+  // ============================================================
+  // 🔵 PAGAR (ARRUMADA → PAGA)
+  // ============================================================
   pagar() {
     if (!this.data?.idSolicitacao) return;
     this.loading = true;
+
     this.solicitacaoService
-      .atualizarStatus(this.data.idSolicitacao, 7)
+      .atualizarStatus(Number(this.data.idSolicitacao), 7)
       .subscribe({
         next: (updated) => {
           this.loading = false;
@@ -96,10 +109,16 @@ export class VisualizarServicoClienteDialog {
       });
   }
 
+  // ============================================================
+  // 🔵 FECHAR
+  // ============================================================
   close() {
     this.dialogRef.close();
   }
 
+  // ============================================================
+  // 🔵 TEMPO DECORRIDO
+  // ============================================================
   calcularTempoDecorrido(dataCriacao: string): string {
     const inicio = new Date(dataCriacao).getTime();
     const agora = Date.now();

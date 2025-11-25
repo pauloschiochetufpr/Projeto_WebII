@@ -161,9 +161,15 @@ export class SolicitacaoService {
 
   atualizarSolicitacao(
     id: number,
-    dto: Partial<SolicitacaoDto>
+    dto: Partial<SolicitacaoDto> & { funcionarioId?: number }
   ): Observable<SolicitacaoDto> {
-    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, dto);
+    const body: any = { ...dto };
+
+    if (dto.funcionarioId !== undefined && dto.funcionarioId !== null) {
+      body.funcionarioId = dto.funcionarioId;
+    }
+
+    return this.http.put<SolicitacaoDto>(`${this.baseUrl}/${id}`, body);
   }
 
   atualizarStatus(

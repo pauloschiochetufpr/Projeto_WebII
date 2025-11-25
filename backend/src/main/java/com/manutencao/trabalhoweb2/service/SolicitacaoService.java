@@ -220,7 +220,13 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
         hist.setStatusOld(statusAntigoStr);
         hist.setStatusNew(salva.getIdStatus() != null ? String.valueOf(salva.getIdStatus()) : null);
         hist.setFuncionarioOld(null);
-        hist.setFuncionarioNew(null);
+        if (dto != null && dto.funcionarioId() != null) {
+    hist.setFuncionarioNew(dto.funcionarioId()); // Long
+} else {
+    hist.setFuncionarioNew(null);
+}
+
+hist.setFuncionarioOld(null);
         hist.setDataHora(LocalDateTime.now());
         // se sua entidade tem campo 'motivo' e você quiser registrar, adicione hist.setMotivo(dto.getMotivo()) se existir
 
@@ -250,7 +256,7 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     // ALTERAÇÃO DE STATUS + HISTÓRICO
     // ===============================================================
    @Transactional
-    public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
+public Solicitacao atualizarStatus(Long id, AtualizarStatusDto dto) {
     Solicitacao solicitacao = solicitacaoRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada"));
 
@@ -258,47 +264,32 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     if (novoStatusId == null) {
         throw new IllegalArgumentException("Novo status não pode ser nulo");
     }
+    System.out.println("DEBUG atualizarStatus - dto.novoStatus=" + dto.getNovoStatus()
+        + " dto.funcionarioId=" + dto.getFuncionarioId()
+        + " dto.cliente=" + dto.isCliente()
+        + " idSolicitacao=" + id);
 
-    // Guarda o status anterior
     Integer statusAntigo = solicitacao.getIdStatus();
-
-    // Atualiza o ID de status
     solicitacao.setIdStatus(novoStatusId);
 
-    // pega ultimo historico (se existir) para obter funcionarioNew anterior
     Optional<HistSolicitacao> ultimoOpt = histSolicitacaoRepository.findTopBySolicitacaoOrderByDataHoraDesc(solicitacao);
 
     Integer funcionarioOldId = null;
     if (ultimoOpt.isPresent()) {
-        // supondo que em HistSolicitacao.funcionarioNew o tipo seja Long (id)
-        funcionarioOldId = ultimoOpt.get().getFuncionarioNew(); // Long
+        funcionarioOldId = ultimoOpt.get().getFuncionarioNew();
     }
 
-
-    // Cria histórico
     HistSolicitacao historico = new HistSolicitacao();
     historico.setSolicitacao(solicitacao);
     historico.setCliente(dto.isCliente());
     historico.setStatusOld(statusAntigo != null ? statusAntigo.toString() : "N/A");
     historico.setStatusNew(novoStatusId.toString());
-    // define funcionarioOld com o id do último funcionarioNew (pode ser null)
     historico.setFuncionarioOld(funcionarioOldId);
-
-    // funcionarioNew vem do DTO (se o front passou); caso contrário, mantém null
-    if (dto.getFuncionarioId() != null) {
-        historico.setFuncionarioNew(dto.getFuncionarioId());
-    } else {
-        historico.setFuncionarioNew(null);
-    }
-
-    historico.setDataHora(LocalDateTime.now());
-
-    histSolicitacaoRepository.save(historico);
+    historico.setFuncionarioNew(dto.getFuncionarioId() != null ? dto.getFuncionarioId() : null);
     historico.setDataHora(LocalDateTime.now());
 
     histSolicitacaoRepository.save(historico);
 
-    // Salva solicitação atualizada
     return solicitacaoRepository.save(solicitacao);
 }
 
@@ -307,19 +298,30 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
     // HELPER
     // ===============================================================
     private void atualizarCampos(Solicitacao s, SolicitacaoDto dto) {
+    if (dto.nome() != null) {
         s.setNome(dto.nome());
+    }
+    if (dto.descricao() != null) {
         s.setDescricao(dto.descricao());
+    }
+    if (dto.valor() != null) {
         s.setValor(dto.valor());
+    }
+    if (dto.idStatus() != null) {
         s.setIdStatus(dto.idStatus());
+    }
+    if (dto.idCategoria() != null) {
         s.setIdCategoria(dto.idCategoria());
-        s.setAtivo(dto.ativo() != null ? dto.ativo() : true);
+    }
+    if (dto.ativo() != null) {
+        s.setAtivo(dto.ativo());
+    }
 
-        if (dto.idCliente() != null) {
-            Cliente cliente = clienteRepository.findById(dto.idCliente())
-                    .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado: " + dto.idCliente()));
-            s.setCliente(cliente);
-        } else {
-            s.setCliente(null);
-        }
+    // Atualiza cliente apenas quando idCliente foi informado (evita setar null)
+    if (dto.idCliente() != null) {
+        Cliente cliente = clienteRepository.findById(dto.idCliente())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado: " + dto.idCliente()));
+        s.setCliente(cliente);
+    }
     }
 }

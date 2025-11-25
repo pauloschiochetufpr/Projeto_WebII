@@ -102,7 +102,7 @@ List<Object[]> findAllLastUpdate();
     @Query("SELECT new com.manutencao.trabalhoweb2.dto.ReceitaDiariaDTO(CAST(h.dataHora AS LocalDate), SUM(s.valor), COUNT(s)) " +
            "FROM Solicitacao s " +
            "JOIN HistSolicitacao h ON s.idSolicitacao = h.solicitacao.idSolicitacao " +
-           "WHERE h.statusNew = 'PAGA' " +
+           "WHERE h.statusNew IN ('6', '7') " +
            "AND (:inicio IS NULL OR h.dataHora >= :inicio) " +
            "AND (:fim IS NULL OR h.dataHora <= :fim) " +
            "GROUP BY CAST(h.dataHora AS LocalDate) " +
@@ -114,7 +114,7 @@ List<Object[]> findAllLastUpdate();
            "FROM Solicitacao s, Categoria c, HistSolicitacao h " +
            "WHERE s.idCategoria = c.idCategoria " +
            "AND s.idSolicitacao = h.solicitacao.idSolicitacao " +
-           "AND h.statusNew = 'PAGA' " +
+           "AND h.statusNew IN ('6', '7')" +
            "GROUP BY c.nome " +
            "ORDER BY SUM(s.valor) DESC")
     List<ReceitaPorCategoriaDTO> findReceitaPorCategoria();
