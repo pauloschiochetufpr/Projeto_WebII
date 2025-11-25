@@ -1,9 +1,8 @@
-drop database manutencao;
+drop database Manutencao;
 
-Create DATABASE manutencao;
+Create DATABASE Manutencao;
 
-Use manutencao;
-
+Use Manutencao;
 Create table cep(
     cep VARCHAR(8) PRIMARY KEY,      
     logradouro VARCHAR(255),
@@ -65,16 +64,7 @@ CREATE TABLE categoria (
     nome VARCHAR(64) NOT NULL
 );
 
--- Categorias --
-INSERT INTO categoria (nome) VALUES 
-('Notebook'),
-('Desktop'),
-('Impressora'),
-('Mouse'),
-('Teclado');
 
-INSERT INTO categoria (nome) VALUES 
-('treko');
 
 CREATE TABLE funcionario (
     id_funcionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -93,32 +83,46 @@ CREATE TABLE stat (
     stat VARCHAR(15) NOT NULL
 );
 
--- Status --
-INSERT INTO stat (stat) VALUES ('ABERTA');
-INSERT INTO stat (stat) VALUES ('ORÇADA');
-INSERT INTO stat (stat) VALUES ('APROVADA');
-INSERT INTO stat (stat) VALUES ('REJEITADA');
-INSERT INTO stat (stat) VALUES ('ARRUMADA');
-INSERT INTO stat (stat) VALUES ('PAGA');
-INSERT INTO stat (stat) VALUES ('FINALIZADA');
-INSERT INTO stat (stat) VALUES ('REDIRECIONADA');
-
 CREATE TABLE solicitacao (
     id_solicitacao INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+
+    -- dados básicos
     nome VARCHAR(64) NOT NULL,
     descricao VARCHAR(255) NOT NULL,
-    id_cliente BIGINT UNSIGNED,
-    valor DECIMAL(10 , 2 ),
+
+    -- relacionamento
+    id_cliente BIGINT UNSIGNED NOT NULL,
+    id_categoria INT UNSIGNED NOT NULL,
     id_status INT UNSIGNED NOT NULL,
-    id_categoria INT UNSIGNED UNSIGNED NOT NULL,
+
+    -- valores
+    valor DECIMAL(10,2) DEFAULT 0,
+
+    -- informações adicionais usadas no fluxo do back e front
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- manutenção
+    descricao_manutencao TEXT NULL,
+    orientacoes_cliente TEXT NULL,
+
+    -- funcionário responsável atual
+    funcionario_responsavel INT UNSIGNED NULL,
+
+    -- redirecionamento
+    funcionario_redirecionado_para INT UNSIGNED NULL,
+
+    -- flags
     ativo BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (id_categoria)
-        REFERENCES categoria (id_categoria),
-    FOREIGN KEY (id_status)
-        REFERENCES stat (id_status),
-    FOREIGN KEY (id_cliente)
-        REFERENCES cliente (id_cliente)
+
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria),
+    FOREIGN KEY (id_status) REFERENCES stat(id_status),
+
+    FOREIGN KEY (funcionario_responsavel) REFERENCES funcionario(id_funcionario),
+    FOREIGN KEY (funcionario_redirecionado_para) REFERENCES funcionario(id_funcionario)
 );
+
 
 CREATE TABLE hist_solicitacao (
     id_historico INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -168,3 +172,29 @@ INSERT INTO ddd_validos (ddd) VALUES
 ('95'),
 ('96'),
 ('98'), ('99');
+
+-- Status --
+INSERT INTO stat (stat) VALUES ('ABERTA');
+INSERT INTO stat (stat) VALUES ('ORÇADA');
+INSERT INTO stat (stat) VALUES ('APROVADA');
+INSERT INTO stat (stat) VALUES ('REJEITADA');
+INSERT INTO stat (stat) VALUES ('ARRUMADA');
+INSERT INTO stat (stat) VALUES ('PAGA');
+INSERT INTO stat (stat) VALUES ('FINALIZADA');
+INSERT INTO stat (stat) VALUES ('REDIRECIONADA');
+
+-- Categorias --
+INSERT INTO categoria (nome) VALUES 
+('Notebook'),
+('Desktop'),
+('Impressora'),
+('Mouse'),
+('Teclado');
+
+ALTER TABLE hist_solicitacao
+ADD motivo TEXT NULL;
+
+select * from funcionario;
+
+-- 0) Use o banco correto
+USE manutencao;
