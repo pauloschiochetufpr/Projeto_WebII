@@ -1,40 +1,50 @@
-<div class="w-full p-4 font-sa-sansation bg-azul-main min-h-[93vh]">
+<div class="w-full p-4 font-sa-sansation bg-azul-main h-fit min-h-[93vh]">
   <div class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-4">
     <table class="w-full table-auto border-separate border-spacing-y-2">
       <thead class="bg-azul-main/90 shadow-gray-500 shadow-inner text-white rounded-md select-none">
         <tr>
-          <th class="py-3 px-4 text-left rounded-l-lg">ID</th>
-          <th class="py-3 px-4 text-left">Nome</th>
-          <th class="py-3 px-4 text-left">Status</th>
-          <th class="py-3 px-4 text-center rounded-r-lg">
+          <th class="py-3 px-4 text-left rounded-l-lg">Nome</th>
+          <th class="py-3 px-4 text-left">Email</th>
+          <th class="py-3 px-4 text-left">Ativo</th>
+          <th class="py-3 px-4 text-left rounded-r-lg text-center">
             <a
-              [routerLink]="['/categoriaEquipamento/novaCategoria']"
+              [routerLink]="['/funcionarios/novo']"
               class="inline-flex items-center gap-2 px-4 py-2 bg-verde-sec text-white font-semibold rounded-lg hover:bg-verde-sec/90 transition"
             >
               <i class="fa fa-plus"></i>
-              Nova Categoria
+              Novo
             </a>
           </th>
         </tr>
       </thead>
       <tbody>
         <tr
-          *ngFor="let categoria of categoriasEquipamento"
+          *ngFor="let funcionario of funcionarios"
           class="bg-gray-200 hover:bg-gray-100 transition duration-150 shadow-sm rounded-md"
         >
           <td class="py-3 px-4 text-slate-700 rounded-l-lg select-none">
-            {{ categoria.id }}
+            {{ funcionario.nome }}
           </td>
           <td class="py-3 px-4 text-slate-700 select-none">
-            {{ categoria.nome }}
+            {{ funcionario.email }}
           </td>
           <td class="py-3 px-4 text-slate-700 select-none">
-            {{ categoria.ativo ? 'Ativo' : 'Não-ativo' }}
+            {{ funcionario.ativo ? 'Sim' : 'Não' }}
           </td>
-          <td class="text-center rounded-r-lg space-x-2" style="width: 250px">
+          <td class="text-center rounded-r-lg space-x-2" style="width: 300px">
+            <!-- Botão Ver -->
+            <button
+              type="button"
+              (click)="abrirModal(funcionario)"
+              class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+            >
+              <i class="fa fa-eye"></i>
+              Ver
+            </button>
+
             <!-- Botão Editar -->
             <a
-              [routerLink]="['/categoriaEquipamento/editarCategoria', categoria.id]"
+              [routerLink]="['/funcionarios/editar', funcionario.id]"
               class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
             >
               <i class="fa fa-edit"></i>
@@ -42,20 +52,21 @@
             </a>
 
             <!-- Botão Remover -->
-            <button
-              (click)="remover(categoria.id, categoria.nome)"
+            <a
+              href="#"
+              (click)="remover($event, funcionario)"
               class="inline-flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
             >
               <i class="fa fa-times"></i>
               Remover
-            </button>
+            </a>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <p *ngIf="categoriasEquipamento.length === 0" class="text-center text-gray-600 mt-4">
-      Nenhuma categoria cadastrada.
+    <p *ngIf="funcionarios.length === 0" class="text-center text-gray-600 mt-4">
+      Nenhum usuário cadastrado.
     </p>
   </div>
 </div>

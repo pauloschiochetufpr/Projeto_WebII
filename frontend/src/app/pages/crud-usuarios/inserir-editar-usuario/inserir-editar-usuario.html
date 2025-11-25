@@ -1,0 +1,80 @@
+<div class="w-full min-h-[93vh] bg-azul-main p-6 flex items-center justify-center">
+  <div class="w-full max-w-2xl bg-white shadow-xl rounded-lg p-6">
+    <h2 class="text-3xl font-bold text-azul-main font-sansation mb-6 select-none">
+      {{ editando ? 'Editar Usuário' : 'Novo Usuário' }}
+    </h2>
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="space-y-4">
+      <!-- Nome -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Nome</label>
+        <input
+          type="text"
+          formControlName="nome"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          [disabled]="editando"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main disabled:bg-gray-100"
+        />
+      </div>
+
+      <!-- Data de Nascimento -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Data de Nascimento</label>
+        <input
+          type="date"
+          formControlName="dataNasc"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
+
+      <!-- Telefone -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Telefone</label>
+        <input
+          type="text"
+          formControlName="telefone"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
+
+      <!-- Ativo (somente edição) -->
+      <div *ngIf="editando">
+        <label class="block text-gray-700 font-medium mb-1">Ativo</label>
+        <select
+          formControlName="ativo"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        >
+          <option [value]="true">Ativo</option>
+          <option [value]="false">Não-Ativo</option>
+        </select>
+      </div>
+
+      <!-- Senha (somente cadastro) -->
+      <div *ngIf="!editando">
+        <label class="block text-gray-700 font-medium mb-1">Senha (4 dígitos)</label>
+        <input
+          type="password"
+          formControlName="senha"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
+
+      <!-- Botão -->
+      <button
+        type="submit"
+        class="w-full bg-azul-main text-white font-semibold py-2 rounded-md hover:bg-azul-main/90 transition"
+      >
+        {{ editando ? 'Salvar Alterações' : 'Cadastrar Usuário' }}
+      </button>
+    </form>
+  </div>
+</div>

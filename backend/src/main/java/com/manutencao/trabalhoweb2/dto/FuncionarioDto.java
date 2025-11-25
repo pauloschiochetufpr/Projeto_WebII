@@ -1,19 +1,12 @@
 package com.manutencao.trabalhoweb2.dto;
 
-public class FuncionarioDto {
-    private Long id;
-    private String nome;
+import java.time.LocalDate;
 
-    public FuncionarioDto() {}
-
-    public FuncionarioDto(Long id, String nome) {
-        this.id = id;
-        this.nome = nome;
-    }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-}
+public record FuncionarioDto(
+    Long id,
+    String nome,
+    String email,
+    LocalDate dataNasc,
+    String telefone,
+    Boolean ativo
+) {}

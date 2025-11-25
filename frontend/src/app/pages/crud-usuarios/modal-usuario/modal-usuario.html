@@ -1,0 +1,60 @@
+<div class="p-6 w-full max-w-3xl bg-white rounded-xl shadow-xl">
+  <!-- Título -->
+  <h2
+    mat-dialog-title
+    class="text-2xl font-bold text-azul-main font-sansation flex items-center gap-2 mb-6 select-none border-b pb-3"
+  >
+    Informações do Usuário
+  </h2>
+
+  <!-- Conteúdo -->
+  <div
+    mat-dialog-content
+    class="grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg shadow-inner"
+  >
+    <div>
+      <p class="text-sm text-gray-500 font-medium">Nome</p>
+      <p class="text-gray-800 font-semibold">{{ funcionario.nome }}</p>
+    </div>
+
+    <div>
+      <p class="text-sm text-gray-500 font-medium">Email</p>
+      <p class="text-gray-800 font-semibold">{{ funcionario.email }}</p>
+    </div>
+
+    <div>
+      <p class="text-sm text-gray-500 font-medium">Data de Nascimento</p>
+      <p class="text-gray-800 font-semibold">{{ funcionario.dataNasc }}</p>
+    </div>
+
+    <div>
+      <p class="text-sm text-gray-500 font-medium">Telefone</p>
+      <p class="text-gray-800 font-semibold">{{ funcionario.telefone }}</p>
+    </div>
+
+    <div>
+      <p class="text-sm text-gray-500 font-medium">Ativo</p>
+      <p
+        class="font-semibold"
+        [ngClass]="funcionario.ativo ? 'text-green-600' : 'text-red-600'"
+      >
+        {{ funcionario.ativo ? 'Sim' : 'Não' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div
+    mat-dialog-actions
+    align="end"
+    class="mt-6 flex justify-end border-t pt-4"
+  >
+    <button
+      mat-button
+      (click)="dialog.close()"
+      class="px-5 py-2 bg-azul-main text-white rounded-md font-medium hover:bg-azul-main/90 transition"
+    >
+      Fechar
+    </button>
+  </div>
+</div>

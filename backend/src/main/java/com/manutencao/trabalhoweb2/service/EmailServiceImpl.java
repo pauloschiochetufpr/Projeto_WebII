@@ -71,4 +71,6 @@ public class EmailServiceImpl implements EmailService {
             sendSimpleText(to, subject, "Sua senha é: " + variables.get("senha"));
         }
     }
+
+    
 }

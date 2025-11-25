@@ -1,43 +1,42 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
-import { CategoriaEquipamento } from '../../../models/solicitacao.model';
-import { CategoriaEquipamentoService } from '../../../services/categoria-equipamento';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CategoriaEquipamentoService } from '../../../services/categoria-equipamento';
+import { CategoriaEquipamento } from '../../../models/solicitacao.model';
 
 @Component({
   selector: 'app-editar-categoria',
-  imports: [CommonModule, FormsModule, RouterModule],
+  standalone: true,
+  imports: [RouterModule, FormsModule],
   templateUrl: './editar-categoria.html',
-  styleUrl: './editar-categoria.css'
+  styleUrls: ['./editar-categoria.css']
 })
 export class EditarCategoria implements OnInit {
-  @ViewChild('formInserirCategoria') formInserirCategoria!: NgForm; 
-  categoria : CategoriaEquipamento = new CategoriaEquipamento();
+  categoria: CategoriaEquipamento = new CategoriaEquipamento();
 
   constructor(
-    private categoriaEquipamentoService : CategoriaEquipamentoService,
-    private route : ActivatedRoute,
-    private router : Router
-  ){}
+    private categoriaEquipamentoService: CategoriaEquipamentoService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    let id = +this.route.snapshot.params['id'];
-    const dado = this.categoriaEquipamentoService.buscarPorId(id);
-    if (dado !== undefined){
-      this.categoria = dado
-    }else{
-      throw new Error ("Categoria não encontrada: id = " + id);
-    }
+    const id = +this.route.snapshot.params['id'];
+    this.categoriaEquipamentoService.buscarPorId(id).subscribe({
+      next: (categoria) => this.categoria = categoria,
+      error: () => {
+        alert("Categoria não encontrada");
+        this.router.navigate(['/categoriaEquipamento']);
+      }
+    });
   }
 
-  atualizar(): void{
-    if(this.formInserirCategoria.form.valid){
-      this.categoriaEquipamentoService.atualizar(this.categoria);
-      this.router.navigate(['/categoriaEquipamento'])
+  atualizar(form: NgForm): void {
+    if (form.valid) {
+      this.categoriaEquipamentoService.atualizar(this.categoria).subscribe({
+        next: () => this.router.navigate(['/categoriaEquipamento']),
+        error: () => alert("Erro ao atualizar categoria")
+      });
     }
   }
-
-
-
 }

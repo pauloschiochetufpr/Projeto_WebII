@@ -51,8 +51,8 @@ public class AuthService {
     @Autowired
     private CepRepository cepRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+     @Autowired
+     private JwtUtil jwtUtil;
 
     
     public AuthService() {}
@@ -129,7 +129,7 @@ public class AuthService {
                 "senha", senhaGerada,
                 "loginUrl", "https://localhost:4200/login"
             );
-            emailService.sendHtmlTemplate(req.email, "Bem-vindo a equipe! Aqui está a sua senha :)", "email-registration", vars);
+          emailService.sendHtmlTemplate(req.email, "Bem-vindo a equipe! Aqui está a sua senha :)", "email-registration", vars);
 
 
             // Retorno de sucesso
@@ -173,12 +173,12 @@ public class AuthService {
                 
                 
             // Gerar tokens
-            String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);
-            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(cliente.getIdCliente()));
+          String accessToken = jwtUtil.generateAccessToken(String.valueOf(cliente.getIdCliente()), claims);
+          String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(cliente.getIdCliente()));
 
 
             // Retornar resposta AuthResponse
-            return new AuthResponse(accessToken, refreshToken);
+          return new AuthResponse(accessToken, refreshToken);
         }
         if (!funOptional.isEmpty()) {
 
@@ -197,11 +197,11 @@ public class AuthService {
                     "exp", Instant.now().plusSeconds(15 * 60).getEpochSecond());
 
             // Gerar tokens
-            String accessToken = jwtUtil.generateAccessToken(String.valueOf(func.getIdFuncionario()), claims);
-            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(func.getIdFuncionario()));
+          String accessToken = jwtUtil.generateAccessToken(String.valueOf(func.getIdFuncionario()), claims);
+          String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(func.getIdFuncionario()));
 
             // Retornar resposta AuthResponse
-            return new AuthResponse(accessToken, refreshToken);
+          return new AuthResponse(accessToken, refreshToken);
         }
          return new BasicResponse(500, "Servidor com erro inesperado");
 
