@@ -1,15 +1,34 @@
-<body class="bg-gray-100 h-screen grid place-items-center">
-  <form class="bg-white p-4 rounded w-80" #formInserirCategoria="ngForm" (ngSubmit)="atualizar(formInserirCategoria)">
+<body class="bg-azul-main h-screen grid place-items-center">
+  <form
+    class="bg-white p-6 rounded-xl shadow-lg w-96 space-y-4"
+    #formInserirCategoria="ngForm"
+    (ngSubmit)="atualizar(formInserirCategoria)"
+  >
+    <h2 class="text-2xl font-bold text-azul-main mb-4 select-none">
+      Editar Categoria
+    </h2>
 
     <!-- Nome da Categoria -->
-    <input type="text" id="nome" name="nome" placeholder="Nome"
-           class="w-full mb-3 p-2 border rounded"
-           [(ngModel)]="categoria.nome"
-           #nome="ngModel"
-           minlength="2" required>
+    <div>
+      <label for="nome" class="block text-gray-700 font-medium mb-1">Nome</label>
+      <input
+        type="text"
+        id="nome"
+        name="nome"
+        placeholder="Digite o nome da categoria"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-azul-main"
+        [(ngModel)]="categoria.nome"
+        #nome="ngModel"
+        minlength="2"
+        required
+      />
+    </div>
 
     <!-- Mensagens de erro -->
-    <div *ngIf="nome.errors && (nome.dirty || nome.touched)" class="bg-red-200 text-red-900 rounded p-2 border-2 border-red-300 mb-4">
+    <div
+      *ngIf="nome.errors && (nome.dirty || nome.touched)"
+      class="bg-red-100 text-red-700 rounded-md p-2 border border-red-300 text-sm"
+    >
       <div *ngIf="nome.errors?.required">Digite a categoria do equipamento.</div>
       <div *ngIf="nome.errors?.minlength">
         A categoria do equipamento deve conter ao menos 2 caracteres.
@@ -17,23 +36,34 @@
     </div>
 
     <!-- Status da Categoria -->
-    <select name="ativo" class="w-full mb-3 p-2 border rounded" [(ngModel)]="categoria.ativo">
-      <option [ngValue]="true">Ativo</option>
-      <option [ngValue]="false">Não-ativo</option>
-    </select>
-
-    <!-- Botões -->
-    <div class="flex justify-between">
-      <a class="bg-gray-300 px-4 py-2 rounded text-center inline-block"
-         [routerLink]="['/categoriaEquipamento']">
-        Cancelar
-      </a>
-      <button type="submit"
-              class="bg-blue-500 text-white px-4 py-2 rounded"
-              [disabled]="formInserirCategoria.form.invalid">
-        Salvar
-      </button>
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Status</label>
+      <select
+        name="ativo"
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-azul-main"
+        [(ngModel)]="categoria.ativo"
+      >
+        <option [ngValue]="true">Ativo</option>
+        <option [ngValue]="false">Não-ativo</option>
+      </select>
     </div>
 
+    <!-- Botões -->
+    <div class="flex justify-between items-center pt-4 border-t">
+      <a
+        class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 font-medium hover:bg-gray-400 transition"
+        [routerLink]="['/categoriaEquipamento']"
+      >
+        Cancelar
+      </a>
+
+      <button
+        type="submit"
+        class="px-4 py-2 rounded-md bg-azul-main text-white font-semibold hover:bg-azul-main/90 transition disabled:opacity-50"
+        [disabled]="formInserirCategoria.form.invalid"
+      >
+        Salvar Alterações
+      </button>
+    </div>
   </form>
 </body>

@@ -1,50 +1,61 @@
-<body class="min-h-screen bg-gray-50 flex items-center justify-center">
-  <div class="w-full max-w-2xl p-4">
-    <div class="flex justify-between items-center mb-3">
-      <h2 class="text-xl font-bold">Categoria de Equipamento</h2>
-      <a class="px-3 py-2 rounded border text-sm inline-flex items-center"
-         [routerLink]="['/categoriaEquipamento/novaCategoria']"
-         title="Novo">
-        <i class="fa fa-plus mr-1"></i> Nova Categoria
-      </a>
-    </div>
+<div class="w-full p-4 font-sa-sansation bg-azul-main min-h-[93vh]">
+  <div class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-4">
+    <table class="w-full table-auto border-separate border-spacing-y-2">
+      <thead class="bg-azul-main/90 shadow-gray-500 shadow-inner text-white rounded-md select-none">
+        <tr>
+          <th class="py-3 px-4 text-left rounded-l-lg">ID</th>
+          <th class="py-3 px-4 text-left">Nome</th>
+          <th class="py-3 px-4 text-left">Status</th>
+          <th class="py-3 px-4 text-center rounded-r-lg">
+            <a
+              [routerLink]="['/categoriaEquipamento/novaCategoria']"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-verde-sec text-white font-semibold rounded-lg hover:bg-verde-sec/90 transition"
+            >
+              <i class="fa fa-plus"></i>
+              Nova Categoria
+            </a>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let categoria of categoriasEquipamento"
+          class="bg-gray-200 hover:bg-gray-100 transition duration-150 shadow-sm rounded-md"
+        >
+          <td class="py-3 px-4 text-slate-700 rounded-l-lg select-none">
+            {{ categoria.id }}
+          </td>
+          <td class="py-3 px-4 text-slate-700 select-none">
+            {{ categoria.nome }}
+          </td>
+          <td class="py-3 px-4 text-slate-700 select-none">
+            {{ categoria.ativo ? 'Ativo' : 'Não-ativo' }}
+          </td>
+          <td class="text-center rounded-r-lg space-x-2" style="width: 250px">
+            <!-- Botão Editar -->
+            <a
+              [routerLink]="['/categoriaEquipamento/editarCategoria', categoria.id]"
+              class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
+            >
+              <i class="fa fa-edit"></i>
+              Editar
+            </a>
 
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="px-4 py-2">ID</th>
-            <th class="px-4 py-2">Nome</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2 text-center">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="border-t" *ngFor="let categoria of categoriasEquipamento">
-            <td class="px-4 py-2">{{categoria.id}}</td>
-            <td class="px-4 py-2">{{categoria.nome}}</td>
-            <td class="px-4 py-2">{{categoria.ativo ? 'Ativo' : 'Não-ativo'}}</td>
-            <td class="px-4 py-2 text-center">
-              <!-- EDITAR -->
-              <a [routerLink]="['/categoriaEquipamento/editarCategoria', categoria.id]" 
-                 class="inline-flex items-center p-1 mr-2 text-blue-500" 
-                 title="Editar">
-                <i class="fas fa-edit"></i>
-              </a>
-              <!-- REMOVER -->
-              <button (click)="remover(categoria.id, categoria.nome)" 
-                      class="inline-flex items-center p-1 text-red-500"
-                      title="Remover">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            <!-- Botão Remover -->
+            <button
+              (click)="remover(categoria.id, categoria.nome)"
+              class="inline-flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+            >
+              <i class="fa fa-times"></i>
+              Remover
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      <p *ngIf="categoriasEquipamento.length === 0" class="p-4 text-center text-gray-500">
-        Nenhuma categoria cadastrada
-      </p>
-    </div>
+    <p *ngIf="categoriasEquipamento.length === 0" class="text-center text-gray-600 mt-4">
+      Nenhuma categoria cadastrada.
+    </p>
   </div>
-</body>
+</div>

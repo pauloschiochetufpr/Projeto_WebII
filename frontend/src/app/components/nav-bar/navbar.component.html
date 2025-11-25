@@ -27,6 +27,12 @@
       class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec hover:bg-opacity-90 bg-opacity-100 duration-200 ease-in-out transition-colors"
       >CATEGORIAS</a
     >
+    <a
+      *ngIf="cargo === 'funcionario'"
+      routerLink="/funcionarios"
+      class="select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-md bg-verde-sec hover:bg-opacity-90 bg-opacity-100 duration-200 ease-in-out transition-colors"
+      >FUNCIONÁRIOS</a
+    >
 
     <div
       class="-rotate-45 bg-verde-sec w-[5px] h-[1000px] absolute right-[740px] -top-[500px] z-10"

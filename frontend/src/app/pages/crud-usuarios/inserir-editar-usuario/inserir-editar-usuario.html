@@ -1,46 +1,80 @@
-<div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-  <h2 class="text-2xl font-bold mb-5">
-    {{ editando ? 'Editar Usuário' : 'Novo Usuário' }}
-  </h2>
+<div class="w-full min-h-[93vh] bg-azul-main p-6 flex items-center justify-center">
+  <div class="w-full max-w-2xl bg-white shadow-xl rounded-lg p-6">
+    <h2 class="text-3xl font-bold text-azul-main font-sansation mb-6 select-none">
+      {{ editando ? 'Editar Usuário' : 'Novo Usuário' }}
+    </h2>
 
-  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="space-y-4">
+      <!-- Nome -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Nome</label>
+        <input
+          type="text"
+          formControlName="nome"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4">
-      <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome">
-    </mat-form-field>
+      <!-- Email -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          [disabled]="editando"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main disabled:bg-gray-100"
+        />
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" [disabled]="editando">
-    </mat-form-field>
+      <!-- Data de Nascimento -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Data de Nascimento</label>
+        <input
+          type="date"
+          formControlName="dataNasc"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4">
-      <mat-label>Data de Nascimento</mat-label>
-      <input matInput type="" formControlName="dataNasc">
-    </mat-form-field>
+      <!-- Telefone -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Telefone</label>
+        <input
+          type="text"
+          formControlName="telefone"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4">
-      <mat-label>Telefone</mat-label>
-      <input matInput formControlName="telefone">
-    </mat-form-field>
+      <!-- Ativo (somente edição) -->
+      <div *ngIf="editando">
+        <label class="block text-gray-700 font-medium mb-1">Ativo</label>
+        <select
+          formControlName="ativo"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        >
+          <option [value]="true">Ativo</option>
+          <option [value]="false">Não-Ativo</option>
+        </select>
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4" *ngIf="editando">
-      <mat-label>Ativo</mat-label>
-      <mat-select formControlName="ativo">
-        <mat-option [value]="true">Ativo</mat-option>
-        <mat-option [value]="false">Não-Ativo</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <!-- Senha (somente cadastro) -->
+      <div *ngIf="!editando">
+        <label class="block text-gray-700 font-medium mb-1">Senha (4 dígitos)</label>
+        <input
+          type="password"
+          formControlName="senha"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-azul-main"
+        />
+      </div>
 
-    <mat-form-field appearance="outline" class="w-full mb-4" *ngIf="!editando">
-      <mat-label>Senha (4 dígitos)</mat-label>
-      <input matInput type="password" formControlName="senha">
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" class="w-full mt-4">
-      {{ editando ? 'Salvar Alterações' : 'Cadastrar Usuário' }}
-    </button>
-
-  </form>
+      <!-- Botão -->
+      <button
+        type="submit"
+        class="w-full bg-azul-main text-white font-semibold py-2 rounded-md hover:bg-azul-main/90 transition"
+      >
+        {{ editando ? 'Salvar Alterações' : 'Cadastrar Usuário' }}
+      </button>
+    </form>
+  </div>
 </div>
