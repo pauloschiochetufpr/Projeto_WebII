@@ -1,6 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; 
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { catchError, of, Subscription, take, finalize } from 'rxjs';
 import { JsonTestService } from '../../services/jsontest';
@@ -8,7 +14,7 @@ import { FuncHeader } from '../func-header/func-header';
 import { DateSelection } from '../../services/date-selection';
 import { SolicitacaoService } from '../../services/solicitacao';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { RelatorioService } from '../../services/relatorio.service'; 
+import { RelatorioService } from '../../services/relatorio.service';
 
 export interface Solicitation {
   idSolicitacao?: number;
@@ -33,7 +39,7 @@ export interface Solicitation {
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     RouterModule,
     FuncHeader,
     MatDialogModule,
@@ -45,16 +51,25 @@ export class HomeFuncionario implements OnInit, OnDestroy {
   solicitations: Solicitation[] = [];
   loading = false;
   error: string | null = null;
+
   isModalOpen = false;
   activeTab: 'periodo' | 'categoria' = 'periodo';
   formPeriodo: FormGroup;
-  loadingReport = false; 
+  loadingReport = false;
 
   private sub = new Subscription();
 
   statusMapById: Record<number, string> = {
-    1: 'ABERTA', 2: 'ORÇADA', 3: 'REJEITADA', 4: 'APROVADA',
-    5: 'REDIRECIONADA', 6: 'ARRUMADA', 7: 'PAGA', 8: 'FINALIZADA', 9: 'CANCELADA',
+    0: 'Desconhecido',
+    1: 'ABERTA',
+    2: 'ORÇADA',
+    3: 'REJEITADA',
+    4: 'APROVADA',
+    5: 'REDIRECIONADA',
+    6: 'ARRUMADA',
+    7: 'PAGA',
+    8: 'FINALIZADA',
+    9: 'CANCELADA',
   };
 
   constructor(
@@ -63,11 +78,11 @@ export class HomeFuncionario implements OnInit, OnDestroy {
     public dateSelection: DateSelection,
     private dialog: MatDialog,
     private relatorioService: RelatorioService,
-    private fb: FormBuilder 
+    private fb: FormBuilder
   ) {
     this.formPeriodo = this.fb.group({
       dataInicio: ['', Validators.required],
-      dataFim: ['', Validators.required]
+      dataFim: ['', Validators.required],
     });
   }
 
@@ -75,11 +90,18 @@ export class HomeFuncionario implements OnInit, OnDestroy {
     this.loadAbertoFromBackend();
     this.initializeReportDates();
   }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
+
+  // 🔵 1) Carrega solicitações ABERTAS
   private loadAbertoFromBackend(): void {
     this.loading = true;
     this.error = null;
 
-    const sub = this.solicitacaoService.listarTodasComLastUpdate()
+    const sub = this.solicitacaoService
+      .listarTodasComLastUpdate()
       .pipe(
         take(1),
         catchError((err) => {
@@ -93,98 +115,48 @@ export class HomeFuncionario implements OnInit, OnDestroy {
             this.loadFromMock();
             return;
           }
+
           const all = (arr || []).map((d) => this.normalize(d));
-          this.solicitations = all.filter((item) => this.getStatus(item) === 'ABERTA');
+          this.solicitations = all.filter(
+            (item) => this.getStatus(item) === 'ABERTA'
+          );
           this.sortSolicitations();
           this.loading = false;
         },
-        error: (err) => {
+        error: () => {
           this.error = 'Erro ao carregar solicitações';
           this.loading = false;
         },
       });
+
     this.sub.add(sub);
   }
 
+  // 🔵 Fallback para MOCK
   private loadFromMock(): void {
     const s = this.jsonService.users$.subscribe({
       next: (arr) => {
         const all = (arr || []).map((d) => this.normalize(d));
-        this.solicitations = all.filter((item) => this.getStatus(item) === 'ABERTA');
+        this.solicitations = all.filter(
+          (item) => this.getStatus(item) === 'ABERTA'
+        );
         this.sortSolicitations();
         this.loading = false;
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Erro ao carregar solicitações';
         this.loading = false;
       },
     });
+
     this.sub.add(s);
   }
 
-  initializeReportDates(): void {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-
-    this.formPeriodo.patchValue({
-      dataInicio: firstDay,
-      dataFim: lastDay
-    });
-  }
-
-  openReportModal() { this.isModalOpen = true; }
-  closeReportModal() { this.isModalOpen = false; }
-  switchTab(tab: 'periodo' | 'categoria') { this.activeTab = tab; }
-
-  baixarRelatorio() {
-    this.loadingReport = true;
-
-    if (this.activeTab === 'periodo') {
-      if (this.formPeriodo.invalid) return;
-      const { dataInicio, dataFim } = this.formPeriodo.value;
-      
-      this.relatorioService.baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
-        .pipe(finalize(() => this.loadingReport = false))
-        .subscribe({
-          next: (blob) => this.downloadFile(blob, `relatorio_periodo.pdf`),
-          error: (err) => console.error('Erro ao baixar PDF Período', err)
-        });
-    } else {
-      this.relatorioService.baixarPdfReceitasPorCategoria()
-        .pipe(finalize(() => this.loadingReport = false))
-        .subscribe({
-          next: (blob) => this.downloadFile(blob, `relatorio_categoria.pdf`),
-          error: (err) => console.error('Erro ao baixar PDF Categoria', err)
-        });
-    }
-  }
-
-  private downloadFile(blob: Blob, fileName: string) {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    this.closeReportModal();
-  }
-
-  private sortSolicitations() {
-    this.solicitations.sort((a, b) => {
-      const da = this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
-      const db = this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
-      return da - db;
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
+  // 🔵 Normalizar dados
   normalize(d: any): Solicitation {
     return {
-      idSolicitacao: d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
+      idSolicitacao:
+        d.idSolicitacao ?? (typeof d.id === 'number' ? d.id : undefined),
       id: d.id ?? d.idSolicitacao,
       nome: d.nome ?? d.requesterName ?? d.name,
       requesterName: d.requesterName ?? d.nome ?? d.name,
@@ -194,6 +166,21 @@ export class HomeFuncionario implements OnInit, OnDestroy {
       state: d.state ?? d.statusName ?? null,
       ...d,
     };
+  }
+
+  // 🔵 Obter Status Normalizado
+  getStatus(s: Solicitation): string {
+    if (s.state) return s.state;
+    return this.statusMapById[Number(s.idStatus) || 0];
+  }
+
+  // 🔵 Ordenação pela data
+  private sortSolicitations() {
+    this.solicitations.sort((a, b) => {
+      const da = this.parseDateString(this.getDateString(a))?.getTime() ?? 0;
+      const db = this.parseDateString(this.getDateString(b))?.getTime() ?? 0;
+      return da - db;
+    });
   }
 
   getDateString(s: Solicitation): string | null {
@@ -215,9 +202,68 @@ export class HomeFuncionario implements OnInit, OnDestroy {
     return desc.length > max ? desc.slice(0, max - 1) + '…' : desc;
   }
 
-  getStatus(s: Solicitation): string {
-    if (s.state) return s.state;
-    if (s.idStatus && this.statusMapById[s.idStatus]) return this.statusMapById[s.idStatus];
-    return 'Desconhecido';
+  // =================================================
+  // 🔵 RELATÓRIOS
+  // =================================================
+
+  initializeReportDates(): void {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+      .toISOString()
+      .split('T')[0];
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      .toISOString()
+      .split('T')[0];
+
+    this.formPeriodo.patchValue({
+      dataInicio: firstDay,
+      dataFim: lastDay,
+    });
+  }
+
+  openReportModal() {
+    this.isModalOpen = true;
+  }
+  closeReportModal() {
+    this.isModalOpen = false;
+  }
+  switchTab(tab: 'periodo' | 'categoria') {
+    this.activeTab = tab;
+  }
+
+  baixarRelatorio() {
+    this.loadingReport = true;
+
+    if (this.activeTab === 'periodo') {
+      if (this.formPeriodo.invalid) return;
+
+      const { dataInicio, dataFim } = this.formPeriodo.value;
+
+      this.relatorioService
+        .baixarPdfReceitasPorPeriodo(dataInicio, dataFim)
+        .pipe(finalize(() => (this.loadingReport = false)))
+        .subscribe({
+          next: (blob) => this.downloadFile(blob, `relatorio_periodo.pdf`),
+          error: (err) => console.error('Erro ao baixar PDF Período', err),
+        });
+    } else {
+      this.relatorioService
+        .baixarPdfReceitasPorCategoria()
+        .pipe(finalize(() => (this.loadingReport = false)))
+        .subscribe({
+          next: (blob) => this.downloadFile(blob, `relatorio_categoria.pdf`),
+          error: (err) => console.error('Erro ao baixar PDF Categoria', err),
+        });
+    }
+  }
+
+  private downloadFile(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    this.closeReportModal();
   }
 }

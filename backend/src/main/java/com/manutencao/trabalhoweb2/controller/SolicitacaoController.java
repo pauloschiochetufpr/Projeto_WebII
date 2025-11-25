@@ -3,6 +3,7 @@ package com.manutencao.trabalhoweb2.controller;
 import com.manutencao.trabalhoweb2.dto.AtualizarStatusDto;
 import com.manutencao.trabalhoweb2.dto.SolicitacaoDto;
 import com.manutencao.trabalhoweb2.dto.SolicitacaoLastUpdateDto;
+import com.manutencao.trabalhoweb2.dto.SolicitacaoResponseDto;
 import com.manutencao.trabalhoweb2.model.Solicitacao;
 import com.manutencao.trabalhoweb2.service.SolicitacaoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,20 +25,28 @@ public class SolicitacaoController {
     private SolicitacaoService solicitacaoService;
 
     @GetMapping("/")
-    public ResponseEntity<List<Solicitacao>> listarTodas() {
-        return ResponseEntity.ok(solicitacaoService.listarTodas());
-    }
+    public ResponseEntity<List<SolicitacaoResponseDto>> listarTodas() {
+    List<SolicitacaoResponseDto> dtos = solicitacaoService.listarTodas()
+            .stream()
+            .map(solicitacaoService::toDto)
+            .collect(Collectors.toList());
+    return ResponseEntity.ok(dtos);
+    } 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Solicitacao> buscarPorId(@PathVariable Long id) {
-        return solicitacaoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    public ResponseEntity<SolicitacaoResponseDto> buscarPorId(@PathVariable Long id) {
+    return solicitacaoService.buscarPorId(id)
+            .map(s -> ResponseEntity.ok(solicitacaoService.toDto(s)))
+            .orElse(ResponseEntity.notFound().build());
+}
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Solicitacao>> buscarPorStatus(@PathVariable Integer status) {
-        return ResponseEntity.ok(solicitacaoService.buscarPorStatus(status));
+     public ResponseEntity<List<SolicitacaoResponseDto>> buscarPorStatus(@PathVariable Integer status) {
+        List<SolicitacaoResponseDto> dtos = solicitacaoService.buscarPorStatus(status)
+                .stream()
+                .map(solicitacaoService::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/cliente/{id}/with-last-update")
@@ -154,39 +164,42 @@ public ResponseEntity<List<Map<String, Object>>> listarPorFuncionarioComLastUpda
 
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody SolicitacaoDto dto) {
-        try {
-            Solicitacao nova = solicitacaoService.criar(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nova);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+public ResponseEntity<?> criar(@RequestBody SolicitacaoDto dto) {
+    try {
+        Solicitacao nova = solicitacaoService.criar(dto);
+        // retorna DTO em vez da entidade
+        return ResponseEntity.status(HttpStatus.CREATED).body(solicitacaoService.toDto(nova));
+    } catch (EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+}
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody SolicitacaoDto dto) {
-        try {
-            Solicitacao atualizada = solicitacaoService.atualizar(id, dto);
-            return ResponseEntity.ok(atualizada);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody SolicitacaoDto dto) {
+    try {
+        Solicitacao atualizada = solicitacaoService.atualizar(id, dto);
+        // retorna DTO
+        return ResponseEntity.ok(solicitacaoService.toDto(atualizada));
+    } catch (EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+}
 
     
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> atualizarStatus(
-        @PathVariable Long id,
-        @RequestBody AtualizarStatusDto dto) {
-        try {
-            Solicitacao s = solicitacaoService.atualizarStatus(id, dto);
-            return ResponseEntity.ok(s);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Status inválido: " + e.getMessage());
-        }
+public ResponseEntity<?> atualizarStatus(
+    @PathVariable Long id,
+    @RequestBody AtualizarStatusDto dto) {
+    try {
+        Solicitacao s = solicitacaoService.atualizarStatus(id, dto);
+        // retorna DTO
+        return ResponseEntity.ok(solicitacaoService.toDto(s));
+    } catch (EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Status inválido: " + e.getMessage());
     }
+}
 
     //soft delete
     @PutMapping("/{id}/desativar")
