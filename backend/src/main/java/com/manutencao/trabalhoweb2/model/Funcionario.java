@@ -24,15 +24,18 @@ public class Funcionario {
     @Column(length = 13, nullable = false)
     private String telefone;
 
-    @Column(name = "senha_hash", length = 64, nullable = false)
+    @Column(name = "senha_hash", length = 255)
     private String senhaHash;
+/* 
+    @Column(name = "senha_hash", length = 64, nullable = false)
+    private String senhaHash; */
 
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    protected Funcionario() {}
+    public Funcionario() {}
 
-    public Funcionario(String nome, String email, LocalDate dataNasc, String telefone, String senhaHash, String salt) {
+    public Funcionario(String nome, String email, LocalDate dataNasc, String telefone, String senhaHash , String salt) {
         this.nome = nome;
         this.email = email;
         this.dataNasc = dataNasc;

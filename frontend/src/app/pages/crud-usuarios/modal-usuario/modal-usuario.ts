@@ -1,16 +1,20 @@
-import { Component, Input } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Funcionario } from '../../../models/usuario.model';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-modal-usuario',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, MatButtonModule],
   templateUrl: './modal-usuario.html',
-  styleUrl: './modal-usuario.css'
+  styleUrls: ['./modal-usuario.css']
 })
-
 export class ModalUsuarioComponent {
-  @Input() funcionario: Funcionario = new Funcionario();
-  constructor(public activeModal: NgbActiveModal) {}
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public funcionario: Funcionario,
+    public dialog: MatDialogRef<ModalUsuarioComponent>
+  ) {}
 }

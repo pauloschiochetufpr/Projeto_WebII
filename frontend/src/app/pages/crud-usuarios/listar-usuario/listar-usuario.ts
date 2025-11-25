@@ -3,52 +3,61 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Funcionario } from '../../../models/usuario.model';
 import { FuncionarioService } from '../../../services/funcionario';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalUsuarioComponent } from '../modal-usuario/modal-usuario';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-listar-usuario',
-  imports: [CommonModule, RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule, MatDialogModule],
   templateUrl: './listar-usuario.html',
-  styleUrl: './listar-usuario.css'
+  styleUrls: ['./listar-usuario.css']
 })
 export class ListarUsuario implements OnInit {
-  funcionarios: Funcionario[] = []; 
+  funcionarios: Funcionario[] = [];
 
-  constructor(private funcionarioService: FuncionarioService,
-    private modalService : NgbModal
-  ){}
-  
+  constructor(
+    private funcionarioService: FuncionarioService,
+    private dialog: MatDialog
+  ) {}
+
   ngOnInit(): void {
     this.listarTodos();
   }
 
-  listarTodos(): Funcionario[]{
+  listarTodos(): void {
     this.funcionarioService.listarTodos().subscribe({
       next: (data: Funcionario[]) => {
-        if (data == null) {
-          this.funcionarios = [];
-        }
-        else {
-          this.funcionarios = data;
-        }
+        this.funcionarios = data.map(f => ({
+          ...f,
+          dataNasc: f.dataNasc ? this.formatarData(f.dataNasc) : ''
+        }));
+      },
+      error: (err) => {
+        console.error('Erro ao listar usuários', err);
+        this.funcionarios = [];
       }
     });
-    return this.funcionarios
+  }
+
+  formatarData(dataStr: string): string {
+    const d = new Date(dataStr);
+    return d.toLocaleDateString('pt-BR');
   }
 
   remover($event: any, funcionario: Funcionario): void {
     $event.preventDefault();
-    if (confirm(`Deseja realmente remover o usuário ${funcionario.nome}?`)){
-      this.funcionarioService.remover(funcionario.id_funcionario!).subscribe({
-        complete: () => { this.listarTodos(); }
+    if (confirm(`Deseja realmente remover o usuário ${funcionario.nome}?`)) {
+      this.funcionarioService.remover(funcionario.id!).subscribe({
+        complete: () => this.listarTodos()
       });
     }
   }
 
-  abrirModal(funcionario: Funcionario){
-    const modalRef = this.modalService.open(ModalUsuarioComponent);
-    modalRef.componentInstance.funcionario = funcionario;
+  abrirModal(funcionario: Funcionario) {
+    this.dialog.open(ModalUsuarioComponent, {
+      width: '450px',
+      data: funcionario
+    });
   }
-
 }

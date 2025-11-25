@@ -1,51 +1,40 @@
 import { Injectable } from '@angular/core';
-import { CategoriaEquipamento } from '../models/solicitacao.model'
-
-const LS_CHAVE = "categoriaEquipamento";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { CategoriaEquipamento } from '../models/solicitacao.model';
+import { DatePicker } from '../components';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriaEquipamentoService {
+
+  BASE_URL = "https://localhost:8443/api/categorias";
+
   
-  constructor(){ };
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 
-  listarTodos():CategoriaEquipamento[] {
-    const categoriaEquipamento = localStorage[LS_CHAVE]
-    return categoriaEquipamento ? JSON.parse(categoriaEquipamento) : [];
+  constructor(private http: HttpClient) {}
+
+  listarTodos(): Observable<CategoriaEquipamento[]> {
+    return this.http.get<CategoriaEquipamento[]>(this.BASE_URL);
   }
 
-  inserir(categoriaEquipamento : CategoriaEquipamento) : void {
-    const listaCategoriaEquipamento = this.listarTodos(); 
-    console.log("Tipo: ", typeof listaCategoriaEquipamento)
-    console.log("Dado: ", listaCategoriaEquipamento)
-    categoriaEquipamento.id = new Date().getTime();  
-    listaCategoriaEquipamento.push(categoriaEquipamento);
-    localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
+  inserir(categoria: CategoriaEquipamento): Observable<CategoriaEquipamento> {
+    return this.http.post<CategoriaEquipamento>(this.BASE_URL, categoria);
   }
 
-  atualizar(categoriaEquipamento : CategoriaEquipamento): void {
-    const listaCategoriaEquipamento = this.listarTodos();
-    listaCategoriaEquipamento.forEach((obj, index, objs)=>{
-      if (categoriaEquipamento.id === obj.id){   //ttttttttttttt
-        objs[index] = categoriaEquipamento
-      }
-    });
-    localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
+  atualizar(categoria: CategoriaEquipamento): Observable<CategoriaEquipamento> {
+    return this.http.put<CategoriaEquipamento>(`${this.BASE_URL}/${categoria.id}`, categoria);
   }
 
-  remover(id:number): void{
-    let listaCategoriaEquipamento = this.listarTodos();
-    listaCategoriaEquipamento = 
-      listaCategoriaEquipamento.
-        filter(CategoriaEquipamento => CategoriaEquipamento.id !== id); // tttttttt
-    localStorage[LS_CHAVE] = JSON.stringify(listaCategoriaEquipamento);
+  remover(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.BASE_URL}/${id}`);
   }
 
-  buscarPorId(id: number): CategoriaEquipamento | undefined{
-    const listaCategoriaEquipamento = this.listarTodos();
-    return listaCategoriaEquipamento.find(categoria => categoria.id === id);
+  buscarPorId(id: number): Observable<CategoriaEquipamento> {
+    return this.http.get<CategoriaEquipamento>(`${this.BASE_URL}/${id}`);
   }
-
-
 }

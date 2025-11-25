@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
-import { CrudWorkersComponent } from './pages/crud-workers/crud-workers.component';
 import { Listar } from './pages/listar/listar';
 import { AreaUsuario } from './pages/area-usuario/area-usuario';
 import { Home } from './pages/home/home';
@@ -9,7 +8,9 @@ import { CategoriaEquipamentoComponent } from './pages/categoria-equipamento/cat
 import { Inserir } from './pages/categoria-equipamento/inserir/inserir';
 import { authGuard } from './guards/auth.guard';
 import { EditarCategoria } from './pages/categoria-equipamento/editar-categoria/editar-categoria';
-import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
+import { ListarUsuario } from './pages/crud-usuarios/listar-usuario/listar-usuario';
+import { InserirEditarUsuario } from './pages/crud-usuarios/inserir-editar-usuario/inserir-editar-usuario';
+//import { HomeFuncionario } from './components/home-funcionario/home-funcionario';
 
 export const routes: Routes = [
   {
@@ -21,12 +22,6 @@ export const routes: Routes = [
   {
     path: 'solicitacao',
     component: Listar,
-    canActivate: [authGuard],
-    data: { roles: ['funcionario'] },
-  },
-  {
-    path: 'crud-workers',
-    component: CrudWorkersComponent,
     canActivate: [authGuard],
     data: { roles: ['funcionario'] },
   },
@@ -66,4 +61,22 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['funcionario'] },
   },
+  {
+    path: 'funcionarios',
+    component: ListarUsuario,
+    canActivate: [authGuard],
+    data: { roles: ['funcionario']}
+  },
+  {
+    path: 'funcionarios/novo',
+    component: InserirEditarUsuario,
+    canActivate: [authGuard],
+    data: { roles: ['funcionario']}
+  },
+  {
+    path: 'funcionarios/editar/:id',
+    component: InserirEditarUsuario,
+    canActivate: [authGuard],
+    data: {roles: ['funcionario']}
+  }
 ];

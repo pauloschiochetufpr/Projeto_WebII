@@ -1,43 +1,40 @@
-<h1>Usuários</h1>
-    <table class="table table-striped table-bordered table-hover">
-        <tbody>
-        <tr>
-            <th>Nome</th>
-            <th>Login</th>
-            <th>Perfil</th>
-            <th class="text-center">
-                <a [routerLink]="['/usuarios/novo']" href="#"
-                title="Novo" alt="Novo"
-                class="btn btn-xs btn-success">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                Novo
-                </a>
-            </th>
-        </tr>
-        <tr *ngFor="let funcionario of funcionarios">
-            <td> {{funcionario.nome }} </td>
-            <td> {{funcionario.email}} </td>
-            <td> {{funcionario.perfil}} </td>
-            <td class="text-center" style="width: 300px">
-                <button type="button" class="btn btn-xs btn-info"
-                (click)="abrirModal(funcionario)">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-                Ver
-                </button>
-                    <a [routerLink]="['/usuarios/editar', funcionario.id_funcionario]"
-                    href="#" title="Editar" alt="Editar"
-                    class="btn btn-xs btn-warning">
-                <i class="fa fa-edit" aria-hidden="true"></i>
-                Editar
-                    </a>
-                    <a href="#" title="Remover" alt="Remover"
-                    class="btn btn-xs btn-danger"
-                    (click)="remover($event, funcionario)">
-                <i class="fa fa-times" aria-hidden="true"></i>
-                Remover
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-<p *ngIf="funcionarios.length==0">Nenhum usuário cadastrado.</p>
+
+<div class="w-full p-4 font-sa-sansation bg-azul-main h-fit min-h-[93vh]">
+<div
+    class="relative max-w-full bg-white border-2 border-azul-main rounded-2xl shadow-md p-4"
+  >
+  <table class="w-full table-auto border-separate border-spacing-y-2">
+  <thead class="bg-azul-main/90 shadow-gray-500 shadow-inner text-white rounded-md select-none">
+    <tr>
+      <th class="py-3 px-4 text-left rounded-l-lg">Nome</th>
+      <th class="py-3 px-4 text-left">Email</th>
+      <th class="py-3 px-4 text-left">Ativo</th>
+      <th class="py-3 px-4 text-left rounded-r-lg text-center">
+        <a [routerLink]="['/funcionarios/novo']" class="btn btn-xs btn-success">
+          <i class=" select-none text-azul-main font-semibold font-sansation px-6 py-2 rounded-lg bg-verde-sec bg-opacity-100 hover:shadow-inner hover:shadow-gray-500 transition-shadow duration-300 ease-in-out" aria-hidden="true">Novo</i> 
+        </a>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let funcionario of funcionarios" class="bg-gray-200 hover:bg-gray-100 transition duration-150 shadow-sm rounded-md">
+      <td class="py-3 px-4 text-slate-700 rounded-l-lg select-none">{{ funcionario.nome }}</td>
+      <td class="py-3 px-4 text-slate-700 select-none">{{ funcionario.email }}</td>
+      <td class="py-3 px-4 text-slate-700 select-none">{{ funcionario.ativo ? 'Sim' : 'Não' }}</td>
+      <td class=" text-center rounded-r-lg " style="width: 300px">
+        <button type="button" class="btn btn-xs btn-info" (click)="abrirModal(funcionario)">
+          <i class="fa fa-eye" aria-hidden="true"></i> Ver
+        </button>
+        <a [routerLink]="['/funcionarios/editar', funcionario.id]" class="btn btn-xs btn-warning">
+          <i class="fa fa-edit" aria-hidden="true"></i> Editar
+        </a>
+        <a href="#" class="btn btn-xs btn-danger" (click)="remover($event, funcionario)">
+          <i class="fa fa-times" aria-hidden="true"></i> Remover
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p *ngIf="funcionarios.length === 0">Nenhum usuário cadastrado.</p>
+</div>
+</div>

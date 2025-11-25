@@ -1,15 +1,16 @@
-<div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Pessoa</h4>
-        <button type="button" class="btn-close" aria-label="Close"
-        (click)="activeModal.close()"></button>
+<div class="p-6 w-full max-w-3xl bg-white rounded-lg shadow-lg" >
 
+<h2 mat-dialog-title class="text-2xl font-bold text-gray-800 flex items-center gap-2 select-none">Informações do Usuário</h2>
+
+<div mat-dialog-content class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg mb-6">
+  <p><strong class="font-semibold select-none">Nome: </strong>{{ funcionario.nome }}</p>
+  <p><strong class="font-semibold select-none">Email: </strong>{{ funcionario.email }}</p>
+  <p><strong class="font-semibold select-none">Data de Nascimento: </strong>{{ funcionario.dataNasc }}</p>
+  <p><strong class="font-semibold select-none">Telefone: </strong>{{ funcionario.telefone }}</p>
+  <p><strong class="font-semibold select-none">Ativo: </strong>{{ funcionario.ativo ? 'Sim' : 'Não' }}</p>
 </div>
-<div class="modal-body">
-    <p>Nome: {{ usuario.nome }} </p>
-    <p>Login: {{ usuario.login }}</p>
-    <p>Perfil: {{ usuario.perfil }}</p>
+
+<div mat-dialog-actions align="end" class="mt-8 text-right border-t pt-4">
+  <button mat-button (click)="dialog.close()" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-100">Fechar</button>
 </div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark"
-    (click)="activeModal.close()">Fechar</button>
 </div>

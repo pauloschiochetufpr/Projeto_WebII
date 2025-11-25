@@ -1,20 +1,14 @@
 <body class="min-h-screen bg-gray-50 flex items-center justify-center">
   <div class="w-full max-w-2xl p-4">
-   <div class="flex justify-around">
-      <div class="">
-          <h2>Categoria de Equipamento</h2>
-        </div>  
-      <div class="flex justify-end mb-3">
-       <!--  <a [routerLink]="['/categoriaEquipamento/novaCategoria']" href="#" title="Novo" alt="Novo">
-          <i class="fa fa-plus"></i>
-          Nova Categoria
-        </a> -->
-          <button class="px-3 py-2 rounded border text-sm" [routerLink]="['/categoriaEquipamento/novaCategoria']" title="Novo">
-               <i class="fa fa-plus"></i>
-          Nova Categoria
-          </button>
-        </div>
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-xl font-bold">Categoria de Equipamento</h2>
+      <a class="px-3 py-2 rounded border text-sm inline-flex items-center"
+         [routerLink]="['/categoriaEquipamento/novaCategoria']"
+         title="Novo">
+        <i class="fa fa-plus mr-1"></i> Nova Categoria
+      </a>
     </div>
+
     <div class="bg-white rounded shadow overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="bg-gray-100 text-left">
@@ -26,33 +20,31 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border-t" *ngFor="let Categoria of categoriasEquipamento">
-            <td class="px-4 py-2">{{Categoria.id}}</td>
-            <td class="px-4 py-2">{{Categoria.nome}}</td>
-            <td class="px-4 py-2">{{Categoria.ativo}}</td>
+          <tr class="border-t" *ngFor="let categoria of categoriasEquipamento">
+            <td class="px-4 py-2">{{categoria.id}}</td>
+            <td class="px-4 py-2">{{categoria.nome}}</td>
+            <td class="px-4 py-2">{{categoria.ativo ? 'Ativo' : 'Não-ativo'}}</td>
             <td class="px-4 py-2 text-center">
-             <a href="#" title="Editar" alt="Editar" 
-                [routerLink]="['/categoriaEquipamento/editarCategoria', Categoria.id]">
+              <!-- EDITAR -->
+              <a [routerLink]="['/categoriaEquipamento/editarCategoria', categoria.id]" 
+                 class="inline-flex items-center p-1 mr-2 text-blue-500" 
+                 title="Editar">
                 <i class="fas fa-edit"></i>
-              </a> 
-             <!--  <button aria-label="Editar" class="inline-flex items-center p-1 mr-2"
-                [routerLink]="['/categoriaEquipamento/editarCategoria', Categoria.id]">
-                <i class="fas fa-edit"></i>
-              </button> -->
-              <!-- <button aria-label="Excluir" class="inline-flex items-center p-1">
-                <i class="fas fa-trash-alt"></i>
-              </button> -->
-              <a href="#" title="Remover" alt="Remover" class="inline-flex items-center p-1"
-                (click)="remover($event, Categoria)">
-                <i class="fas fa-trash-alt"></i>
               </a>
+              <!-- REMOVER -->
+              <button (click)="remover(categoria.id, categoria.nome)" 
+                      class="inline-flex items-center p-1 text-red-500"
+                      title="Remover">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </td>
           </tr>
-          
         </tbody>
-        
       </table>
-      <p *ngIf="categoriasEquipamento.length===0">Nenhuma categoria cadastrada</p>
+
+      <p *ngIf="categoriasEquipamento.length === 0" class="p-4 text-center text-gray-500">
+        Nenhuma categoria cadastrada
+      </p>
     </div>
   </div>
 </body>
