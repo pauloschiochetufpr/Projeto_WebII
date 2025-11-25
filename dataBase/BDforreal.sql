@@ -73,9 +73,6 @@ INSERT INTO categoria (nome) VALUES
 ('Mouse'),
 ('Teclado');
 
-INSERT INTO categoria (nome) VALUES 
-('treko');
-
 CREATE TABLE funcionario (
     id_funcionario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(64) NOT NULL,

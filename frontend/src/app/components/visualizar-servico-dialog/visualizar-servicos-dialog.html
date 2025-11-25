@@ -1,4 +1,6 @@
-<div class="p-6 w-full max-w-3xl bg-white rounded-lg shadow-lg">
+<div
+  class="p-6 w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-y-scroll h-fit max-h-screen"
+>
   <!-- Cabeçalho -->
   <div class="flex items-center justify-between border-b pb-3 mb-4">
     <h2
@@ -49,7 +51,11 @@
 
   <!-- Histórico -->
   <div class="mb-6">
-    <h3 class="text-lg font-semibold mb-3 select-none">Histórico</h3>
+    <h3
+      class="text-lg font-semibold mb-3 select-none max-h-[30vh] overflow-y-scroll"
+    >
+      Histórico
+    </h3>
 
     <ul
       *ngIf="data?.user?.history?.length; else semHistorico"
