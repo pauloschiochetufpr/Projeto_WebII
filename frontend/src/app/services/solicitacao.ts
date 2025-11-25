@@ -7,6 +7,8 @@ import {
   CategoriaEquipamento,
 } from '../models/solicitacao.model';
 import { environment } from '../../environments/environment';
+import { jwtDecode } from 'jwt-decode';
+import { tap } from 'rxjs/operators';
 
 export interface SolicitacaoDto {
   idSolicitacao: number;
@@ -38,23 +40,21 @@ export interface HistSolicitacao {
 })
 export class SolicitacaoService {
   private baseUrl = `${environment.apiUrl}/solicitacoes`;
+  private usuarioId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.extrairToken();
+  }
 
-  private mapCategoria(nomeCategoria: string): number {
-    switch (nomeCategoria?.toLowerCase()) {
-      case 'notebook':
-        return 1;
-      case 'desktop':
-        return 2;
-      case 'impressora':
-        return 3;
-      case 'mouse':
-        return 4;
-      case 'teclado':
-        return 5;
-      default:
-        return 0;
+  extrairToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const payload: any = jwtDecode(token);
+      this.usuarioId = payload.id || null; //
+    } catch (e) {
+      console.error('Erro ao decodificar token:', e);
     }
   }
 
@@ -137,24 +137,35 @@ export class SolicitacaoService {
       );
   }
 
-  // cliente cria solicitação (mexer só no id pra ser o de quem esta criando)
-  criarSolicitacao(data: SolicitacaoCreateDto): Observable<SolicitacaoDto> {
+  criarSolicitacao(data: any): Observable<any> {
+    console.log('[Service] criarSolicitacao chamado com data:', data);
+
+    const idCategoria = Number(data.categoriaEquipamento);
+    console.log('[Service] idCategoria convertido:', idCategoria);
+
+    if (isNaN(idCategoria)) {
+      console.error('[Service] Categoria inválida');
+      return throwError(() => new Error('Categoria inválida.'));
+    }
+
     const dto = {
       nome: data.descricaoEquipamento,
       descricao: data.descricaoDefeito,
-      idCliente: 1, // TODO: pegar do usuário autenticado
-      idCategoria: this.mapCategoria(data.categoriaEquipamento),
+      idCliente: this.usuarioId,
       valor: 0,
       idStatus: 1,
+      idCategoria: idCategoria,
       ativo: true,
     };
 
-    console.log('Enviando solicitação:', dto); // Para debug
+    console.log('[Service] DTO criado:', dto);
 
-    return this.http.post<SolicitacaoDto>(this.baseUrl, dto).pipe(
-      catchError((err) => {
-        console.error('Erro detalhado:', err);
-        return throwError(() => err);
+    return this.http.post<any>(this.baseUrl, dto).pipe(
+      tap({
+        next: (res) =>
+          console.log('[Service] Requisição HTTP bem-sucedida:', res),
+        error: (err) =>
+          console.error('[Service] Erro na requisição HTTP:', err),
       })
     );
   }
@@ -209,13 +220,7 @@ export class SolicitacaoService {
         catchError((err) => {
           console.error('Erro ao carregar categorias do backend', err);
           // Fallback em caso de erro
-          return of([
-            { id: 1, nome: 'Notebook', ativo: true },
-            { id: 2, nome: 'Desktop', ativo: true },
-            { id: 3, nome: 'Impressora', ativo: true },
-            { id: 4, nome: 'Mouse', ativo: true },
-            { id: 5, nome: 'Teclado', ativo: true },
-          ]);
+          return of([{ id: 0, nome: 'erro', ativo: true }]);
         })
       );
   }

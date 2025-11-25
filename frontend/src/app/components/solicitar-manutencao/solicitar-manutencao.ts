@@ -1,14 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { SolicitacaoService } from '../../services/solicitacao';
-import {
-  SolicitacaoCreateDto,
-  CategoriaEquipamento,
-} from '../../models/solicitacao.model';
 
 @Component({
   selector: 'app-solicitar-manutencao',
@@ -17,15 +13,14 @@ import {
   templateUrl: './solicitar-manutencao.html',
 })
 export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
-  formData: SolicitacaoCreateDto = {
+  formData: any = {
     descricaoEquipamento: '',
-    categoriaEquipamento: '',
+    categoriaEquipamento: null,
     descricaoDefeito: '',
   };
 
-  categorias: CategoriaEquipamento[] = [];
+  categorias: any[] = [];
   loading = false;
-  loadingCategorias = false;
   error: string | null = null;
   success: string | null = null;
 
@@ -45,93 +40,72 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
   }
 
   private loadCategorias(): void {
-    this.loadingCategorias = true;
     const s = this.solicitacaoService.getCategorias().subscribe({
-      next: (categorias) => {
-        this.categorias = categorias;
-        this.loadingCategorias = false;
+      next: (cats) => {
+        console.log('[Component] Categorias recebidas do service:', cats);
+
+        // Corrige para que cada categoria tenha a propriedade `id` que o select espera
+        this.categorias = cats.map((c: any) => ({
+          id: c.idCategoria, // <- aqui estava o problema
+          nome: c.nome,
+          ativo: c.ativo,
+        }));
+
+        // Log para confirmar
+        this.categorias.forEach((c: any, i: number) => {
+          console.log(
+            `[Component] Categoria[${i}] id:`,
+            c.id,
+            'tipo:',
+            typeof c.id
+          );
+        });
       },
-      error: (err) => {
-        console.error('Erro ao carregar categorias', err);
-        this.loadingCategorias = false;
-        // Fallback
-        this.categorias = [
-          { id: 1, nome: 'Notebook', ativo: true },
-          { id: 2, nome: 'Desktop', ativo: true },
-          { id: 3, nome: 'Impressora', ativo: true },
-          { id: 4, nome: 'Mouse', ativo: true },
-          { id: 5, nome: 'Teclado', ativo: true },
-        ];
-      },
+      error: (err) =>
+        console.error('[Component] Erro ao carregar categorias', err),
     });
     this.sub.add(s);
   }
 
   onSubmit(): void {
-    if (!this.validarForm()) {
+    console.log('[Component] onSubmit chamado', this.formData);
+
+    if (
+      !this.formData.descricaoEquipamento.trim() ||
+      this.formData.categoriaEquipamento == null ||
+      !this.formData.descricaoDefeito.trim()
+    ) {
+      this.error = 'Preencha todos os campos obrigatórios.';
+      console.warn('[Component] Form inválido:', this.formData);
       return;
     }
 
     this.loading = true;
-    this.error = null;
-    this.success = null;
+    console.log('[Component] Form válido. Chamando service...');
 
     const s = this.solicitacaoService
       .criarSolicitacao(this.formData)
       .subscribe({
-        next: (response) => {
+        next: (res) => {
+          console.log('[Component] Solicitação enviada com sucesso:', res);
           this.success = 'Solicitação enviada com sucesso!';
           this.loading = false;
 
-          // Limpar formulário após 2 segundos e redirecionar
           setTimeout(() => {
-            this.resetForm();
+            console.log('[Component] Redirecionando para /');
             this.router.navigate(['/']);
           }, 2000);
         },
         error: (err) => {
-          console.error('Erro ao enviar solicitação', err);
-          this.error = 'Erro ao enviar solicitação. Tente novamente.';
+          console.error('[Component] Erro ao enviar solicitação:', err);
+          this.error = 'Erro ao enviar solicitação.';
           this.loading = false;
         },
       });
+
     this.sub.add(s);
   }
 
-  private validarForm(): boolean {
-    if (!this.formData.descricaoEquipamento?.trim()) {
-      this.error = 'Descrição do equipamento é obrigatória';
-      return false;
-    }
-    if (this.formData.descricaoEquipamento.length < 5) {
-      this.error = 'Descrição do equipamento deve ter pelo menos 5 caracteres';
-      return false;
-    }
-    if (!this.formData.categoriaEquipamento) {
-      this.error = 'Selecione uma categoria';
-      return false;
-    }
-    if (!this.formData.descricaoDefeito?.trim()) {
-      this.error = 'Descrição do defeito é obrigatória';
-      return false;
-    }
-    if (this.formData.descricaoDefeito.length < 10) {
-      this.error = 'Descrição do defeito deve ter pelo menos 10 caracteres';
-      return false;
-    }
-    return true;
-  }
-  //
-  private resetForm(): void {
-    this.formData = {
-      descricaoEquipamento: '',
-      categoriaEquipamento: '',
-      descricaoDefeito: '',
-    };
-    this.error = null;
-    this.success = null;
-  }
-  //voltar p inicio
   goBack(): void {
     this.router.navigate(['/']);
   }

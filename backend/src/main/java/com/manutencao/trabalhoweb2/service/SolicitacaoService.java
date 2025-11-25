@@ -50,7 +50,8 @@ public class SolicitacaoService {
 }
 
 
-    // ===============================================================
+    
+// ===============================================================
 // LISTAR TODAS COM JOIN (COMPLETO)
 // ===============================================================
 public List<SolicitacaoLastUpdateDto> listarTodasComUltimoHistorico() {
@@ -179,24 +180,24 @@ public List<SolicitacaoLastUpdateDto> listarPorClienteComLastUpdate(Long cliente
 
     @Transactional
    public Solicitacao criar(SolicitacaoDto dto) {
-    Solicitacao s = new Solicitacao();
-    atualizarCampos(s, dto);
+        Solicitacao s = new Solicitacao();
+        atualizarCampos(s, dto);
 
-    Solicitacao saved = solicitacaoRepository.save(s);
+        Solicitacao saved = solicitacaoRepository.save(s);
 
-    HistSolicitacao hist = new HistSolicitacao();
-    hist.setSolicitacao(saved);
-    hist.setCliente(true);
-    hist.setStatusOld(null);
-    hist.setStatusNew("ABERTA");
-    hist.setFuncionarioOld(null);
-    hist.setFuncionarioNew(null);
-    hist.setDataHora(LocalDateTime.now());
+        HistSolicitacao hist = new HistSolicitacao();
+        hist.setSolicitacao(saved);
+        hist.setCliente(true);
+        hist.setStatusOld(null);
+        hist.setStatusNew("ABERTA");
+        hist.setFuncionarioOld(null);
+        hist.setFuncionarioNew(null);
+        hist.setDataHora(LocalDateTime.now());
 
-    histSolicitacaoRepository.save(hist);
+        histSolicitacaoRepository.save(hist);
 
-    return saved;
-}
+        return saved;
+    }
 
     @Transactional
     public Solicitacao atualizar(Long id, SolicitacaoDto dto) {

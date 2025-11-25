@@ -18,7 +18,6 @@
     <button
       (click)="goBack()"
       class="font-semibold font-sansation text-white px-6 py-2 rounded-lg bg-roxo-terc hover:shadow-inner hover:shadow-gray-600 transition-shadow ease-in-out duration-300 select-none"
-      type="button"
     >
       Voltar
     </button>
@@ -28,147 +27,89 @@
     *ngIf="success"
     class="mb-6 p-4 bg-verde-sec/10 border border-verde-sec/50 rounded-lg"
   >
-    <div class="flex items-center">
-      <span class="text-verde-sec mr-2 text-xl">✓</span>
-      <span class="text-verde-sec font-medium font-sansation select-none">{{
-        success
-      }}</span>
-    </div>
-    <p class="text-verde-sec/90 text-sm mt-1 font-sansation select-none">
-      Sua solicitação foi **ABERTA**.
+    <p class="text-verde-sec font-medium font-sansation select-none">
+      ✓ {{ success }}
     </p>
   </div>
 
   <div
     *ngIf="error"
-    class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg select-none"
+    class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg"
   >
-    <div class="flex items-center select-none">
-      <span class="text-red-600 mr-2 text-xl">✗</span>
-      <span class="text-red-800 font-medium font-sansation">{{ error }}</span>
-    </div>
-  </div>
-
-  <div class="bg-gray-50 border rounded-lg p-8 shadow-inner">
-    <form (ngSubmit)="onSubmit()" #form="ngForm">
-      <div class="mb-4">
-        <label
-          for="descricaoEquipamento"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
-        >
-          Descrição do Equipamento *
-        </label>
-        <input
-          type="text"
-          id="descricaoEquipamento"
-          name="descricaoEquipamento"
-          [(ngModel)]="formData.descricaoEquipamento"
-          required
-          maxlength="100"
-          placeholder="Ex: Notebook Dell"
-          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
-        />
-        <div
-          class="mt-1 text-xs text-gray-500 text-right font-sansation select-none"
-        >
-          {{ formData.descricaoEquipamento?.length || 0 }}/100 caracteres
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <label
-          for="categoriaEquipamento"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
-        >
-          Categoria do Equipamento *
-        </label>
-        <select
-          id="categoriaEquipamento"
-          name="categoriaEquipamento"
-          [(ngModel)]="formData.categoriaEquipamento"
-          required
-          [disabled]="loadingCategorias"
-          class="select-none w-full px-4 py-2 border-2 border-azul-main/50 rounded-md appearance-none font-sansation text-slate-800 bg-white focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none disabled:bg-gray-200"
-        >
-          <option value="">
-            {{
-              loadingCategorias
-                ? "Carregando categorias..."
-                : "Selecione uma categoria"
-            }}
-          </option>
-          <option *ngFor="let categoria of categorias" [value]="categoria.nome">
-            {{ categoria.nome }}
-          </option>
-        </select>
-        <div
-          class="select-none pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-        ></div>
-      </div>
-
-      <div class="mb-6">
-        <label
-          for="descricaoDefeito"
-          class="block text-sm font-semibold text-azul-main font-sansation mb-2 select-none"
-        >
-          Descrição do Defeito *
-        </label>
-        <textarea
-          id="descricaoDefeito"
-          name="descricaoDefeito"
-          [(ngModel)]="formData.descricaoDefeito"
-          required
-          rows="4"
-          maxlength="500"
-          placeholder="Qual o problema?"
-          class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 resize-none focus:border-verde-sec focus:ring-1 focus:ring-verde-sec transition duration-150 outline-none"
-        ></textarea>
-        <div
-          class="mt-1 text-xs text-gray-500 text-right font-sansation select-none"
-        >
-          {{ formData.descricaoDefeito?.length || 0 }}/500 caracteres
-        </div>
-      </div>
-
-      <div class="flex justify-end">
-        <button
-          type="submit"
-          [disabled]="loading || form.invalid"
-          class="select-none font-semibold font-sansation py-2 px-8 rounded-lg transition duration-300 shadow-md flex items-center bg-verde-sec hover:bg-verde-sec/90 text-azul-main disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-        >
-          <span *ngIf="loading" class="mr-2">
-            <svg
-              class="animate-spin h-4 w-4 text-azul-main"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </span>
-          {{ loading ? "Enviando..." : "Solicitar Manutenção" }}
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <div class="mt-6 p-4 bg-azul-main/10 border border-azul-main/30 rounded-lg">
-    <p class="text-azul-main text-sm font-sansation select-none">
-      <strong>Observação:</strong>
-      Você será notificado por e-mail quando nós fizermos e mandarmos o
-      orçamento, fique no aguardo e atento.
+    <p class="text-red-800 font-medium font-sansation select-none">
+      ✗ {{ error }}
     </p>
   </div>
+
+  <!-- FORMULÁRIO -->
+  <form
+    #form="ngForm"
+    (ngSubmit)="onSubmit()"
+    class="bg-gray-50 border rounded-lg p-8 shadow-inner"
+  >
+    <!-- Descrição Equipamento -->
+    <div class="mb-4">
+      <label
+        class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >Descrição do Equipamento *</label
+      >
+      <input
+        type="text"
+        name="descricaoEquipamento"
+        [(ngModel)]="formData.descricaoEquipamento"
+        required
+        minlength="5"
+        maxlength="100"
+        class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation text-slate-800 focus:border-verde-sec outline-none"
+      />
+    </div>
+
+    <!-- Categoria -->
+    <div class="mb-4">
+      <label
+        class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >Categoria do Equipamento *</label
+      >
+
+      <select
+        name="categoriaEquipamento"
+        [(ngModel)]="formData.categoriaEquipamento"
+        required
+        class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation bg-white text-slate-800 focus:border-verde-sec outline-none"
+      >
+        <option [ngValue]="null">Selecione uma categoria</option>
+        <option *ngFor="let c of categorias" [ngValue]="c.id">
+          {{ c.nome }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Defeito -->
+    <div class="mb-6">
+      <label
+        class="block text-sm font-semibold text-azul-main font-sansation mb-2"
+        >Descrição do Defeito *</label
+      >
+      <textarea
+        name="descricaoDefeito"
+        [(ngModel)]="formData.descricaoDefeito"
+        required
+        minlength="10"
+        maxlength="500"
+        rows="4"
+        class="w-full px-4 py-2 border-2 border-azul-main/50 rounded-md font-sansation resize-none focus:border-verde-sec outline-none"
+      ></textarea>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="font-semibold font-sansation py-2 px-8 rounded-lg transition duration-300 shadow-md flex items-center bg-verde-sec hover:bg-verde-sec/90 text-azul-main disabled:bg-gray-300 disabled:text-gray-500"
+      >
+        <span *ngIf="loading" class="mr-2 animate-spin">⟳</span>
+        {{ loading ? "Enviando..." : "Solicitar Manutenção" }}
+      </button>
+    </div>
+  </form>
 </div>

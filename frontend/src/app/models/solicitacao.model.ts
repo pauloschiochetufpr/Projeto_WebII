@@ -1,6 +1,6 @@
 export interface SolicitacaoCreateDto {
   descricaoEquipamento: string;
-  categoriaEquipamento: string;
+  categoriaEquipamento: number | null;
   descricaoDefeito: string;
 }
 
@@ -9,7 +9,7 @@ export interface Solicitation {
   id?: number | string;
   idCliente?: number;
   descricaoEquipamento?: string;
-  categoriaEquipamento?: string;
+  categoriaEquipamento: number;
   descricaoDefeito?: string;
   dataHora?: string;
   idStatus?: number;
@@ -20,31 +20,30 @@ export interface Solicitation {
 
 export class CategoriaEquipamento {
   constructor(
-    public id: number = 0, 
+    public id: number = 0,
     public nome: string = '',
     public ativo: boolean = true
   ) {}
 }
 
 export class Cliente {
-  constructor (
-    public idCliente : number, 
-    public cpf: string='',
-    public nome: string='',
-    public email : string='',
-    public telefone : string='',
-    public ativo : boolean=true,
-  ){}
+  constructor(
+    public idCliente: number,
+    public cpf: string = '',
+    public nome: string = '',
+    public email: string = '',
+    public telefone: string = '',
+    public ativo: boolean = true
+  ) {}
 }
 
 export class Funcionario {
   constructor(
-    public idFuncionario : number,
-    public nome : string='', 
-    public email : string='',
-    public dataNasc : string='',
-    public telefone : string='',
-	  public ativo : boolean=true,
-  ){}
+    public idFuncionario: number,
+    public nome: string = '',
+    public email: string = '',
+    public dataNasc: string = '',
+    public telefone: string = '',
+    public ativo: boolean = true
+  ) {}
 }
-
