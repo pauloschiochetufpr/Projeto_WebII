@@ -46,7 +46,7 @@ export class SolicitarManutencaoComponent implements OnInit, OnDestroy {
 
         // Corrige para que cada categoria tenha a propriedade `id` que o select espera
         this.categorias = cats.map((c: any) => ({
-          id: c.idCategoria, // <- aqui estava o problema
+          id: c.id,
           nome: c.nome,
           ativo: c.ativo,
         }));

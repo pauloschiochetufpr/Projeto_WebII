@@ -59,9 +59,7 @@
             <th class="p-3 text-left text-sm font-semibold text-white">
               Descrição
             </th>
-            <th class="p-3 text-center text-sm font-semibold text-white">
-              Ações
-            </th>
+            <th class="p-3 text-center text-sm font-semibold text-white"></th>
           </tr>
         </thead>
 
@@ -76,14 +74,7 @@
             <td class="p-3 text-sm text-slate-700">
               {{ getDescriptionTruncated(s, 30) }}
             </td>
-            <td class="p-3 text-sm text-center">
-              <a
-                class="select-none cursor-pointer inline-block px-4 py-2 rounded-md bg-verde-sec bg-opacity-100 text-azul-main font-semibold transition hover:shadow-gray-600 hover:shadow-inner"
-                title="Ir para Orçar"
-              >
-                Orçar
-              </a>
-            </td>
+            <td class="p-3 text-sm text-center"></td>
           </tr>
 
           <tr *ngIf="!loading && solicitations.length === 0">
